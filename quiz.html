@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Explorer Quiz</title>
+    <!-- Favicon using your logo.png -->
+    <link rel="icon" type="image/png" href="logo.jpg">
+    <link rel="apple-touch-icon" href="logo.jpg">
+    <meta name="msapplication-TileImage" content="logo.png">
+    <meta name="theme-color" content="#0a2a43">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 50%, #0066cc 100%);
+            min-height: 100vh;
+        }
+
+        .ocean-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, 
+                #001f3f 0%, 
+                #003366 20%, 
+                #0066cc 60%, 
+                #4da6ff 100%
+            );
+            overflow: hidden;
+        }
+
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(90vh) scale(1);
+            }
+            90% {
+                opacity: 1;
+                transform: translateY(-10vh) scale(1);
+            }
+        }
+
+        .game-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Welcome Screen */
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .fish-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: swim 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes swim {
+            0% { transform: translateX(-10px) rotate(-5deg); }
+            100% { transform: translateX(10px) rotate(5deg); }
+        }
+
+        .welcome-card h1 {
+            font-size: 2.5rem;
+            color: #001f3f;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .welcome-card p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Quiz Screen */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .level-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .level-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .score-info .score {
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .question-container {
+            margin-bottom: 2rem;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .question-card h2 {
+            color: #001f3f;
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .answer-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .answer-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: #3a7bd5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .answer-btn.correct {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            border-color: #00b894;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .answer-btn.incorrect {
+            background: linear-gradient(135deg, #e17055, #d63031);
+            color: white;
+            border-color: #d63031;
+            animation: incorrectShake 0.6s ease;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes incorrectShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .quiz-footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        /* Level Complete Screen */
+        .celebration-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .celebration-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .celebration-card h2 {
+            color: #001f3f;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .level-stats {
+            margin-bottom: 2rem;
+            color: #666;
+        }
+
+        .level-stats p {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .sea-fact-container {
+            margin-bottom: 2rem;
+        }
+
+        .sea-fact-container h3 {
+            color: #0066cc;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .sea-fact-card {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(116, 185, 255, 0.3);
+        }
+
+        .sea-fact-card p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Game Complete Screen */
+        .victory-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .trophy-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            animation: trophy 2s ease-in-out infinite;
+        }
+
+        @keyframes trophy {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-5deg) scale(1.05); }
+            75% { transform: rotate(5deg) scale(1.05); }
+        }
+
+        .victory-card h1 {
+            color: #001f3f;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .victory-card p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .final-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0066cc;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 10px 25px rgba(58, 123, 213, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 10px;
+            }
+            
+            .welcome-card,
+            .celebration-card,
+            .victory-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .welcome-card h1,
+            .victory-card h1 {
+                font-size: 2rem;
+            }
+            
+            .quiz-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .level-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .progress-bar {
+                width: 150px;
+            }
+            
+            .final-stats {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .stat {
+                padding: 0.75rem;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            
+            .fish-icon,
+            .celebration-icon {
+                font-size: 3rem;
+            }
+            
+            .trophy-icon {
+                font-size: 4rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-card h1,
+            .victory-card h1 {
+                font-size: 1.75rem;
+            }
+            
+            .question-card h2 {
+                font-size: 1.2rem;
+            }
+            
+            .celebration-card h2 {
+                font-size: 1.5rem;
+            }
+            
+            .btn {
+                padding: 0.875rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ocean-background">
+        <div class="bubbles" id="bubbles-container"></div>
+        
+        <div class="game-container">
+            <!-- Start Screen -->
+            <div id="start-screen" class="screen active">
+                <div class="welcome-card">
+                    <div class="fish-icon">🐠</div>
+                    <h1>Ocean Explorer Quiz</h1>
+                    <p>Dive deep into the mysteries of the sea! Answer questions correctly to unlock fascinating sea facts and progress through 10 exciting levels.</p>
+                    <button id="start-btn" class="btn btn-primary">Start Your Adventure</button>
+                </div>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div id="quiz-screen" class="screen">
+                <div class="quiz-header">
+                    <div class="level-info">
+                        <span class="level-badge">Level <span id="current-level">1</span></span>
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="score-info">
+                        <span class="score">Score: <span id="current-score">0</span></span>
+                    </div>
+                </div>
+
+                <div class="question-container">
+                    <div class="question-card">
+                        <h2 id="question-text">Loading question...</h2>
+                        <div id="answers-container" class="answers-grid">
+                            <!-- Answers will be dynamically inserted -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiz-footer">
+                    <div class="question-counter">
+                        Question <span id="question-number">1</span> of <span id="total-questions">5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level Complete Screen -->
+            <div id="level-complete-screen" class="screen">
+                <div class="celebration-card">
+                    <div class="celebration-icon">🎉</div>
+                    <h2>Level Complete!</h2>
+                    <div class="level-stats">
+                        <p>Level <span id="completed-level">1</span> finished!</p>
+                        <p>Score: <span id="level-score">0</span> points</p>
+                    </div>
+                    
+                    <div class="sea-fact-container">
+                        <h3>🌊 Sea Fact Unlocked!</h3>
+                        <div class="sea-fact-card">
+                            <p id="sea-fact-text">Loading sea fact...</p>
+                        </div>
+                    </div>
+                    
+                    <button id="next-level-btn" class="btn btn-primary">Continue to Next Level</button>
+                </div>
+            </div>
+
+            <!-- Game Complete Screen -->
+            <div id="game-complete-screen" class="screen">
+                <div class="victory-card">
+                    <div class="trophy-icon">🏆</div>
+                    <h1>Ocean Master!</h1>
+                    <p>Congratulations! You've completed all 10 levels and become a true Ocean Explorer!</p>
+                    <div class="final-stats">
+                        <div class="stat">
+                            <span class="stat-value" id="final-score">0</span>
+                            <span class="stat-label">Total Score</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">10</span>
+                            <span class="stat-label">Levels Mastered</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">10</span>
+                            <span class="stat-label">Sea Facts Learned</span>
+                        </div>
+                    </div>
+                    <button id="play-again-btn" class="btn btn-primary">Play Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game Data
+        const gameData = {
+            questions: [
+                // Level 1 - Easy
+                [
+                    {
+                        question: "What is the largest fish in the ocean?",
+                        answers: ["Great White Shark", "Whale Shark", "Blue Whale", "Tuna"],
+                        correct: 1
+                    },
+                    {
+                        question: "How many hearts does an octopus have?",
+                        answers: ["1", "2", "3", "4"],
+                        correct: 2
+                    },
+                    {
+                        question: "What do you call a group of fish?",
+                        answers: ["Flock", "Herd", "School", "Pack"],
+                        correct: 2
+                    },
+                    {
+                        question: "Which ocean is the largest?",
+                        answers: ["Atlantic", "Pacific", "Indian", "Arctic"],
+                        correct: 1
+                    },
+                    {
+                        question: "What color is a seahorse's blood?",
+                        answers: ["Red", "Blue", "Green", "Transparent"],
+                        correct: 3
+                    }
+                ],
+                // Level 2
+                [
+                    {
+                        question: "How do fish breathe underwater?",
+                        answers: ["Through their skin", "Through gills", "They hold their breath", "Through their fins"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is the deepest part of the ocean called?",
+                        answers: ["Mariana Trench", "Grand Canyon", "Bermuda Triangle", "Pacific Ridge"],
+                        correct: 0
+                    },
+                    {
+                        question: "Which fish can change its gender?",
+                        answers: ["Goldfish", "Clownfish", "Shark", "Tuna"],
+                        correct: 1
+                    },
+                    {
+                        question: "What percentage of the ocean have humans explored?",
+                        answers: ["Less than 5%", "About 25%", "Around 50%", "Over 75%"],
+                        correct: 0
+                    },
+                    {
+                        question: "How do dolphins sleep?",
+                        answers: ["Completely unconscious", "One brain hemisphere at a time", "Standing up", "They don't sleep"],
+                        correct: 1
+                    }
+                ],
+                // Level 3
+                [
+                    {
+                        question: "What is bioluminescence?",
+                        answers: ["Fish migration", "Light produced by living organisms", "Deep sea pressure", "Ocean currents"],
+                        correct: 1
+                    },
+                    {
+                        question: "How many species of sharks exist?",
+                        answers: ["About 50", "Over 500", "Around 100", "Less than 25"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is the fastest marine animal?",
+                        answers: ["Dolphin", "Tuna", "Sailfish", "Marlin"],
+                        correct: 2
+                    },
+                    {
+                        question: "Which sea creature has the most powerful bite?",
+                        answers: ["Great White Shark", "Saltwater Crocodile", "Orca", "Giant Squid"],
+                        correct: 1
+                    },
+                    {
+                        question: "How old can sea turtles live?",
+                        answers: ["20-30 years", "50-80 years", "Over 100 years", "200+ years"],
+                        correct: 2
+                    }
+                ],
+                // Level 4
+                [
+                    {
+                        question: "What causes ocean tides?",
+                        answers: ["Wind", "Earth's rotation", "Moon's gravitational pull", "Temperature changes"],
+                        correct: 2
+                    },
+                    {
+                        question: "Which fish is known for its electricity generation?",
+                        answers: ["Electric Eel", "Stingray", "Electric Ray", "All of the above"],
+                        correct: 3
+                    },
+                    {
+                        question: "What is the 'twilight zone' in the ocean?",
+                        answers: ["Surface layer", "Middle depth with little light", "Ocean floor", "Coral reef area"],
+                        correct: 1
+                    },
+                    {
+                        question: "How do anglerfish attract prey?",
+                        answers: ["Loud sounds", "Bright colors", "Bioluminescent lure", "Fast swimming"],
+                        correct: 2
+                    },
+                    {
+                        question: "What is the largest structure built by living creatures?",
+                        answers: ["Giant kelp forest", "Great Barrier Reef", "Sargasso Sea", "Antarctic ice shelf"],
+                        correct: 1
+                    }
+                ],
+                // Level 5
+                [
+                    {
+                        question: "How do whales communicate over long distances?",
+                        answers: ["Echolocation", "Low-frequency songs", "Body language", "Chemical signals"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is unique about a shark's skeleton?",
+                        answers: ["It's made of bone", "It's made of cartilage", "It's hollow", "It changes color"],
+                        correct: 1
+                    },
+                    {
+                        question: "Which ocean zone has no light?",
+                        answers: ["Sunlight zone", "Twilight zone", "Midnight zone", "Abyssal zone"],
+                        correct: 3
+                    },
+                    {
+                        question: "How do sea otters prevent themselves from drifting apart while sleeping?",
+                        answers: ["They anchor to rocks", "They hold hands", "They sleep on shore", "They don't sleep in water"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is a group of whales called?",
+                        answers: ["School", "Pod", "Herd", "Colony"],
+                        correct: 1
+                    }
+                ],
+                // Level 6
+                [
+                    {
+                        question: "How many chambers does a fish heart have?",
+                        answers: ["1", "2", "3", "4"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is the Great Pacific Garbage Patch?",
+                        answers: ["A natural algae bloom", "A collection of marine debris", "An underwater volcano", "A type of coral reef"],
+                        correct: 1
+                    },
+                    {
+                        question: "Which fish can live in both fresh and salt water?",
+                        answers: ["Goldfish", "Salmon", "Clownfish", "Angelfish"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is the purpose of a fish's lateral line?",
+                        answers: ["Decoration", "Detect water movement and pressure", "Store energy", "Change color"],
+                        correct: 1
+                    },
+                    {
+                        question: "How do sea cucumbers defend themselves?",
+                        answers: ["They hide in shells", "They expel internal organs", "They change color", "They swim away quickly"],
+                        correct: 1
+                    }
+                ],
+                // Level 7
+                [
+                    {
+                        question: "What is the average depth of the ocean?",
+                        answers: ["1,000 meters", "2,500 meters", "4,000 meters", "6,000 meters"],
+                        correct: 2
+                    },
+                    {
+                        question: "Which marine animal has the best eyesight?",
+                        answers: ["Dolphin", "Octopus", "Mantis Shrimp", "Eagle Ray"],
+                        correct: 2
+                    },
+                    {
+                        question: "How do coral reefs form?",
+                        answers: ["Volcanic activity", "Calcium carbonate skeletons of coral polyps", "Sediment deposits", "Algae growth"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is the function of a shark's spiracle?",
+                        answers: ["Hearing", "Breathing while resting", "Detecting electrical fields", "Navigation"],
+                        correct: 1
+                    },
+                    {
+                        question: "Which fish is considered a 'living fossil'?",
+                        answers: ["Shark", "Coelacanth", "Sturgeon", "Lungfish"],
+                        correct: 1
+                    }
+                ],
+                // Level 8
+                [
+                    {
+                        question: "What is ocean acidification?",
+                        answers: ["Natural pH changes", "Pollution from acid rain", "CO2 absorption making water more acidic", "Volcanic underwater activity"],
+                        correct: 2
+                    },
+                    {
+                        question: "How do deep-sea creatures survive extreme pressure?",
+                        answers: ["Thick shells", "Special proteins and no gas-filled organs", "Hibernation", "They migrate to shallow water"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is the vampire squid's unique defense mechanism?",
+                        answers: ["Ink cloud", "Turns itself inside out", "Bioluminescent display", "All of the above"],
+                        correct: 3
+                    },
+                    {
+                        question: "How long can a sperm whale hold its breath?",
+                        answers: ["30 minutes", "Up to 90 minutes", "2 hours", "4 hours"],
+                        correct: 1
+                    },
+                    {
+                        question: "What causes the different colors in tropical fish?",
+                        answers: ["Diet", "Chromatophores and structural coloration", "Water temperature", "Age"],
+                        correct: 1
+                    }
+                ],
+                // Level 9
+                [
+                    {
+                        question: "What is hydrothermal vent?",
+                        answers: ["Underwater tornado", "Hot water springs on ocean floor", "Type of coral", "Deep ocean current"],
+                        correct: 1
+                    },
+                    {
+                        question: "How do fish regulate their buoyancy?",
+                        answers: ["Swimming constantly", "Swim bladder", "Changing body density", "Air bubbles"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is the longest migration in the animal kingdom?",
+                        answers: ["Gray whale", "Arctic tern", "Leatherback turtle", "Salmon"],
+                        correct: 1
+                    },
+                    {
+                        question: "How do cleaner fish benefit their clients?",
+                        answers: ["Provide protection", "Remove parasites and dead tissue", "Share food", "Warn of predators"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is the deepest living fish ever recorded?",
+                        answers: ["Barreleye fish", "Snailfish", "Fangtooth", "Hatchetfish"],
+                        correct: 1
+                    }
+                ],
+                // Level 10 - Expert
+                [
+                    {
+                        question: "What is the role of the ocean's thermohaline circulation?",
+                        answers: ["Creates waves", "Global heat and nutrient distribution", "Generates tides", "Forms coral reefs"],
+                        correct: 1
+                    },
+                    {
+                        question: "How do some fish produce antifreeze proteins?",
+                        answers: ["Special diet", "Genetic adaptation to prevent ice crystal formation", "Body heat generation", "Thick skin"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is the 'elevator strategy' used by some marine animals?",
+                        answers: ["Vertical migration for feeding", "Deep diving technique", "Mating behavior", "Predator avoidance"],
+                        correct: 0
+                    },
+                    {
+                        question: "How do giant tube worms near hydrothermal vents get energy?",
+                        answers: ["Photosynthesis", "Chemosynthetic bacteria", "Filter feeding", "Hunting small fish"],
+                        correct: 1
+                    },
+                    {
+                        question: "What percentage of Earth's oxygen is produced by marine phytoplankton?",
+                        answers: ["25%", "50-70%", "10%", "90%"],
+                        correct: 1
+                    }
+                ]
+            ],
+            
+            seaFacts: [
+                "The ocean contains 99% of Earth's living space and is home to over 2 million marine species!",
+                "Dolphins have names for each other! They use unique whistle signatures to identify themselves.",
+                "The Great Barrier Reef is so large it can be seen from space and is home to over 1,500 species of fish!",
+                "A single blue whale's heart is as big as a small car and can weigh as much as 400 pounds!",
+                "Sea otters hold hands while sleeping to prevent drifting apart - they also use tools like rocks to crack open shellfish!",
+                "The giant Pacific octopus has three hearts, blue blood, and can change both color and texture instantly!",
+                "Seahorses are the only species where males get pregnant and give birth to their young!",
+                "The ocean's deepest point, Challenger Deep in the Mariana Trench, is deeper than Mount Everest is tall!",
+                "Some deep-sea creatures create their own light through bioluminescence - over 80% of deep-sea animals glow!",
+                "The ocean produces more than half of the world's oxygen and absorbs 25% of all carbon dioxide emissions!"
+            ]
+        };
+
+        // Fish Quiz Game Class
+        class FishQuiz {
+            constructor() {
+                this.currentLevel = 1;
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.questionsPerLevel = 5;
+                this.totalLevels = 10;
+                this.selectedAnswers = [];
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.showScreen('start-screen');
+                this.createBubbles();
+            }
+            
+            initializeElements() {
+                // Screens
+                this.startScreen = document.getElementById('start-screen');
+                this.quizScreen = document.getElementById('quiz-screen');
+                this.levelCompleteScreen = document.getElementById('level-complete-screen');
+                this.gameCompleteScreen = document.getElementById('game-complete-screen');
+                
+                // Buttons
+                this.startBtn = document.getElementById('start-btn');
+                this.nextLevelBtn = document.getElementById('next-level-btn');
+                this.playAgainBtn = document.getElementById('play-again-btn');
+                
+                // Quiz elements
+                this.currentLevelSpan = document.getElementById('current-level');
+                this.progressFill = document.getElementById('progress-fill');
+                this.currentScoreSpan = document.getElementById('current-score');
+                this.questionText = document.getElementById('question-text');
+                this.answersContainer = document.getElementById('answers-container');
+                this.questionNumber = document.getElementById('question-number');
+                this.totalQuestions = document.getElementById('total-questions');
+                
+                // Level complete elements
+                this.completedLevel = document.getElementById('completed-level');
+                this.levelScore = document.getElementById('level-score');
+                this.seaFactText = document.getElementById('sea-fact-text');
+                
+                // Game complete elements
+                this.finalScore = document.getElementById('final-score');
+                
+                // Set total questions
+                this.totalQuestions.textContent = this.questionsPerLevel;
+            }
+            
+            bindEvents() {
+                this.startBtn.addEventListener('click', () => this.startGame());
+                this.nextLevelBtn.addEventListener('click', () => this.nextLevel());
+                this.playAgainBtn.addEventListener('click', () => this.resetGame());
+            }
+            
+            showScreen(screenId) {
+                document.querySelectorAll('.screen').forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                document.getElementById(screenId).classList.add('active');
+            }
+            
+            startGame() {
+                this.currentLevel = 1;
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.updateUI();
+                this.showScreen('quiz-screen');
+                this.loadQuestion();
+            }
+            
+            updateUI() {
+                this.currentLevelSpan.textContent = this.currentLevel;
+                this.currentScoreSpan.textContent = this.score;
+                this.questionNumber.textContent = this.currentQuestion + 1;
+                
+                // Update progress bar
+                const overallProgress = ((this.currentLevel - 1) * this.questionsPerLevel + this.currentQuestion) / (this.totalLevels * this.questionsPerLevel) * 100;
+                this.progressFill.style.width = `${overallProgress}%`;
+            }
+            
+            loadQuestion() {
+                const levelQuestions = gameData.questions[this.currentLevel - 1];
+                const question = levelQuestions[this.currentQuestion];
+                
+                this.questionText.textContent = question.question;
+                this.answersContainer.innerHTML = '';
+                
+                question.answers.forEach((answer, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'answer-btn';
+                    button.textContent = answer;
+                    button.addEventListener('click', () => this.selectAnswer(index));
+                    this.answersContainer.appendChild(button);
+                });
+                
+                this.updateUI();
+            }
+            
+            selectAnswer(selectedIndex) {
+                const levelQuestions = gameData.questions[this.currentLevel - 1];
+                const question = levelQuestions[this.currentQuestion];
+                const buttons = this.answersContainer.querySelectorAll('.answer-btn');
+                
+                // Disable all buttons
+                buttons.forEach(btn => btn.style.pointerEvents = 'none');
+                
+                // Show correct/incorrect
+                buttons[selectedIndex].classList.add(selectedIndex === question.correct ? 'correct' : 'incorrect');
+                
+                if (selectedIndex !== question.correct) {
+                    buttons[question.correct].classList.add('correct');
+                }
+                
+                // Update score
+                if (selectedIndex === question.correct) {
+                    this.score += 10;
+                }
+                
+                // Move to next question after delay
+                setTimeout(() => {
+                    this.currentQuestion++;
+                    
+                    if (this.currentQuestion >= this.questionsPerLevel) {
+                        this.completeLevel();
+                    } else {
+                        this.loadQuestion();
+                    }
+                }, 1500);
+            }
+            
+            completeLevel() {
+                this.completedLevel.textContent = this.currentLevel;
+                this.levelScore.textContent = this.score;
+                this.seaFactText.textContent = gameData.seaFacts[this.currentLevel - 1];
+                
+                if (this.currentLevel >= this.totalLevels) {
+                    // Game complete
+                    setTimeout(() => {
+                        this.completeGame();
+                    }, 3000);
+                } else {
+                    this.showScreen('level-complete-screen');
+                }
+            }
+            
+            nextLevel() {
+                this.currentLevel++;
+                this.currentQuestion = 0;
+                this.showScreen('quiz-screen');
+                this.loadQuestion();
+            }
+            
+            completeGame() {
+                this.finalScore.textContent = this.score;
+                this.showScreen('game-complete-screen');
+                
+                // Add celebration animation
+                this.createConfetti();
+            }
+            
+            resetGame() {
+                this.currentLevel = 1;
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.showScreen('start-screen');
+            }
+            
+            createConfetti() {
+                // Simple confetti effect
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
+                
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.style.position = 'fixed';
+                        confetti.style.left = Math.random() * 100 + 'vw';
+                        confetti.style.top = '-10px';
+                        confetti.style.width = '10px';
+                        confetti.style.height = '10px';
+                        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.pointerEvents = 'none';
+                        confetti.style.zIndex = '1000';
+                        confetti.style.borderRadius = '50%';
+                        
+                        document.body.appendChild(confetti);
+                        
+                        const fallAnimation = confetti.animate([
+                            { transform: 'translateY(-10px) rotate(0deg)', opacity: 1 },
+                            { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                        ], {
+                            duration: 3000 + Math.random() * 2000,
+                            easing: 'ease-in'
+                        });
+                        
+                        fallAnimation.onfinish = () => {
+                            confetti.remove();
+                        };
+                    }, i * 100);
+                }
+            }
+
+            createBubbles() {
+                const bubblesContainer = document.getElementById('bubbles-container');
+                
+                // Create initial bubbles
+                for (let i = 0; i < 10; i++) {
+                    this.createBubble(bubblesContainer);
+                }
+                
+                // Continue creating bubbles
+                setInterval(() => {
+                    this.createBubble(bubblesContainer);
+                }, 2000);
+            }
+
+            createBubble(container) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.width = (Math.random() * 20 + 10) + 'px';
+                bubble.style.height = bubble.style.width;
+                bubble.style.animationDelay = Math.random() * 2 + 's';
+                bubble.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                
+                container.appendChild(bubble);
+                
+                setTimeout(() => {
+                    if (bubble.parentNode) {
+                        bubble.remove();
+                    }
+                }, 8000);
+            }
+        }
+
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new FishQuiz();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vaquita - The World's Most Endangered Marine Mammal</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo.jpg">
+  <link rel="apple-touch-icon" href="logo.jpg">
+  <meta name="msapplication-TileImage" content="logo.png">
+  <meta name="theme-color" content="#0a2a43">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --ocean-blue: #1a456b;
+      --light-teal: #80deea;
+      --pale-blue: #e1f5fe;
+      --alert-red: rgba(255, 82, 82, 0.6);
+      --white: #ffffff;
+      --dark-ocean: #0d3961;
+      --conservation-green: rgba(38, 166, 154, 0.3);
+      --wave-blue: #006994;
+      --coral: #ff7f50;
+      --aqua: #4db8ff;
+      --seafoam: #00ffaa;
+      --sunset: #ff8e53;
+    }
+
+    /* NAVIGATION STYLES */
+    /* Top Navigation Bar */
+    .top-nav {
+      background: rgba(5, 20, 35, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 15px 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 999;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+      display: none; /* Hidden by default, shown on desktop */
+    }
+
+    .top-nav-container {
+      max-width: min(1200px, 90%);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--light-teal);
+      text-decoration: none;
+    }
+
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 5px;
+    }
+
+    .nav-item {
+      position: relative;
+    }
+
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      display: block;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* Different colors for each nav item */
+    .nav-link.games { background: var(--aqua); }
+    .nav-link.convo { background: var(--seafoam); }
+    .nav-link.donate { background: var(--coral); }
+    .nav-link.animals { background: var(--sunset); }
+    .nav-link.pollution { background: #9b5de5; }
+    .nav-link.about { background: #00bbf9; }
+    .nav-link.contact { background: #00f5d4; }
+    .nav-link.news { background: #f15bb5; }
+    .nav-link.visit { background: #feaf40; }
+    .nav-link.home { background: #4db8ff; }
+
+    /* HAMBURGER MENU */
+    .hamburger-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .hamburger-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--aqua);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 1001;
+    }
+
+    .hamburger-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(77, 184, 255, 0.6);
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      margin: 2px 0;
+      background: white;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-btn.active span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-btn.active span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .hamburger-nav {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 300px;
+      height: 100vh;
+      background: rgba(5, 20, 35, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      transition: right 0.4s ease;
+      padding: 80px 20px 20px;
+      overflow-y: auto;
+      box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .hamburger-nav.active {
+      right: 0;
+    }
+
+    .hamburger-tabs {
+      list-style: none;
+      width: 100%;
+    }
+
+    .hamburger-tab {
+      width: 100%;
+      margin-bottom: 5px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .hamburger-tab a {
+      display: flex;
+      align-items: center;
+      padding: 18px 20px;
+      text-decoration: none;
+      color: white;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a i {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a span {
+      margin-left: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .hamburger-tab:hover {
+      transform: translateX(-5px);
+    }
+
+    /* Different colors for each tab */
+    .tab1 { background: var(--aqua); }
+    .tab2 { background: var(--seafoam); }
+    .tab3 { background: var(--coral); }
+    .tab4 { background: var(--sunset); }
+    .tab5 { background: #9b5de5; }
+    .tab6 { background: #00bbf9; }
+    .tab7 { background: #00f5d4; }
+    .tab8 { background: #f15bb5; }
+    .tab9 { background: #feaf40; }
+
+    /* Active tab indicator */
+    .hamburger-tab.active {
+      box-shadow: inset 5px 0 0 white;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      color: var(--white);
+      background-image: url('lpk.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      padding: clamp(10px, 2vw, 20px);
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* Bubble animation - optimized for performance */
+    .bubble {
+      position: fixed;
+      bottom: -100px;
+      z-index: -1; /* Behind content */
+      color: rgba(255, 255, 255, 0.6);
+      user-select: none;
+      pointer-events: none;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.1));
+      animation-name: bubbles-rise;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      display: none; /* Hidden by default */
+    }
+
+    @keyframes bubbles-rise {
+      0% { 
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 0.3;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% { 
+        transform: translateY(-120vh) translateX(15vw) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .container {
+      max-width: min(960px, 90%);
+      margin: 0 auto;
+      padding: clamp(20px, 3vw, 30px);
+      background-color: rgba(26, 69, 107, 0.85);
+      border-radius: 8px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      text-transform: uppercase;
+      font-size: clamp(0.7rem, 2vw, 0.9rem);
+      color: var(--light-teal);
+      font-weight: bold;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 6vw, 2.5rem);
+      margin: 0;
+      color: var(--white);
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .species-name {
+      font-style: italic;
+      color: var(--pale-blue);
+      margin: 5px 0 clamp(15px, 3vw, 25px);
+      font-size: clamp(1rem, 3vw, 1.2rem);
+    }
+
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: clamp(15px, 3vw, 20px);
+      margin-bottom: clamp(20px, 3vw, 30px);
+      min-height: min(350px, 40vw);
+    }
+
+    .image-background {
+      flex: 2;
+      min-width: 300px;
+      background-image: url('lpk.jpg');
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .image-caption {
+      background-color: rgba(13, 57, 97, 0.9);
+      color: white;
+      padding: clamp(15px, 3vw, 25px);
+      flex: 1;
+      border-radius: 8px;
+      min-width: min(250px, 100%);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .image-caption h4 {
+      margin: 0 0 clamp(10px, 2vw, 15px);
+      font-size: clamp(0.9rem, 3vw, 1.1rem);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--light-teal);
+    }
+
+    .image-caption p {
+      margin: clamp(8px, 2vw, 12px) 0;
+      font-size: clamp(0.9rem, 2vw, 1rem);
+    }
+
+    .content p {
+      margin-bottom: clamp(15px, 3vw, 25px);
+      line-height: 1.7;
+      font-size: clamp(0.95rem, 2vw, 1.05rem);
+    }
+
+    .vaquita-fact {
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: clamp(10px, 2vw, 15px);
+      border-left: 4px solid var(--light-teal);
+      margin: clamp(15px, 3vw, 20px) 0;
+      font-style: italic;
+    }
+
+    .emergency-alert {
+      background-color: rgba(255, 82, 82, 0.3);
+      padding: clamp(15px, 3vw, 20px);
+      border: 2px solid var(--alert-red);
+      border-radius: 8px;
+      margin: clamp(20px, 3vw, 25px) 0;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(255, 82, 82, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); }
+    }
+
+    .resources {
+      margin-top: clamp(25px, 5vw, 40px);
+      padding-top: clamp(15px, 3vw, 20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .resources a {
+      color: var(--light-teal);
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: clamp(10px, 2vw, 15px);
+      transition: color 0.3s;
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .resources a:hover {
+      color: #4dd0e1;
+      text-decoration: underline;
+    }
+
+    ul {
+      margin: clamp(10px, 2vw, 15px) 0;
+      padding-left: clamp(15px, 3vw, 20px);
+    }
+
+    li {
+      margin-bottom: clamp(5px, 1vw, 8px);
+      font-size: clamp(0.95rem, 2vw, 1rem);
+    }
+
+    .conservation-callout {
+      background: linear-gradient(135deg, var(--conservation-green), rgba(26, 119, 111, 0.5));
+      padding: clamp(15px, 3vw, 20px);
+      border-radius: 8px;
+      margin: clamp(20px, 3vw, 25px) 0;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    @media (min-width: 769px) {
+      .top-nav {
+        display: block;
+      }
+      .hamburger-menu {
+        display: none;
+      }
+      .container {
+        margin-top: 80px; /* Make space for the fixed navbar */
+      }
+      .bubble {
+        display: block;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .image-container {
+        flex-direction: column;
+      }
+
+      .image-background {
+        width: 100%;
+        min-height: 200px;
+        flex: none;
+      }
+
+      .image-caption {
+        width: 100%;
+        flex: none;
+      }
+      
+      body {
+        background-attachment: scroll;
+      }
+      
+      .emergency-alert {
+        animation: none; /* Disable pulse on mobile for performance */
+      }
+      
+      .hamburger-nav {
+        width: 80%;
+        max-width: 300px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .image-background {
+        min-height: 150px;
+      }
+      
+      .resources a {
+        display: block;
+        margin-right: 0;
+        margin-bottom: 8px;
+      }
+      
+      .hamburger-btn {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .hamburger-btn span {
+        width: 22px;
+        height: 2.5px;
+      }
+      
+      .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .nav-link {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- TOP NAVIGATION BAR (Desktop) -->
+  <nav class="top-nav">
+    <div class="top-nav-container">
+      <a href="daliy.html" class="nav-logo">DISCOVER THE WONDERS UNDER THE SEA</a>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="gemes.html" class="nav-link games">Games</a></li>
+        <li class="nav-item"><a href="chat.html" class="nav-link convo">Convo</a></li>
+        <li class="nav-item"><a href="DONATE.HTML" class="nav-link donate">Donate</a></li>
+        <li class="nav-item"><a href="animals.html" class="nav-link animals">Animals</a></li>
+        <li class="nav-item"><a href="#" class="nav-link pollution">Man Node Pollution</a></li>
+        <li class="nav-item"><a href="#" class="nav-link about">About</a></li>
+        <li class="nav-item"><a href="contact.html" class="nav-link contact">Contact</a></li>
+        <li class="nav-item"><a href="news.html" class="nav-link news">News</a></li>
+        <li class="nav-item"><a href="visit.html" class="nav-link visit">Visit</a></li>
+        <li class="nav-item"><a href="daliy.html" class="nav-link home">Home</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HAMBURGER MENU (Mobile) -->
+  <div class="hamburger-menu">
+    <div class="hamburger-btn" id="hamburgerBtn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <!-- HAMBURGER NAVIGATION (Mobile) -->
+  <nav class="hamburger-nav" id="hamburgerNav">
+    <ul class="hamburger-tabs">
+      <li class="hamburger-tab tab1">
+        <a href="daliy.html">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab2">
+        <a href="gemes.html">
+          <i class="fas fa-gamepad"></i>
+          <span>Games</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab3">
+        <a href="chat.html">
+          <i class="fas fa-comments"></i>
+          <span>Convo</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab4">
+        <a href="DONATE.HTML">
+          <i class="fas fa-donate"></i>
+          <span>Donate</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab5">
+        <a href="animals.html">
+          <i class="fas fa-paw"></i>
+          <span>Animals</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab6">
+        <a href="#">
+          <i class="fas fa-industry"></i>
+          <span>Man Node Pollution</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab7">
+        <a href="#">
+          <i class="fas fa-info-circle"></i>
+          <span>About</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab8">
+        <a href="contact.html">
+          <i class="fas fa-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab9">
+        <a href="news.html">
+          <i class="fas fa-newspaper"></i>
+          <span>News</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab10">
+        <a href="visit.html">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Visit</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Bubbles will be added here by JavaScript -->
+  
+  <div class="container">
+    <div class="section-title">Critically Endangered Species</div>
+    <h1>Vaquita</h1>
+    <div class="species-name">Phocoena sinus</div>
+
+    <div class="image-container">
+      <div class="image-background"></div>
+      <div class="image-caption">
+        <h4>Distribution</h4>
+        <p>Northern Gulf of California, Mexico</p>
+        <h4>Habitat</h4>
+        <p>Shallow, murky lagoons near coastline</p>
+        <h4>Size</h4>
+        <p>1.5m (5ft) length, 55kg (120lbs) weight</p>
+        <h4>Taxonomy</h4>
+        <p>Family: Phocoenidae (porpoises)</p>
+        <h4>Population</h4>
+        <p>Fewer than 10 individuals remain (2023 estimate)</p>
+      </div>
+    </div>
+
+    <div class="content">
+      <p>
+        The vaquita is the world's most endangered marine mammal, with possibly fewer than 10 individuals remaining in the wild. This small porpoise was only discovered in 1958 and is endemic to Mexico's Gulf of California. Vaquitas are easily recognized by their distinctive dark eye rings and lip patches, giving them a "panda-like" appearance.
+      </p>
+      
+      <div class="vaquita-fact">
+        Vaquita means "little cow" in Spanish. They are the smallest cetaceans in the world and have the most limited range of any marine mammal.
+      </div>
+      
+      <div class="emergency-alert">
+        <h4>CRITICAL STATUS: IMMINENT EXTINCTION</h4>
+        <p>The vaquita population has declined by 98% since 2011 due to bycatch in illegal gillnets. Without immediate, drastic action, this species will go extinct within years.</p>
+      </div>
+      
+      <p>
+        Vaquitas face one primary threat:
+        <ul>
+          <li><strong>Illegal gillnet fishing</strong> for totoaba fish (also endangered)</li>
+        </ul>
+        
+        The totoaba's swim bladder is prized in Chinese traditional medicine, fetching up to $46,000/kg on the black market. Vaquitas become entangled in these nets and drown.
+      </p>
+
+      <div class="conservation-callout">
+        <h4>Conservation Efforts</h4>
+        <p>Despite the dire situation, there is still hope:</p>
+        <ul>
+          <li>Gillnet ban in vaquita habitat (2017)</li>
+          <li>Increased enforcement by Mexican Navy</li>
+          <li>International conservation partnerships</li>
+          <li>Attempts at captive breeding (unsuccessful)</li>
+          <li>Development of alternative fishing gear</li>
+        </ul>
+        <p>In 2021, Mexico launched the "Zero Tolerance" initiative to combat illegal fishing in the Vaquita Refuge Area.</p>
+      </div>
+      
+      <p>
+        The vaquita's story represents the complex intersection of wildlife conservation, illegal trade, and local livelihoods. While the situation appears bleak, conservationists emphasize that vaquitas are resilient animals that can recover if given protection from gillnets. Their survival depends on eliminating illegal fishing in their remaining habitat.
+      </p>
+    </div>
+
+    <div class="resources">
+      <strong>Help Save the Vaquita:</strong><br>
+      <a href="https://www.vivavaquita.org/" target="_blank">Viva Vaquita Conservation</a>
+      <a href="https://www.seashepherd.org/operation-milagro/" target="_blank">Sea Shepherd Operation Milagro</a>
+      <a href="https://www.iucnredlist.org/species/17028/50370296" target="_blank">IUCN Red List</a>
+      <a href="https://www.worldwildlife.org/species/vaquita" target="_blank">WWF Vaquita</a>
+      <a href="https://porpoise.org/save-the-vaquita/" target="_blank">Porpoise Conservation Society</a>
+    </div>
+  </div>
+
+  <script>
+    // NAVIGATION FUNCTIONALITY
+    function setupNavigation() {
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const hamburgerNav = document.getElementById('hamburgerNav');
+      
+      hamburgerBtn.addEventListener('click', function() {
+        this.classList.toggle('active');
+        hamburgerNav.classList.toggle('active');
+        
+        // Prevent body scrolling when nav is open
+        if (hamburgerNav.classList.contains('active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Close nav when clicking outside on mobile
+      document.addEventListener('click', function(e) {
+        if (hamburgerNav.classList.contains('active') && 
+            !hamburgerNav.contains(e.target) && 
+            !hamburgerBtn.contains(e.target)) {
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Add active class to clicked tab
+      document.querySelectorAll('.hamburger-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Close nav after selection
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      });
+    }
+
+    // Create bubbles - only on desktop for performance
+    document.addEventListener('DOMContentLoaded', function() {
+      setupNavigation();
+      
+      if (window.innerWidth > 768) { // Only on larger screens
+        const bubbleCount = 25; // Reduced for performance
+        const body = document.querySelector('body');
+        
+        for (let i = 0; i < bubbleCount; i++) {
+          const bubble = document.createElement('div');
+          bubble.className = 'bubble';
+          
+          // Randomize properties
+          const size = Math.random() * 20 + 10;
+          const left = Math.random() * 100;
+          const opacity = Math.random() * 0.5 + 0.2;
+          const animationDuration = Math.random() * 15 + 10;
+          const animationDelay = Math.random() * 5;
+          
+          bubble.style.width = `${size}px`;
+          bubble.style.height = `${size}px`;
+          bubble.style.left = `${left}vw`;
+          bubble.style.opacity = opacity;
+          bubble.style.animationDuration = `${animationDuration}s`;
+          bubble.style.animationDelay = `${animationDelay}s`;
+          
+          body.appendChild(bubble);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

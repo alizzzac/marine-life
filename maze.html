@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fish Maze Adventure - 10 Levels</title>
+    <!-- Favicon -->
+<!-- Favicon using your logo.png -->
+    <link rel="icon" type="image/png" href="logo.jpg">
+    <link rel="apple-touch-icon" href="logo.jpg">
+    <meta name="msapplication-TileImage" content="logo.png">
+    <meta name="theme-color" content="#0a2a43">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐠</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: 
+                url('b.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .game-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            max-width: min(95vw, 900px);
+            width: 100%;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            color: #98e0da;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            color: #aedfdb;
+            font-weight: bold;
+            flex-wrap: wrap;
+        }
+
+        .level-info {
+            background: rgba(15, 118, 110, 0.2);
+            padding: 8px 16px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: #0f766e;
+            font-weight: bold;
+        }
+
+        .maze-container {
+            position: relative;
+            margin: 15px auto;
+            border: 4px solid #0891b2;
+            border-radius: 10px;
+            background: #1e40af;
+            padding: 8px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 100%;
+        }
+
+        .maze {
+            position: relative;
+            display: grid;
+            gap: 1px;
+            margin: 0 auto;
+            max-width: 100%;
+        }
+
+        .cell {
+            position: relative;
+        }
+
+        .wall {
+            background: #475569;
+            border: 1px solid #334155;
+        }
+
+        .path {
+            background: #a7f3d0;
+            border: 1px solid #6ee7b7;
+        }
+
+        .player {
+            position: absolute;
+            background: #3b82f6;
+            border: 2px solid #1d4ed8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: all 0.2s ease;
+            top: 2px;
+            left: 2px;
+        }
+
+        .fish {
+            position: absolute;
+            background: #f97316;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            top: 3px;
+            left: 3px;
+            animation: pulse 2s infinite;
+        }
+
+        .goal {
+            position: absolute;
+            background: #fbbf24;
+            border: 2px solid #f59e0b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            top: 3px;
+            left: 3px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .controls {
+            margin-top: 15px;
+            color: #0f766e;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
+
+        .game-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #0891b2;
+            color: white;
+            border: none;
+            padding: clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px);
+            border-radius: 8px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            background: #0e7490;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: clamp(20px, 5vw, 40px);
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalAppear 0.5s ease;
+            max-width: min(90vw, 500px);
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .fact-modal .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .discount-modal .modal-content {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        @keyframes modalAppear {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            color: #0f766e;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 15px;
+        }
+
+        .fact-modal .modal-content h2,
+        .discount-modal .modal-content h2 {
+            color: white;
+        }
+
+        .modal-content p {
+            color: #475569;
+            font-size: clamp(1rem, 3vw, 1.1rem);
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .fact-modal .modal-content p,
+        .discount-modal .modal-content p {
+            color: #e2e8f0;
+        }
+
+        .fish-emoji {
+            font-size: clamp(2rem, 6vw, 4rem);
+            margin-bottom: 15px;
+        }
+
+        .collected {
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .fact-details {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .fact-details strong {
+            color: #fbbf24;
+        }
+
+        .discount-details {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .discount-code {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: inline-block;
+        }
+
+        /* Touch controls for mobile devices */
+        .touch-controls {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 15px;
+            width: 200px;
+            height: 200px;
+            margin: 15px auto 0;
+        }
+
+        .touch-btn {
+            background: rgba(8, 145, 178, 0.7);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .touch-btn:active {
+            background: rgba(14, 116, 144, 0.7);
+            transform: scale(0.95);
+        }
+
+        .touch-up {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .touch-left {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .touch-right {
+            grid-column: 3;
+            grid-row: 2;
+        }
+
+        .touch-down {
+            grid-column: 2;
+            grid-row: 3;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .game-info {
+                flex-direction: column;
+                gap: 8px;
+                align-items: center;
+            }
+            
+            .game-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .maze-container {
+                padding: 5px;
+            }
+
+            .touch-controls {
+                display: grid;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .level-info {
+                padding: 6px 12px;
+            }
+            
+            .game-info {
+                font-size: 0.9rem;
+            }
+            
+            .controls p {
+                font-size: 0.85rem;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+                min-width: 100px;
+            }
+        }
+
+        @media (max-height: 600px) and (orientation: landscape) {
+            .game-container {
+                max-height: 90vh;
+                padding: 10px;
+            }
+            
+            h1 {
+                margin-bottom: 5px;
+                font-size: 1.5rem;
+            }
+            
+            .level-info {
+                margin-bottom: 5px;
+            }
+            
+            .game-info {
+                margin-bottom: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .maze-container {
+                margin: 10px auto;
+            }
+            
+            .controls {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🐠 Fish Maze Adventure 🐠</h1>
+        
+        <div class="level-info">
+            Level <span id="currentLevel">1</span> of 10
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 10%"></div>
+        </div>
+        
+        <div class="game-info">
+            <div>🐟 Score: <span id="score">0</span></div>
+            <div>🎣 Fish: <span id="fishCount">0</span>/<span id="totalFish">5</span></div>
+            <div>⏰ Time: <span id="timer">0:00</span></div>
+            <div>📚 Facts: <span id="factsCount">0</span></div>
+            <div>💰 Discount Points: <span id="discountPoints">0</span></div>
+        </div>
+
+        <div class="maze-container">
+            <div id="maze" class="maze"></div>
+        </div>
+
+        <!-- Touch controls for mobile -->
+        <div class="touch-controls">
+            <div class="touch-btn touch-up" onclick="movePlayerTouch('ArrowUp')">↑</div>
+            <div class="touch-btn touch-left" onclick="movePlayerTouch('ArrowLeft')">←</div>
+            <div class="touch-btn touch-right" onclick="movePlayerTouch('ArrowRight')">→</div>
+            <div class="touch-btn touch-down" onclick="movePlayerTouch('ArrowDown')">↓</div>
+        </div>
+
+        <div class="controls">
+            <p>Use arrow keys or WASD to move your fish through the maze and collect educational fish facts!</p>
+            <div class="game-buttons">
+                <button class="btn" onclick="newGame()">🔄 New Game</button>
+                <button class="btn" onclick="nextLevel()" id="nextLevelBtn" disabled>➡️ Next Level</button>
+                <button class="btn" onclick="previousLevel()" id="prevLevelBtn" disabled>⬅️ Previous Level</button>
+                <button class="btn" onclick="resetLevel()">🔄 Reset Level</button>
+                <button class="btn" onclick="showDiscountModal()">💲 Redeem Points</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fish Fact Modal -->
+    <div id="fishFactModal" class="modal fact-modal">
+        <div class="modal-content">
+            <div class="fish-emoji" id="factFishEmoji">🐠</div>
+            <h2 id="factFishName">Amazing Fish Fact!</h2>
+            <div class="fact-details">
+                <p><strong>Scientific Name:</strong> <span id="factScientificName"></span></p>
+                <p><strong>Habitat:</strong> <span id="factHabitat"></span></p>
+                <p><strong>Size:</strong> <span id="factSize"></span></p>
+                <p><strong>Diet:</strong> <span id="factDiet"></span></p>
+                <p><strong>Fun Fact:</strong> <span id="factFunFact"></span></p>
+            </div>
+            <div class="game-buttons">
+                <button class="btn" onclick="closeFishFact()">Continue Adventure! 🌊</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discount Modal -->
+    <div id="discountModal" class="modal discount-modal">
+        <div class="modal-content">
+            <div class="fish-emoji">💰</div>
+            <h2>Redeem Your Points</h2>
+            <div class="discount-details">
+                <p>You have earned <strong><span id="currentPointsDisplay">0</span> discount points</strong>!</p>
+                <p>Every 10 points can be redeemed for a discount code.</p>
+                <p>Current exchange rate: <strong>10 points = 1% discount</strong></p>
+                
+                <div id="discountOptions" style="display: none;">
+                    <p>Select how many points to redeem:</p>
+                    <select id="pointsToRedeem" class="btn" style="width: 100%; margin: 10px 0;">
+                        <option value="10">10 points (1% discount)</option>
+                        <option value="20">20 points (2% discount)</option>
+                        <option value="30">30 points (3% discount)</option>
+                        <option value="40">40 points (4% discount)</option>
+                        <option value="50">50 points (5% discount)</option>
+                    </select>
+                    <button class="btn" onclick="generateDiscountCode()">Generate Discount Code</button>
+                </div>
+                
+                <div id="discountCodeDisplay" style="display: none;">
+                    <p>Here's your discount code:</p>
+                    <div class="discount-code" id="generatedDiscountCode">FISH10</div>
+                    <p>Use this code at checkout for your discount!</p>
+                    <button class="btn" onclick="closeDiscountModal()">Close</button>
+                </div>
+                
+                <div id="notEnoughPoints" style="display: none;">
+                    <p>You don't have enough points to redeem yet.</p>
+                    <p>Keep playing to earn more points!</p>
+                    <button class="btn" onclick="closeDiscountModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Level Complete Modal -->
+    <div id="completionModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">🏆 Level Complete! 🏆</h2>
+            <p id="modalMessage">You completed the underwater maze!</p>
+            <p><strong>Level Score: <span id="levelScore">0</span></strong></p>
+            <p><strong>Total Score: <span id="totalScore">0</span></strong></p>
+            <p>Time: <span id="finalTime">0:00</span></p>
+            <p>Fish Facts Learned: <span id="modalFactsCount">0</span></p>
+            <p>Discount Points Earned: <span id="modalPointsEarned">10</span></p>
+            <div class="game-buttons">
+                <button class="btn" onclick="nextLevel()" id="modalNextBtn">Next Level</button>
+                <button class="btn" onclick="newGame()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced fish facts database with more detailed information
+        const fishFacts = [
+            {
+                name: "Blue Tang",
+                emoji: "🐟",
+                scientificName: "Paracanthurus hepatus",
+                habitat: "Tropical coral reefs in the Pacific Ocean",
+                size: "12 inches (30 cm)",
+                diet: "Algae, zooplankton, and small invertebrates",
+                funFact: "Also known as Dory from Finding Nemo! They can live up to 20 years and are essential for reef health by eating algae."
+            },
+            {
+                name: "Clownfish",
+                emoji: "🐠",
+                scientificName: "Amphiprioninae",
+                habitat: "Sea anemones in warm tropical waters",
+                size: "3-4 inches (7-10 cm)",
+                diet: "Algae, zooplankton, worms, and small crustaceans",
+                funFact: "They are immune to sea anemone stings and form symbiotic relationships! All clownfish are born male and can change to female."
+            },
+            {
+                name: "Angelfish",
+                emoji: "🐟",
+                scientificName: "Pomacanthidae",
+                habitat: "Tropical marine coral reefs and rocky areas",
+                size: "6-24 inches (15-60 cm)",
+                diet: "Sponges, algae, and small invertebrates",
+                funFact: "They can live up to 15 years and change colors dramatically as they age from juvenile to adult!"
+            },
+            {
+                name: "Pufferfish",
+                emoji: "🐡",
+                scientificName: "Tetraodontidae",
+                habitat: "Tropical and subtropical coastal waters",
+                size: "1-24 inches (2.5-60 cm)",
+                diet: "Mollusks, crustaceans, algae, and coral",
+                funFact: "They can inflate to several times their normal size when threatened! Some species are highly toxic to predators."
+            },
+            {
+                name: "Seahorse",
+                emoji: "🐴",
+                scientificName: "Hippocampus",
+                habitat: "Shallow tropical and temperate coastal waters",
+                size: "0.6-14 inches (1.5-35 cm)",
+                diet: "Small crustaceans, plankton, and tiny fish",
+                funFact: "Males are the ones who get pregnant and give birth! They can move their eyes independently and have no stomach."
+            },
+            {
+                name: "Manta Ray",
+                emoji: "🐟",
+                scientificName: "Mobula birostris",
+                habitat: "Open ocean and coastal waters worldwide",
+                size: "15-23 feet wingspan (4.5-7 m)",
+                diet: "Plankton, small fish, and krill",
+                funFact: "They have the largest brain of any fish and are highly intelligent! They can live up to 50 years."
+            },
+            {
+                name: "Great White Shark",
+                emoji: "🦈",
+                scientificName: "Carcharodon carcharias",
+                habitat: "Coastal waters in temperate oceans worldwide",
+                size: "15-20 feet (4.5-6 m)",
+                diet: "Seals, sea lions, fish, and sea turtles",
+                funFact: "They can detect a single drop of blood in 25 gallons of water and sense electrical fields from other animals!"
+            },
+            {
+                name: "Goldfish",
+                emoji: "🐠",
+                scientificName: "Carassius auratus",
+                habitat: "Freshwater lakes, ponds, and rivers",
+                size: "6-8 inches (15-20 cm)",
+                diet: "Plants, insects, small crustaceans, and algae",
+                funFact: "They can remember things for months, not just 3 seconds! They can see ultraviolet and infrared light."
+            },
+            {
+                name: "Betta Fish",
+                emoji: "🐟",
+                scientificName: "Betta splendens",
+                habitat: "Shallow freshwater in Southeast Asia",
+                size: "2.5-3 inches (6-7.5 cm)",
+                diet: "Insects, larvae, and small crustaceans",
+                funFact: "Males build bubble nests to attract females and are extremely territorial! They can breathe air from the surface."
+            },
+            {
+                name: "Tuna",
+                emoji: "🐟",
+                scientificName: "Thunnini",
+                habitat: "Open ocean waters worldwide",
+                size: "3-10 feet (1-3 m)",
+                diet: "Fish, squid, and crustaceans",
+                funFact: "They can swim at speeds up to 47 mph and are warm-blooded! Their body temperature can be 18°F warmer than water."
+            },
+            {
+                name: "Salmon",
+                emoji: "🐟",
+                scientificName: "Salmonidae",
+                habitat: "Both freshwater rivers and saltwater oceans",
+                size: "12-30 inches (30-75 cm)",
+                diet: "Insects, small fish, and crustaceans",
+                funFact: "They can navigate thousands of miles back to their exact birthplace using their sense of smell!"
+            },
+            {
+                name: "Neon Tetra",
+                emoji: "🐠",
+                scientificName: "Paracheirodon innesi",
+                habitat: "Amazon Basin freshwater rivers",
+                size: "1.2 inches (3 cm)",
+                diet: "Small insects, plants, and algae",
+                funFact: "They school in groups of hundreds for protection and create stunning underwater displays! Their colors fade at night."
+            },
+            {
+                name: "Lionfish",
+                emoji: "🐟",
+                scientificName: "Pterois",
+                habitat: "Coral reefs and rocky crevices",
+                size: "6-15 inches (15-38 cm)",
+                diet: "Small fish and invertebrates",
+                funFact: "Their venomous spines can cause painful stings, but they're beautiful hunters that can eat prey half their size!"
+            },
+            {
+                name: "Octopus",
+                emoji: "🐙",
+                scientificName: "Octopus vulgaris",
+                habitat: "Rocky ocean floors and coral reefs",
+                size: "12-24 inches (30-60 cm)",
+                diet: "Crabs, shrimp, fish, and mollusks",
+                funFact: "They have three hearts, blue blood, and can change color instantly! Each arm has its own brain."
+            },
+            {
+                name: "Whale Shark",
+                emoji: "🦈",
+                scientificName: "Rhincodon typus",
+                habitat: "Open ocean in tropical waters",
+                size: "32-40 feet (10-12 m)",
+                diet: "Plankton, small fish, and fish eggs",
+                funFact: "The largest fish in the world, but completely harmless! They can live over 100 years and each has unique spot patterns."
+            },
+            {
+                name: "Electric Eel",
+                emoji: "⚡",
+                scientificName: "Electrophorus electricus",
+                habitat: "Amazon and Orinoco river basins",
+                size: "6 feet (1.8 m)",
+                diet: "Fish, amphibians, and crustaceans",
+                funFact: "Can generate up to 860 volts of electricity! They're actually not eels but a type of knifefish."
+            },
+            {
+                name: "Jellyfish",
+                emoji: "🪼",
+                scientificName: "Aurelia aurita",
+                habitat: "Coastal waters and open ocean worldwide",
+                size: "10-16 inches (25-40 cm)",
+                diet: "Plankton, small fish, and other jellyfish",
+                funFact: "They are 95% water and have no brain, heart, or blood! They've existed for over 500 million years."
+            },
+            {
+                name: "Sea Turtle",
+                emoji: "🐢",
+                scientificName: "Chelonia mydas",
+                habitat: "Tropical and subtropical oceans worldwide",
+                size: "3-4 feet (1-1.2 m)",
+                diet: "Seagrass, algae, and jellyfish",
+                funFact: "They can live over 100 years and migrate thousands of miles! Females return to the same beach where they were born to lay eggs."
+            },
+            {
+                name: "Parrotfish",
+                emoji: "🐟",
+                scientificName: "Scaridae",
+                habitat: "Tropical coral reefs",
+                size: "12-20 inches (30-50 cm)",
+                diet: "Algae scraped from coral surfaces",
+                funFact: "They create tropical sand beaches by eating coral and excreting sand! One large parrotfish can produce 840 pounds of sand per year."
+            },
+            {
+                name: "Moorish Idol",
+                emoji: "🐟",
+                scientificName: "Zanclus cornutus",
+                habitat: "Coral reefs in the Indo-Pacific",
+                size: "7-9 inches (18-23 cm)",
+                diet: "Sponges, tunicates, and algae",
+                funFact: "They're considered one of the most beautiful reef fish and are often mistaken for butterflyfish! They mate for life."
+            }
+        ];
+
+        class FishMazeGame {
+            constructor() {
+                this.currentLevel = 1;
+                this.maxLevel = 10;
+                this.totalScore = 0;
+                this.factsCollected = 0;
+                this.discountPoints = 0;
+                this.levelData = this.generateLevelData();
+                this.initializeLevel();
+            }
+
+            generateLevelData() {
+                return [
+                    { size: 11, fish: 5, timeBonus: 100 },   // Level 1
+                    { size: 13, fish: 6, timeBonus: 120 },   // Level 2
+                    { size: 15, fish: 7, timeBonus: 140 },   // Level 3
+                    { size: 17, fish: 8, timeBonus: 160 },   // Level 4
+                    { size: 19, fish: 9, timeBonus: 180 },   // Level 5
+                    { size: 21, fish: 10, timeBonus: 200 },  // Level 6
+                    { size: 23, fish: 11, timeBonus: 220 },  // Level 7
+                    { size: 25, fish: 12, timeBonus: 240 },  // Level 8
+                    { size: 27, fish: 13, timeBonus: 260 },  // Level 9
+                    { size: 29, fish: 15, timeBonus: 300 }   // Level 10
+                ];
+            }
+
+            initializeLevel() {
+                const levelInfo = this.levelData[this.currentLevel - 1];
+                this.mazeSize = levelInfo.size;
+                this.targetFish = levelInfo.fish;
+                this.timeBonus = levelInfo.timeBonus;
+                
+                this.maze = [];
+                this.playerPos = { x: 1, y: 1 };
+                this.fishPositions = [];
+                this.collectedFish = new Set();
+                this.levelScore = 0;
+                this.startTime = Date.now();
+                this.gameCompleted = false;
+                this.levelCompleted = false;
+                
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                }
+                
+                this.generateMaze();
+                this.generateFishPositions();
+                this.renderMaze();
+                this.startTimer();
+                this.updateUI();
+            }
+
+            generateMaze() {
+                // Initialize maze with walls
+                this.maze = Array(this.mazeSize).fill(null).map(() => 
+                    Array(this.mazeSize).fill(1)
+                );
+                
+                const visited = Array(this.mazeSize).fill(null).map(() => 
+                    Array(this.mazeSize).fill(false)
+                );
+                
+                const directions = [[0, 2], [2, 0], [0, -2], [-2, 0]];
+                
+                const isValid = (x, y) => {
+                    return x >= 0 && x < this.mazeSize && y >= 0 && y < this.mazeSize;
+                };
+                
+                const carve = (x, y) => {
+                    visited[y][x] = true;
+                    this.maze[y][x] = 0;
+                    
+                    const shuffled = [...directions].sort(() => Math.random() - 0.5);
+                    
+                    for (const [dx, dy] of shuffled) {
+                        const nx = x + dx;
+                        const ny = y + dy;
+                        
+                        if (isValid(nx, ny) && !visited[ny][nx]) {
+                            this.maze[y + dy / 2][x + dx / 2] = 0;
+                            carve(nx, ny);
+                        }
+                    }
+                };
+                
+                carve(1, 1);
+                this.maze[1][1] = 0; // Start
+                this.maze[this.mazeSize - 2][this.mazeSize - 2] = 0; // End
+            }
+
+            generateFishPositions() {
+                this.fishPositions = [];
+                const emptyCells = [];
+                
+                for (let y = 0; y < this.mazeSize; y++) {
+                    for (let x = 0; x < this.mazeSize; x++) {
+                        if (this.maze[y][x] === 0 && 
+                            !(x === 1 && y === 1) && 
+                            !(x === this.mazeSize - 2 && y === this.mazeSize - 2)) {
+                            emptyCells.push({ x, y });
+                        }
+                    }
+                }
+                
+                for (let i = 0; i < Math.min(this.targetFish, emptyCells.length); i++) {
+                    const randomIndex = Math.floor(Math.random() * emptyCells.length);
+                    this.fishPositions.push(emptyCells.splice(randomIndex, 1)[0]);
+                }
+            }
+
+            renderMaze() {
+                const mazeElement = document.getElementById('maze');
+                mazeElement.innerHTML = '';
+                
+                // Calculate optimal cell size for perfect screen fit
+                const containerMaxWidth = Math.min(window.innerWidth - 100, 800);
+                const containerMaxHeight = Math.min(window.innerHeight * 0.6, 600);
+                
+                const cellSizeFromWidth = Math.floor(containerMaxWidth / this.mazeSize);
+                const cellSizeFromHeight = Math.floor(containerMaxHeight / this.mazeSize);
+                const cellSize = Math.max(8, Math.min(25, Math.min(cellSizeFromWidth, cellSizeFromHeight)));
+                
+                // Set maze container size
+                const mazeContainer = document.querySelector('.maze-container');
+                const totalSize = this.mazeSize * cellSize;
+                mazeContainer.style.width = `${totalSize + 16}px`;
+                mazeContainer.style.height = `${totalSize + 16}px`;
+                
+                mazeElement.style.gridTemplateColumns = `repeat(${this.mazeSize}, ${cellSize}px)`;
+                
+                for (let y = 0; y < this.mazeSize; y++) {
+                    for (let x = 0; x < this.mazeSize; x++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.classList.add(this.maze[y][x] === 1 ? 'wall' : 'path');
+                        cell.style.width = `${cellSize}px`;
+                        cell.style.height = `${cellSize}px`;
+                        cell.id = `cell-${x}-${y}`;
+                        mazeElement.appendChild(cell);
+                    }
+                }
+                
+                // Add player
+                const playerCell = document.getElementById(`cell-${this.playerPos.x}-${this.playerPos.y}`);
+                const player = document.createElement('div');
+                player.className = 'player';
+                player.id = 'player';
+                player.innerHTML = '🐠';
+                player.style.width = `${cellSize - 4}px`;
+                player.style.height = `${cellSize - 4}px`;
+                player.style.fontSize = `${Math.max(8, cellSize * 0.6)}px`;
+                playerCell.appendChild(player);
+                
+                // Add fish
+                this.fishPositions.forEach((pos, index) => {
+                    const fishCell = document.getElementById(`cell-${pos.x}-${pos.y}`);
+                    const fish = document.createElement('div');
+                    fish.className = 'fish';
+                    fish.id = `fish-${index}`;
+                    fish.innerHTML = '🐟';
+                    fish.style.width = `${cellSize - 6}px`;
+                    fish.style.height = `${cellSize - 6}px`;
+                    fish.style.fontSize = `${Math.max(6, cellSize * 0.5)}px`;
+                    fishCell.appendChild(fish);
+                });
+                
+                // Add goal
+                const goalCell = document.getElementById(`cell-${this.mazeSize - 2}-${this.mazeSize - 2}`);
+                const goal = document.createElement('div');
+                goal.className = 'goal';
+                goal.id = 'goal';
+                goal.innerHTML = '🏆';
+                goal.style.width = `${cellSize - 4}px`;
+                goal.style.height = `${cellSize - 4}px`;
+                goal.style.fontSize = `${Math.max(8, cellSize * 0.6)}px`;
+                goalCell.appendChild(goal);
+            }
+
+            showFishFact(fishIndex) {
+                const factIndex = (this.factsCollected + fishIndex) % fishFacts.length;
+                const fact = fishFacts[factIndex];
+                
+                document.getElementById('factFishEmoji').textContent = fact.emoji;
+                document.getElementById('factFishName').textContent = fact.name;
+                document.getElementById('factScientificName').textContent = fact.scientificName;
+                document.getElementById('factHabitat').textContent = fact.habitat;
+                document.getElementById('factSize').textContent = fact.size;
+                document.getElementById('factDiet').textContent = fact.diet;
+                document.getElementById('factFunFact').textContent = fact.funFact;
+                
+                document.getElementById('fishFactModal').style.display = 'flex';
+                this.factsCollected++;
+                this.updateUI();
+                
+                // Auto-close after 5 seconds
+                setTimeout(() => {
+                    if (document.getElementById('fishFactModal').style.display === 'flex') {
+                        this.closeFishFact();
+                    }
+                }, 5000);
+            }
+
+            closeFishFact() {
+                document.getElementById('fishFactModal').style.display = 'none';
+            }
+
+            movePlayer(direction) {
+                if (this.gameCompleted || this.levelCompleted) return;
+                
+                let newX = this.playerPos.x;
+                let newY = this.playerPos.y;
+                
+                switch (direction) {
+                    case 'ArrowUp':
+                    case 'KeyW':
+                        newY = Math.max(0, this.playerPos.y - 1);
+                        break;
+                    case 'ArrowDown':
+                    case 'KeyS':
+                        newY = Math.min(this.mazeSize - 1, this.playerPos.y + 1);
+                        break;
+                    case 'ArrowLeft':
+                    case 'KeyA':
+                        newX = Math.max(0, this.playerPos.x - 1);
+                        break;
+                    case 'ArrowRight':
+                    case 'KeyD':
+                        newX = Math.min(this.mazeSize - 1, this.playerPos.x + 1);
+                        break;
+                }
+                
+                // Check if move is valid (not a wall)
+                if (this.maze[newY][newX] === 1) {
+                    return;
+                }
+                
+                this.playerPos = { x: newX, y: newY };
+                
+                // Move player element
+                const player = document.getElementById('player');
+                const newCell = document.getElementById(`cell-${newX}-${newY}`);
+                if (player && newCell) {
+                    newCell.appendChild(player);
+                }
+                
+                // Check for fish collection
+                this.fishPositions.forEach((fish, index) => {
+                    if (fish.x === newX && fish.y === newY && !this.collectedFish.has(index)) {
+                        this.collectedFish.add(index);
+                        this.levelScore += 20; // Increased score for educational value
+                        this.totalScore += 20;
+                        const fishElement = document.getElementById(`fish-${index}`);
+                        if (fishElement) {
+                            fishElement.classList.add('collected');
+                        }
+                        // Show fish fact immediately
+                        setTimeout(() => {
+                            this.showFishFact(index);
+                        }, 300);
+                    }
+                });
+                
+                // Check for goal
+                if (newX === this.mazeSize - 2 && newY === this.mazeSize - 2) {
+                    if (this.collectedFish.size >= this.targetFish) {
+                        this.completeLevel();
+                    }
+                }
+                
+                this.updateUI();
+            }
+
+            completeLevel() {
+                this.levelCompleted = true;
+                
+                // Calculate time bonus
+                const elapsedTime = this.getElapsedTime();
+                const timeBonus = Math.max(0, this.timeBonus - elapsedTime * 2);
+                this.levelScore += timeBonus;
+                this.totalScore += timeBonus;
+                
+                // Level completion bonus
+                this.levelScore += 100; // Increased completion bonus
+                this.totalScore += 100;
+                
+                // Add discount points (10 points per level)
+                this.discountPoints += 10;
+                
+                clearInterval(this.timerInterval);
+                
+                if (this.currentLevel >= this.maxLevel) {
+                    this.completeGame();
+                } else {
+                    this.showLevelComplete();
+                }
+            }
+
+            completeGame() {
+                this.gameCompleted = true;
+                document.getElementById('modalTitle').textContent = '🎉 Congratulations! Game Complete! 🎉';
+                document.getElementById('modalMessage').textContent = `Amazing! You completed all 10 levels and learned ${this.factsCollected} fascinating fish facts!`;
+                document.getElementById('levelScore').textContent = this.levelScore;
+                document.getElementById('totalScore').textContent = this.totalScore;
+                document.getElementById('finalTime').textContent = this.formatTime(this.getElapsedTime());
+                document.getElementById('modalFactsCount').textContent = this.factsCollected;
+                document.getElementById('modalPointsEarned').textContent = this.discountPoints;
+                document.getElementById('modalNextBtn').style.display = 'none';
+                document.getElementById('completionModal').style.display = 'flex';
+            }
+
+            showLevelComplete() {
+                document.getElementById('modalTitle').textContent = '🏆 Level Complete! 🏆';
+                document.getElementById('modalMessage').textContent = `Level ${this.currentLevel} completed! Great job learning about marine life!`;
+                document.getElementById('levelScore').textContent = this.levelScore;
+                document.getElementById('totalScore').textContent = this.totalScore;
+                document.getElementById('finalTime').textContent = this.formatTime(this.getElapsedTime());
+                document.getElementById('modalFactsCount').textContent = this.factsCollected;
+                document.getElementById('modalPointsEarned').textContent = this.discountPoints;
+                document.getElementById('modalNextBtn').style.display = 'inline-block';
+                document.getElementById('completionModal').style.display = 'flex';
+            }
+
+            nextLevel() {
+                if (this.currentLevel < this.maxLevel) {
+                    this.currentLevel++;
+                    this.initializeLevel();
+                    document.getElementById('completionModal').style.display = 'none';
+                }
+                this.updateUI();
+            }
+
+            previousLevel() {
+                if (this.currentLevel > 1) {
+                    this.currentLevel--;
+                    this.initializeLevel();
+                }
+                this.updateUI();
+            }
+
+            resetLevel() {
+                this.initializeLevel();
+            }
+
+            startTimer() {
+                this.timerInterval = setInterval(() => {
+                    if (!this.gameCompleted && !this.levelCompleted) {
+                        document.getElementById('timer').textContent = this.formatTime(this.getElapsedTime());
+                    }
+                }, 1000);
+            }
+
+            getElapsedTime() {
+                return Math.floor((Date.now() - this.startTime) / 1000);
+            }
+
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            updateUI() {
+                document.getElementById('currentLevel').textContent = this.currentLevel;
+                document.getElementById('score').textContent = this.totalScore;
+                document.getElementById('fishCount').textContent = this.collectedFish.size;
+                document.getElementById('totalFish').textContent = this.targetFish;
+                document.getElementById('factsCount').textContent = this.factsCollected;
+                document.getElementById('discountPoints').textContent = this.discountPoints;
+                
+                // Update progress bar
+                const progress = (this.currentLevel / this.maxLevel) * 100;
+                document.getElementById('progressFill').style.width = `${progress}%`;
+                
+                // Update button states
+                document.getElementById('nextLevelBtn').disabled = this.currentLevel >= this.maxLevel;
+                document.getElementById('prevLevelBtn').disabled = this.currentLevel <= 1;
+            }
+
+            showDiscountModal() {
+                document.getElementById('currentPointsDisplay').textContent = this.discountPoints;
+                
+                // Show appropriate options based on points available
+                if (this.discountPoints >= 10) {
+                    document.getElementById('discountOptions').style.display = 'block';
+                    document.getElementById('discountCodeDisplay').style.display = 'none';
+                    document.getElementById('notEnoughPoints').style.display = 'none';
+                    
+                    // Update the select options based on available points
+                    const select = document.getElementById('pointsToRedeem');
+                    select.innerHTML = '';
+                    
+                    for (let i = 1; i <= Math.floor(this.discountPoints / 10); i++) {
+                        const points = i * 10;
+                        const option = document.createElement('option');
+                        option.value = points;
+                        option.textContent = `${points} points (${i}% discount)`;
+                        select.appendChild(option);
+                    }
+                } else {
+                    document.getElementById('discountOptions').style.display = 'none';
+                    document.getElementById('discountCodeDisplay').style.display = 'none';
+                    document.getElementById('notEnoughPoints').style.display = 'block';
+                }
+                
+                document.getElementById('discountModal').style.display = 'flex';
+            }
+
+            generateDiscountCode() {
+                const pointsToRedeem = parseInt(document.getElementById('pointsToRedeem').value);
+                const discountPercent = pointsToRedeem / 10;
+                
+                if (pointsToRedeem > this.discountPoints) {
+                    alert("You don't have enough points for this discount!");
+                    return;
+                }
+                
+                // Generate a random discount code
+                const code = `FISH${discountPercent}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+                
+                // Deduct the points
+                this.discountPoints -= pointsToRedeem;
+                this.updateUI();
+                
+                // Show the code
+                document.getElementById('generatedDiscountCode').textContent = code;
+                document.getElementById('discountOptions').style.display = 'none';
+                document.getElementById('discountCodeDisplay').style.display = 'block';
+            }
+
+            closeDiscountModal() {
+                document.getElementById('discountModal').style.display = 'none';
+            }
+
+            setupEventListeners() {
+                document.addEventListener('keydown', (e) => {
+                    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+                        e.preventDefault();
+                        this.movePlayer(e.code);
+                    }
+                    if (e.key === 'Escape' && document.getElementById('fishFactModal').style.display === 'flex') {
+                        this.closeFishFact();
+                    }
+                });
+            }
+        }
+
+        let game;
+
+        function newGame() {
+            if (game && game.timerInterval) {
+                clearInterval(game.timerInterval);
+            }
+            document.getElementById('completionModal').style.display = 'none';
+            document.getElementById('fishFactModal').style.display = 'none';
+            document.getElementById('discountModal').style.display = 'none';
+            game = new FishMazeGame();
+            game.setupEventListeners();
+        }
+
+        function nextLevel() {
+            if (game) {
+                game.nextLevel();
+            }
+        }
+
+        function previousLevel() {
+            if (game) {
+                game.previousLevel();
+            }
+        }
+
+        function resetLevel() {
+            if (game) {
+                game.resetLevel();
+            }
+        }
+
+        function closeFishFact() {
+            if (game) {
+                game.closeFishFact();
+            }
+        }
+
+        function showDiscountModal() {
+            if (game) {
+                game.showDiscountModal();
+            }
+        }
+
+        function generateDiscountCode() {
+            if (game) {
+                game.generateDiscountCode();
+            }
+        }
+
+        function closeDiscountModal() {
+            if (game) {
+                game.closeDiscountModal();
+            }
+        }
+
+        // Touch controls for mobile
+        function movePlayerTouch(direction) {
+            if (game) {
+                game.movePlayer(direction);
+            }
+        }
+
+        // Start the game when page loads
+        window.addEventListener('load', () => {
+            newGame();
+        });
+
+        // Prevent scrolling with arrow keys
+        window.addEventListener('keydown', (e) => {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        // Handle window resize for perfect screen sizing
+        window.addEventListener('resize', () => {
+            if (game) {
+                game.renderMaze();
+            }
+        });
+
+        // Prevent zooming on mobile
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+
+        // Prevent double-tap zoom
+        document.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>

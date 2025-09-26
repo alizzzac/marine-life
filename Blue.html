@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blue Whale - The Largest Animal on Earth</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo.jpg">
+  <link rel="apple-touch-icon" href="logo.jpg">
+  <meta name="msapplication-TileImage" content="logo.png">
+  <meta name="theme-color" content="#0a2a43">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --nav-aqua: #4db8ff;
+      --nav-seafoam: #00ffaa;
+      --nav-coral: #ff7f50;
+      --nav-sunset: #ff8e53;
+    }
+
+    /* NAVIGATION STYLES */
+    .hamburger-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .hamburger-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--nav-aqua);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 1001;
+    }
+
+    .hamburger-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(77, 184, 255, 0.6);
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      margin: 2px 0;
+      background: white;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-btn.active span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-btn.active span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .hamburger-nav {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 300px;
+      height: 100vh;
+      background: rgba(5, 20, 35, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      transition: right 0.4s ease;
+      padding: 80px 20px 20px;
+      overflow-y: auto;
+      box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .hamburger-nav.active {
+      right: 0;
+    }
+
+    .hamburger-tabs {
+      list-style: none;
+      width: 100%;
+    }
+
+    .hamburger-tab {
+      width: 100%;
+      margin-bottom: 5px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .hamburger-tab a {
+      display: flex;
+      align-items: center;
+      padding: 18px 20px;
+      text-decoration: none;
+      color: white;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a i {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a span {
+      margin-left: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .hamburger-tab:hover {
+      transform: translateX(-5px);
+    }
+
+    /* Different colors for each tab */
+    .tab1 { background: var(--nav-aqua); }
+    .tab2 { background: var(--nav-seafoam); }
+    .tab3 { background: var(--nav-coral); }
+    .tab4 { background: var(--nav-sunset); }
+    .tab5 { background: #9b5de5; }
+    .tab6 { background: #00bbf9; }
+    .tab7 { background: #00f5d4; }
+    .tab8 { background: #f15bb5; }
+    .tab9 { background: #0f9d4a; }
+    .tab10 { background: #ff6b6b; } /* New pollution tab color */
+
+    /* Active tab indicator */
+    .hamburger-tab.active {
+      box-shadow: inset 5px 0 0 white;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      color: #ffffff;
+      background: linear-gradient(rgba(3, 4, 94, 0.7), rgba(0, 0, 0, 0.7)), 
+                  url('lopol.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* Bubble animation */
+    .bubble {
+      position: fixed;
+      bottom: -100px;
+      z-index: 9999;
+      color: rgba(255, 255, 255, 0.6);
+      user-select: none;
+      pointer-events: none;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.1));
+      animation-name: bubbles-rise;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    @keyframes bubbles-rise {
+      0% { 
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 0.3;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% { 
+        transform: translateY(-120vh) translateX(15vw) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 30px;
+      background-color: rgba(2, 62, 138, 0.85); /* Deep ocean blue */
+      border-radius: 8px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      color: #48cae4; /* Light blue */
+      font-weight: bold;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 0;
+      color: #ffffff;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .species-name {
+      font-style: italic;
+      color: #caf0f8;
+      margin: 5px 0 25px;
+      font-size: 1.2rem;
+    }
+
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 30px;
+      min-height: 350px;
+    }
+
+    .image-background {
+      flex: 2;
+      min-width: 300px;
+      background-image: url('lopol.jpg');
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .image-caption {
+      background-color: rgba(0, 53, 102, 0.9); /* Darker blue */
+      color: white;
+      padding: 25px;
+      flex: 1;
+      border-radius: 8px;
+      min-width: 250px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .image-caption h4 {
+      margin: 0 0 15px;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #48cae4;
+    }
+
+    .image-caption p {
+      margin: 12px 0;
+      font-size: 1rem;
+    }
+
+    .content p {
+      margin-bottom: 25px;
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+
+    .whale-fact {
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 15px;
+      border-left: 4px solid #48cae4;
+      margin: 20px 0;
+      font-style: italic;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .whale-fact:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
+    }
+
+    .conservation-status {
+      background-color: rgba(255, 109, 0, 0.3);
+      padding: 20px;
+      border: 1px solid rgba(255, 109, 0, 0.6);
+      border-radius: 8px;
+      margin: 25px 0;
+    }
+
+    .resources {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .resources a {
+      color: #48cae4;
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: 15px;
+      transition: color 0.3s;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .resources a:hover {
+      color: #00b4d8;
+      text-decoration: underline;
+    }
+
+    ul {
+      margin: 15px 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .size-comparison {
+      font-weight: bold;
+      color: #90e0ef;
+    }
+
+    /* Interactive elements */
+    .interactive-section {
+      margin: 30px 0;
+      padding: 20px;
+      background: rgba(0, 53, 102, 0.4);
+      border-radius: 8px;
+      border: 1px solid rgba(72, 202, 228, 0.3);
+    }
+
+    .interactive-title {
+      color: #48cae4;
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .interactive-title i {
+      margin-right: 10px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: var(--nav-aqua);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      margin: 5px;
+    }
+
+    .btn:hover {
+      background: #3aa0e0;
+      transform: translateY(-2px);
+    }
+
+    .quiz-container {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+
+    .quiz-question {
+      margin-bottom: 15px;
+    }
+
+    .quiz-option {
+      display: block;
+      padding: 10px;
+      margin: 8px 0;
+      background: rgba(72, 202, 228, 0.1);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quiz-option:hover {
+      background: rgba(72, 202, 228, 0.2);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .image-container {
+        flex-direction: column;
+      }
+
+      .image-background {
+        width: 100%;
+        min-height: 250px;
+        flex: none;
+      }
+
+      .image-caption {
+        width: 100%;
+        min-width: auto;
+      }
+      
+      body {
+        background-attachment: scroll;
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .species-name {
+        font-size: 1rem;
+      }
+      
+      .content p {
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+      
+      .resources a {
+        display: block;
+        margin: 10px 0;
+      }
+      
+      .hamburger-nav {
+        width: 80%;
+        max-width: 300px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      .container {
+        padding: 15px;
+      }
+      
+      .image-caption {
+        padding: 15px;
+      }
+      
+      .image-caption h4 {
+        font-size: 1rem;
+        margin-bottom: 10px;
+      }
+      
+      .image-caption p {
+        font-size: 0.9rem;
+        margin: 8px 0;
+      }
+      
+      .whale-fact, 
+      .conservation-status {
+        padding: 12px;
+        margin: 15px 0;
+      }
+      
+      .conservation-status h4 {
+        font-size: 1rem;
+      }
+      
+      .hamburger-btn {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .hamburger-btn span {
+        width: 22px;
+        height: 2.5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVIGATION COMPONENT -->
+  <div class="hamburger-menu">
+    <div class="hamburger-btn" id="hamburgerBtn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <nav class="hamburger-nav" id="hamburgerNav">
+    <ul class="hamburger-tabs">
+      <li class="hamburger-tab tab1">
+        <a href="daliy.html">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab2">
+        <a href="animals.html">
+          <i class="fas fa-fish"></i>
+          <span>Animals</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab3">
+        <a href="chat.html">
+          <i class="fas fa-hands-helping"></i>
+          <span>Conservation</span>
+        </a>
+      </li>
+      <!-- NEW MAN-MADE POLLUTION TAB -->
+      <li class="hamburger-tab tab10">
+        <a href="pollution.html">
+          <i class="fas fa-industry"></i>
+          <span>Man-made Pollution</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab4">
+        <a href="gemes.html">
+          <i class="fas fa-gamepad"></i>
+          <span>Games</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab5">
+        <a href="about.html">
+          <i class="fas fa-info-circle"></i>
+          <span>About</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab6">
+        <a href="contact.html">
+          <i class="fas fa-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab7">
+        <a href="news.html">
+          <i class="fas fa-newspaper"></i>
+          <span>News</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab8">
+        <a href="visit.html">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Visit</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab9">
+        <a href="DONATE.HTML">
+          <i class="fas fa-donate"></i>
+          <span>Donate</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Bubbles will be added here by JavaScript -->
+  
+  <div class="container">
+    <div class="section-title">Marine Mammals</div>
+    <h1>Blue Whale</h1>
+    <div class="species-name">Balaenoptera musculus</div>
+
+    <div class="image-container">
+      <div class="image-background"></div>
+      <div class="image-caption">
+        <h4>Distribution</h4>
+        <p>All oceans except the Arctic</p>
+        <h4>Habitat</h4>
+        <p>Open ocean, often near continental shelves</p>
+        <h4>Size</h4>
+        <p>25-30m (82-98ft) length, 100-150 tons weight</p>
+        <h4>Taxonomy</h4>
+        <p>Family: Balaenopteridae, Order: Cetacea</p>
+        <h4>Population</h4>
+        <p>10,000-25,000 (pre-whaling: ~350,000)</p>
+      </div>
+    </div>
+
+    <div class="content">
+      <p>
+        The blue whale is the <span class="size-comparison">largest animal ever known to have existed</span>, dwarfing even the biggest dinosaurs. Their heart alone can weigh as much as a small car (400-600kg), and their tongue weighs as much as an elephant. A single adult blue whale can consume up to 4 tons of krill per day during feeding season.
+      </p>
+      
+      <div class="whale-fact" onclick="revealMoreFacts()">
+        <i class="fas fa-lightbulb"></i> A blue whale's spout can reach up to 9m (30ft) in height, and their low-frequency vocalizations can travel hundreds of miles underwater—the loudest sound made by any animal. Click for more facts.
+      </div>
+      
+      <div id="moreFacts" class="hidden">
+        <p>Blue whales are so large that some of their blood vessels are big enough for a small child to swim through. Their aorta (main artery) has a diameter of about 23cm (9 inches)!</p>
+      </div>
+      
+      <div class="conservation-status">
+        <h4>Conservation Status: Endangered (IUCN Red List)</h4>
+        <p>Population recovering but still at 3-11% of pre-whaling numbers</p>
+      </div>
+      
+      <p>
+        Blue whales are baleen whales, meaning they filter-feed using keratin plates instead of teeth. They primarily eat tiny shrimp-like creatures called krill, consuming up to 40 million krill per day. Their massive size is possible because the buoyancy of water supports their weight, unlike land animals.
+      </p>
+
+      <div class="interactive-section">
+        <h3 class="interactive-title"><i class="fas fa-chart-line"></i> Blue Whale Population Recovery</h3>
+        <p>Select a region to see population recovery status:</p>
+        <button class="btn" onclick="showPopulation('california')">California Coast</button>
+        <button class="btn" onclick="showPopulation('antarctic')">Antarctic</button>
+        <button class="btn" onclick="showPopulation('global')">Global</button>
+        
+        <div id="populationInfo" class="quiz-container hidden">
+          <p id="populationText"></p>
+        </div>
+      </div>
+
+      <p>
+        Major threats to blue whales include:
+        <ul>
+          <li><strong>Historical commercial whaling</strong> (nearly drove them to extinction)</li>
+          <li><strong>Ship strikes</strong> (collisions with large vessels)</li>
+          <li><strong>Ocean noise pollution</strong> (disrupts communication)</li>
+          <li><strong>Climate change</strong> (affects krill populations)</li>
+          <li><strong>Entanglement in fishing gear</strong></li>
+        </ul>
+      </p>
+      
+      <div class="whale-fact" onclick="revealMoreFacts2()">
+        <i class="fas fa-lightbulb"></i> Blue whale calves are the biggest babies on Earth, born at about 7m (23ft) long and weighing 2-3 tons. They gain about 90kg (200lbs) per day from their mother's rich milk. Click for more.
+      </div>
+      
+      <div id="moreFacts2" class="hidden">
+        <p>A blue whale mother produces approximately 200-400 liters of milk per day with a fat content of 35-50% (human milk has about 4% fat content). This incredibly rich milk helps the calf grow rapidly.</p>
+      </div>
+
+      <div class="interactive-section">
+        <h3 class="interactive-title"><i class="fas fa-brain"></i> Blue Whale Knowledge Quiz</h3>
+        <p>Test your knowledge about these magnificent giants:</p>
+        <button class="btn" onclick="startQuiz()">Start Quiz</button>
+        
+        <div id="quizContainer" class="quiz-container hidden">
+          <div id="question1" class="quiz-question">
+            <p>1. How much can a blue whale's heart weigh?</p>
+            <div class="quiz-option" onclick="checkAnswer(1, 'small car', this)">As much as a small car (400-600kg)</div>
+            <div class="quiz-option" onclick="checkAnswer(1, 'human', this)">About the same as an adult human</div>
+            <div class="quiz-option" onclick="checkAnswer(1, 'motorcycle', this)">As much as a motorcycle</div>
+          </div>
+          
+          <div id="question2" class="quiz-question hidden">
+            <p>2. What is the primary food of blue whales?</p>
+            <div class="quiz-option" onclick="checkAnswer(2, 'krill', this)">Krill (tiny shrimp-like creatures)</div>
+            <div class="quiz-option" onclick="checkAnswer(2, 'plankton', this)">Plankton</div>
+            <div class="quiz-option" onclick="checkAnswer(2, 'small fish', this)">Small fish</div>
+          </div>
+          
+          <div id="quizResult" class="hidden">
+            <h4><i class="fas fa-award"></i> <span id="resultText"></span></h4>
+            <button class="btn" onclick="resetQuiz()">Try Again</button>
+          </div>
+        </div>
+      </div>
+      
+      <p>
+        Conservation successes include:
+        <ul>
+          <li>International protection since 1966 (International Whaling Commission)</li>
+          <li>Population increases in some areas (e.g., California coast)</li>
+          <li>Ship speed reduction zones in critical habitats</li>
+          <li>Improved monitoring and research</li>
+        </ul>
+      </p>
+      
+      <p>
+        The blue whale's recovery demonstrates nature's resilience when given protection. Their continued conservation helps maintain the health of ocean ecosystems worldwide.
+      </p>
+    </div>
+
+    <div class="resources">
+      <strong>Learn More & Support Conservation:</strong><br>
+      <a href="https://www.iucnredlist.org/species/2477/156923585" target="_blank" rel="noopener noreferrer">IUCN Red List</a>
+      <a href="https://www.worldwildlife.org/species/blue-whale" target="_blank" rel="noopener noreferrer">WWF Blue Whales</a>
+      <a href="https://marine-conservation.org/" target="_blank" rel="noopener noreferrer">Marine Conservation Institute</a>
+      <a href="https://www.noaa.gov/education/resource-collections/marine-life/marine-mammals" target="_blank" rel="noopener noreferrer">NOAA Marine Mammals</a>
+      <a href="https://whales.org/" target="_blank" rel="noopener noreferrer">Whale and Dolphin Conservation</a>
+    </div>
+  </div>
+
+  <script>
+    // NAVIGATION FUNCTIONALITY
+    function setupNavigation() {
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const hamburgerNav = document.getElementById('hamburgerNav');
+      
+      hamburgerBtn.addEventListener('click', function() {
+        this.classList.toggle('active');
+        hamburgerNav.classList.toggle('active');
+        
+        // Prevent body scrolling when nav is open
+        if (hamburgerNav.classList.contains('active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Close nav when clicking outside on mobile
+      document.addEventListener('click', function(e) {
+        if (hamburgerNav.classList.contains('active') && 
+            !hamburgerNav.contains(e.target) && 
+            !hamburgerBtn.contains(e.target)) {
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Add active class to clicked tab
+      document.querySelectorAll('.hamburger-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Close nav after selection
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      });
+    }
+
+    // Create bubbles
+    function createBubbles() {
+      const bubbleCount = 30;
+      const body = document.querySelector('body');
+      
+      for (let i = 0; i < bubbleCount; i++) {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        
+        // Randomize properties
+        const size = Math.random() * 20 + 10;
+        const left = Math.random() * 100;
+        const opacity = Math.random() * 0.5 + 0.2;
+        const animationDuration = Math.random() * 15 + 10;
+        const animationDelay = Math.random() * 5;
+        
+        bubble.style.width = `${size}px`;
+        bubble.style.height = `${size}px`;
+        bubble.style.left = `${left}vw`;
+        bubble.style.opacity = opacity;
+        bubble.style.animationDuration = `${animationDuration}s`;
+        bubble.style.animationDelay = `${animationDelay}s`;
+        
+        body.appendChild(bubble);
+      }
+    }
+
+    // Interactive elements functionality
+    function revealMoreFacts() {
+      const moreFacts = document.getElementById('moreFacts');
+      moreFacts.classList.toggle('hidden');
+    }
+    
+    function revealMoreFacts2() {
+      const moreFacts2 = document.getElementById('moreFacts2');
+      moreFacts2.classList.toggle('hidden');
+    }
+    
+    function showPopulation(region) {
+      const populationInfo = document.getElementById('populationInfo');
+      const populationText = document.getElementById('populationText');
+      
+      populationInfo.classList.remove('hidden');
+      
+      switch(region) {
+        case 'california':
+          populationText.innerHTML = "<strong>California Coast:</strong> This population has shown the strongest recovery, now estimated at around 2,000 individuals. It represents one of the great conservation success stories, with numbers increasing steadily since protection began.";
+          break;
+        case 'antarctic':
+          populationText.innerHTML = "<strong>Antarctic:</strong> Once home to the largest blue whale population (over 200,000), the Antarctic population was decimated by whaling. Current estimates suggest only 1-2% of the original population remains, with recovery happening very slowly.";
+          break;
+        case 'global':
+          populationText.innerHTML = "<strong>Global:</strong> The worldwide blue whale population is estimated at 10,000-25,000 individuals, compared to pre-whaling numbers of 350,000. While still endangered, the global population is increasing at a rate of 7-8% per year in some regions.";
+          break;
+      }
+    }
+    
+    let currentQuestion = 0;
+    let score = 0;
+    
+    function startQuiz() {
+      document.getElementById('quizContainer').classList.remove('hidden');
+      document.getElementById('question1').classList.remove('hidden');
+    }
+    
+    function checkAnswer(questionNum, answer, element) {
+      // Visual feedback
+      const options = element.parentElement.querySelectorAll('.quiz-option');
+      options.forEach(opt => {
+        opt.style.pointerEvents = 'none'; // Prevent further clicks
+      });
+      
+      // Correct answers
+      const correctAnswers = {
+        1: 'small car',
+        2: 'krill'
+      };
+      
+      if (answer === correctAnswers[questionNum]) {
+        element.style.background = 'rgba(0, 200, 83, 0.3)';
+        element.style.border = '1px solid #00c853';
+        score++;
+      } else {
+        element.style.background = 'rgba(255, 87, 34, 0.3)';
+        element.style.border = '1px solid #ff5722';
+        
+        // Highlight correct answer
+        options.forEach(opt => {
+          if (opt.textContent.includes(correctAnswers[questionNum])) {
+            opt.style.background = 'rgba(0, 200, 83, 0.3)';
+            opt.style.border = '1px solid #00c853';
+          }
+        });
+      }
+      
+      // Move to next question or show results
+      setTimeout(() => {
+        document.getElementById(`question${questionNum}`).classList.add('hidden');
+        
+        if (questionNum < 2) {
+          document.getElementById(`question${questionNum + 1}`).classList.remove('hidden');
+        } else {
+          showQuizResults();
+        }
+      }, 1500);
+    }
+    
+    function showQuizResults() {
+      const quizResult = document.getElementById('quizResult');
+      const resultText = document.getElementById('resultText');
+      
+      quizResult.classList.remove('hidden');
+      
+      if (score === 2) {
+        resultText.textContent = `Perfect! You got ${score}/2 correct. You're a blue whale expert!`;
+      } else if (score === 1) {
+        resultText.textContent = `Good job! You got ${score}/2 correct. You know quite a bit about blue whales!`;
+      } else {
+        resultText.textContent = `You got ${score}/2 correct. Learn more about these magnificent giants!`;
+      }
+    }
+    
+    function resetQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      
+      // Reset all questions and options
+      document.querySelectorAll('.quiz-question').forEach(q => {
+        q.classList.add('hidden');
+      });
+      
+      document.querySelectorAll('.quiz-option').forEach(opt => {
+        opt.style.background = 'rgba(72, 202, 228, 0.1)';
+        opt.style.border = 'none';
+        opt.style.pointerEvents = 'auto';
+      });
+      
+      document.getElementById('quizResult').classList.add('hidden');
+      document.getElementById('quizContainer').classList.add('hidden');
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      setupNavigation();
+      createBubbles();
+    });
+  </script>
+</body>
+</html>

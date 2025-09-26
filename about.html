@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us - Sea Theme</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --deep-blue: #051937;
+      --electric-aqua: #00f9ff;
+      --neon-seafoam: #6fffe9;
+      --coral-pink: #ff6b6b;
+      --sunlight-yellow: #fffac2;
+      --purple-depth: #9d4edd;
+      --ocean-teal: #00c9b7;
+      --pollution-brown: #8B4513; /* New color for pollution tab */
+    }
+
+    body, html {
+      height: 100%;
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+    }
+
+    .video-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .content {
+      position: relative;
+      z-index: 3;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .about-box {
+      background: rgba(0, 0, 50, 0.5);
+      padding: 40px;
+      border-radius: 15px;
+      max-width: 700px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    p {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    /* Whale Canvas Container */
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    
+    /* Watermark */
+    .watermark {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 5px 10px;
+      border-radius: 10px;
+      pointer-events: none;
+    }
+    
+    /* Controls */
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.8rem;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 8px 12px;
+      border-radius: 10px;
+      max-width: 250px;
+      pointer-events: none;
+    }
+    
+    /* Underwater elements */
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      z-index: 0;
+      animation: bubble-rise linear forwards;
+    }
+    
+    @keyframes bubble-rise {
+      0% {
+        transform: translateY(0);
+        opacity: 0.5;
+      }
+      100% {
+        transform: translateY(-100vh);
+        opacity: 0;
+      }
+    }
+    
+   .seaweed {
+      position: fixed;
+      bottom: 0;
+      width: 8px;
+      height: 60px;
+      background: linear-gradient(to top, #2e8b57, #3cb371);
+      border-radius: 4px;
+      z-index: 0;
+      animation: seaweed-sway 4s ease-in-out infinite alternate;
+    }
+    
+    @keyframes seaweed-sway {
+      0% { transform: rotate(-5deg); }
+      100% { transform: rotate(5deg); }
+    }
+    
+    /* Sunlight rays */
+    .sunray {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 1px;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.2), rgba(255,255,255,0));
+      transform-origin: top;
+      z-index: 0;
+      animation: ray-move 8s infinite ease-in-out;
+    }
+    
+    @keyframes ray-move {
+      0% { opacity: 0; }
+      50% { opacity: 0.3; }
+      100% { opacity: 0; }
+    }
+
+    /* NAVIGATION STYLES */
+    .hamburger-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .hamburger-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--electric-aqua);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 10001;
+    }
+
+    .hamburger-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(0, 249, 255, 0.6);
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      margin: 2px 0;
+      background: white;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-btn.active span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-btn.active span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .hamburger-nav {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 300px;
+      height: 100vh;
+      background: rgba(5, 20, 35, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 9999;
+      transition: right 0.4s ease;
+      padding: 80px 20px 20px;
+      overflow-y: auto;
+      box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .hamburger-nav.active {
+      right: 0;
+    }
+
+    .hamburger-tabs {
+      list-style: none;
+      width: 100%;
+    }
+
+    .hamburger-tab {
+      width: 100%;
+      margin-bottom: 5px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .hamburger-tab a {
+      display: flex;
+      align-items: center;
+      padding: 18px 20px;
+      text-decoration: none;
+      color: white;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a i {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a span {
+      margin-left: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .hamburger-tab:hover {
+      transform: translateX(-5px);
+    }
+
+    /* Different colors for each tab using the new palette */
+    .tab1 { background: var(--electric-aqua); }
+    .tab2 { background: var(--neon-seafoam); }
+    .tab3 { background: var(--coral-pink); }
+    .tab4 { background: #ffcc33; }
+    .tab5 { background: var(--pollution-brown); } /* New pollution tab */
+    .tab6 { background: var(--purple-depth); }
+    .tab7 { background: #4776e6; }
+    .tab8 { background: var(--ocean-teal); }
+    .tab9 { background: #ff5e62; }
+    .tab10 { background:  #d032a8; }
+
+    /* Active tab indicator */
+    .hamburger-tab.active {
+      box-shadow: inset 5px 0 0 white;
+    }
+
+    /* Responsive for navigation */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+      
+      .about-box {
+        padding: 20px;
+      }
+      
+      .hamburger-nav {
+        width: 80%;
+        max-width: 300px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hamburger-btn {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .hamburger-btn span {
+        width: 22px;
+        height: 2.5px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <video class="video-bg" autoplay muted loop>
+    <source src="51594-465226691_large.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  
+  <!-- Underwater elements -->
+  <div class="sunray" style="left: 20%;"></div>
+  <div class="sunray" style="left: 40%; animation-delay: 2s;"></div>
+  <div class="sunray" style="left: 60%; animation-delay: 1s;"></div>
+  <div class="sunray" style="left: 80%; animation-delay: 3s;"></div>
+  
+  <!-- NAVIGATION -->
+  <!-- HAMBURGER MENU -->
+  <div class="hamburger-menu">
+      <div class="hamburger-btn" id="hamburgerBtn">
+          <span></span>
+          <span></span>
+          <span></span>
+      </div>
+  </div>
+
+  <!-- HAMBURGER NAVIGATION -->
+  <nav class="hamburger-nav" id="hamburgerNav">
+      <ul class="hamburger-tabs">
+          <li class="hamburger-tab tab1">
+              <a href="game.html">
+                  <i class="fas fa-gamepad"></i>
+                  <span>Games</span>
+              </a>
+          </li>
+          <li class="hamburger-tab tab2">
+              <a href="chat.html">
+                  <i class="fas fa-comments"></i>
+                  <span>Convo</span>
+              </a>
+          </li>
+          <li class="hamburger-tab tab3">
+              <a href="DONATE.HTML">
+                  <i class="fas fa-donate"></i>
+                  <span>Donate</span>
+              </a>
+          </li>
+          <li class="hamburger-tab tab4">
+              <a href="animals.html">
+                  <i class="fas fa-paw"></i>
+                  <span>Animals</span>
+              </a>
+          </li>
+          <li class="hamburger-tab tab5">
+              <a href="pollution.html">
+                  <i class="fas fa-industry"></i>
+                  <span>Man Made Pollution</span>
+              </a>
+          </li>
+          <li class="hamburger-tab tab6">
+              <a href="about.html">
+                  <i class="fas fa-info-circle"></i>
+                  <span>About</span>
+              </a>
+          </li>
+          <li class="hamburger-tab tab7">
+              <a href="contact.html">
+                  <i class="fas fa-envelope"></i>
+                  <span>Contact</span>
+              </a>
+          </li>
+          <li class="hamburger-tab tab8">
+              <a href="news.html">
+                  <i class="fas fa-newspaper"></i>
+                  <span>News</span>
+              </a>
+          </li>
+          <li class="hamburger-tab tab9">
+              <a href="visit.html">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>Visit</span>
+              </a>
+          </li>
+          <li class="hamburger-tab tab10">
+              <a href="index.html">
+                  <i class="fas fa-user"></i>
+                  <span>Home</span>
+              </a>
+          </li>
+      </ul>
+  </nav>
+ 
+  <!-- Whale Canvas Container -->
+  <div id="canvas-container"></div>
+  
+  <div class="watermark">Move your cursor to guide the whale</div>
+  <div class="controls">Click to toggle eye expression<br>Press 'S' to save animation</div>
+
+  <div class="content">
+    <div class="about-box">
+      <h1>About Us</h1>
+      <p>
+        Welcome to our ocean-inspired journey. Our team is dedicated to preserving marine life
+        and spreading awareness about the wonders of the deep sea. Dive with us as we explore
+        conservation, education, and beauty beneath the waves.
+      </p>
+      <p>
+        Our mission is to protect marine ecosystems and inspire the next generation of ocean
+        advocates through innovative research, education, and community engagement.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // NAVIGATION FUNCTIONALITY
+    function setupNavigation() {
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const hamburgerNav = document.getElementById('hamburgerNav');
+        
+        hamburgerBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            hamburgerNav.classList.toggle('active');
+            
+            // Prevent body scrolling when nav is open
+            if (hamburgerNav.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Close nav when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            if (hamburgerNav.classList.contains('active') && 
+                !hamburgerNav.contains(e.target) && 
+                !hamburgerBtn.contains(e.target)) {
+                hamburgerBtn.classList.remove('active');
+                hamburgerNav.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Add active class to clicked tab
+        document.querySelectorAll('.hamburger-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Close nav after selection
+                hamburgerBtn.classList.remove('active');
+                hamburgerNav.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+    }
+
+    // Initialize navigation
+    document.addEventListener('DOMContentLoaded', setupNavigation);
+
+    // Whale animation variables
+    let numLayers;
+    let layers = [];
+    let size;
+    let speed;
+    let bx, by;
+    let x2, y2, r2, dy2, dx2, tailr2, l2;
+    let eye;
+    let particles = [];
+    let trail = [];
+    let expressiveEyes = true;
+    let eyeExpression = 'default';
+
+    // Create bubbles
+    function createBubbles() {
+      setInterval(() => {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.style.left = Math.random() * 100 + 'vw';
+        bubble.style.bottom = '0px';
+        const size = Math.random() * 30 + 10;
+        bubble.style.width = size + 'px';
+        bubble.style.height = size + 'px';
+        bubble.style.animationDuration = (Math.random() * 10 + 5) + 's';
+        document.body.appendChild(bubble);
+        
+        // Remove bubble after animation
+        setTimeout(() => {
+          bubble.remove();
+        }, 15000);
+      }, 500);
+    }
+
+    function setup() {
+      const canvas = createCanvas(windowWidth, windowHeight);
+      canvas.parent('canvas-container');
+      frameRate(60);
+      
+      // Initialize with default values
+      numLayers = 35;
+      size = 50;
+      speed = 1.5;
+      
+      initLayers();
+      
+      // Center initial mouse position
+      mouseX = width / 2;
+      mouseY = height / 2;
+      
+      // Create particles for sparkle effect
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x: random(width),
+          y: random(height),
+          size: random(1, 4),
+          speed: random(0.2, 1),
+          alpha: random(100, 200)
+        });
+      }
+      
+      // Start creating bubbles
+      createBubbles();
+    }
+    
+    function initLayers() {
+      // Reset global smoothing variables
+      r2 = dy2 = dx2 = tailr2 = l2 = 0;
+      layers = [];
+      
+      // Initialize layers from tail to nose
+      for (let i = numLayers - 1; i >= 0; i--) {
+        layers[i] = new Layer(i);
+      }
+      
+      // Center initial mouse position
+      mouseX = width / 2;
+      mouseY = height / 2;
+    }
+
+    function draw() {
+      // Clear to transparent background
+      clear();
+      
+      // Draw particles
+      drawParticles();
+      
+      eye = 0; // Reset eye drawing flag
+      x2 = mouseX;
+      y2 = mouseY;
+      
+      // Store current head position for trail
+      if (frameCount % 2 === 0) {
+        trail.push({x: mouseX, y: mouseY});
+        if (trail.length > 20) trail.shift();
+      }
+      
+      // Draw motion trail
+      drawMotionTrail();
+      
+      // Update layer positions from nose to tail
+      for (let i = layers.length - 1; i >= 0; i--) {
+        layers[i].updateLayer();
+      }
+      
+      // Draw layers from tail to nose
+      for (let i = 0; i < layers.length; i++) {
+        layers[i].drawLayer();
+      }
+      
+      // Occasionally change eye expression
+      if (expressiveEyes && frameCount % 180 === 0) {
+        eyeExpression = random(['default', 'surprised', 'happy', 'curious']);
+      }
+    }
+    
+    function drawParticles() {
+      noStroke();
+      for (let i = 0; i < particles.length; i++) {
+        let p = particles[i];
+        fill(255, 255, 255, p.alpha);
+        ellipse(p.x, p.y, p.size, p.size);
+        
+        // Move particles
+        p.x += sin(frameCount * 0.05 + i) * 0.3;
+        p.y -= p.speed;
+        
+        // Reset if off screen
+        if (p.y < -10) {
+          p.y = height + 10;
+          p.x = random(width);
+        }
+      }
+    }
+    
+    function drawMotionTrail() {
+      noStroke();
+      for (let i = 0; i < trail.length; i++) {
+        let alpha = map(i, 0, trail.length, 0, 100);
+        let size = map(i, 0, trail.length, 2, 15);
+        fill(150, 200, 255, alpha);
+        ellipse(trail[i].x, trail[i].y, size, size);
+      }
+    }
+
+    class Layer {
+      constructor(i) {
+        // Calculate layer properties
+        this.L = 1 - i / numLayers;
+        this.R = (30 * pow(this.L, 3) - 58.5 * sq(this.L) + 28 * this.L + 0.92) * size / 2;
+        this.dY = (10 * pow(this.L, 3) - 10 * sq(this.L)) * size;
+        this.gray = 200 - 80 * this.L;
+        this.first = (i === numLayers - 1) ? 1 : 0;
+        
+        // Initialize position
+        this.X = width / 2;
+        this.Y = height / 2;
+        
+        // Tail properties
+        this.tailR = 0;
+        this.dX = 0;
+        
+        if (this.L > 0.775) {
+          this.dX = (22 * sq(this.L) - 30 * this.L + 10) * size;
+          if (i !== 0) {
+            this.tailR = (-86.7 * sq(this.L) + 153.2 * this.L - 66) * size / 2;
+          }
+        }
+        
+        // Store previous frame values
+        this.R2 = r2;
+        this.dY2 = dy2;
+        this.dX2 = dx2;
+        this.tailR2 = tailr2;
+        this.L2 = l2;
+        
+        // Update global references
+        r2 = this.R;
+        dy2 = this.dY;
+        dx2 = this.dX;
+        tailr2 = this.tailR;
+        l2 = this.L;
+      }
+
+      updateLayer() {
+        // Save previous position
+        this.BX = bx;
+        this.BY = by;
+        
+        // Update current position
+        bx = this.X;
+        by = this.Y;
+        
+        if (this.first === 1) {
+          // Nose layer follows mouse with smoothing
+          this.X = (speed / numLayers * x2 + this.X) / (speed / numLayers + 1);
+          this.Y = (speed / numLayers * y2 + this.Y) / (speed / numLayers + 1);
+        } else {
+          // Other layers follow previous position
+          this.X = this.BX;
+          this.Y = this.BY;
+        }
+        
+        // Update position history
+        this.X2 = x2;
+        this.Y2 = y2;
+        x2 = this.X;
+        y2 = this.Y;
+      }
+
+      drawLayer() {
+        fill(this.gray);
+        noStroke();
+        
+        if (this.L <= 0.775) {
+          // Draw body
+          ellipse(this.X, this.Y - this.dY, this.R * 2, this.R * 2);
+          
+          // Draw fins - SYMMETRICAL AND PROPORTIONAL
+          if (this.L > 0.3 && this.L <= 0.4) {
+            // Fin size based on position
+            let finSize = size * (this.L - 0.3) * 1.4;
+            
+            // Draw both fins with the same size and orientation
+            for (let side = -1; side <= 1; side += 2) {
+              push();
+              // Position fins symmetrically
+              translate(this.X + side * this.R * 0.6, this.Y + this.R * 0.4);
+              
+              // Rotate fins outward
+              rotate(side * PI/4);
+              
+              // Draw fin base
+              fill(this.gray);
+              ellipse(0, 0, finSize * 40, finSize * 15);
+              
+              // Draw fin detail
+              fill(this.gray - 30);
+              ellipse(0, 0, finSize * 25, finSize * 8);
+              
+              pop();
+            }
+          }
+          
+          // Draw belly
+          fill(this.gray + 30);
+          stroke(this.gray + 30);
+          strokeWeight(2);
+          beginShape();
+          if (!this.first) {
+            vertex(
+              this.X2 + cos(PI/6) * this.R2, 
+              this.Y2 - this.dY2 + sin(PI/6) * this.R2
+            );
+          }
+          for (let i = PI/6; i <= 5*PI/6; i += PI/15) {
+            vertex(
+              this.X + cos(i) * this.R,
+              this.Y - this.dY + sin(i) * this.R
+            );
+          }
+          if (!this.first) {
+            vertex(
+              this.X2 + cos(5*PI/6) * this.R2,
+              this.Y2 - this.dY2 + sin(5*PI/6) * this.R2
+            );
+          }
+          endShape(CLOSE);
+          noStroke();
+          
+          // Draw blowhole
+          if (this.L > 0.4 && this.L < 0.5) {
+            fill(this.gray - 50);
+            noStroke();
+            beginShape();
+            let offset = abs(this.L - 0.45) / 0.05;
+            let startAngle = (17 + offset) * PI/12;
+            let endAngle = (19 - offset) * PI/12;
+            for (let a = startAngle; a <= endAngle; a += PI/50) {
+              vertex(
+                this.X + cos(a) * this.R,
+                this.Y - this.dY + sin(a) * this.R
+              );
+            }
+            endShape(CLOSE);
+          }
+          
+          // Draw mouth and eyes
+          if (this.L < 0.2) {
+            stroke(100);
+            strokeWeight(3);
+            // Mouth
+            if (!this.first) {
+              line(
+                this.X2 - cos(PI/6) * this.R2, this.Y2 - this.dY2 + sin(PI/6) * this.R2,
+                this.X - cos(PI/6) * this.R, this.Y - this.dY + sin(PI/6) * this.R
+              );
+              line(
+                this.X2 + cos(PI/6) * this.R2, this.Y2 - this.dY2 + sin(PI/6) * this.R2,
+                this.X + cos(PI/6) * this.R, this.Y - this.dY + sin(PI/6) * this.R
+              );
+            }
+            // Bigger, more expressive eyes
+            if (eye === 0) {
+              noStroke();
+              let eyeX, eyeY;
+              
+              // Draw eye sockets - bigger and more prominent
+              fill(180, 180, 200);
+              eyeX = this.X - this.R * 0.75;
+              eyeY = this.Y - this.R * 0.15;
+              ellipse(eyeX, eyeY, size/1.2, size/1.2);
+              ellipse(this.X + this.R * 0.75, eyeY, size/1.2, size/1.2);
+              
+              // Draw main eyes - much bigger and expressive
+              fill(30, 30, 50);
+              ellipse(eyeX, eyeY, size/1.5, size/1.5);
+              ellipse(this.X + this.R * 0.75, eyeY, size/1.5, size/1.5);
+              
+              // Draw pupils with expression
+              fill(0);
+              let pupilSize = size/4;
+              let pupilOffsetX = 0;
+              let pupilOffsetY = 0;
+              
+              // Different expressions
+              if (expressiveEyes) {
+                switch(eyeExpression) {
+                  case 'surprised':
+                    pupilSize = size/6;
+                    pupilOffsetY = -size/8;
+                    break;
+                  case 'happy':
+                    pupilOffsetX = size/12;
+                    pupilOffsetY = size/12;
+                    pupilSize = size/5;
+                    break;
+                  case 'curious':
+                    pupilOffsetX = -size/12;
+                    pupilOffsetY = -size/12;
+                    pupilSize = size/5;
+                    break;
+                  default: // 'default'
+                    pupilSize = size/4;
+                }
+              }
+              
+              ellipse(eyeX + pupilOffsetX, eyeY + pupilOffsetY, pupilSize, pupilSize);
+              ellipse(this.X + this.R * 0.75 + pupilOffsetX, eyeY + pupilOffsetY, pupilSize, pupilSize);
+              
+              // Draw eye highlights - bigger and more noticeable
+              fill(220, 220, 255);
+              ellipse(eyeX - size/10, eyeY - size/10, size/4, size/4);
+              ellipse(this.X + this.R * 0.75 + size/12, eyeY - size/10, size/4, size/4);
+              
+              // Draw extra shine
+              fill(255, 255, 255, 220);
+              ellipse(eyeX - size/12, eyeY - size/8, size/8, size/8);
+              ellipse(this.X + this.R * 0.75 + size/8, eyeY - size/8, size/8, size/8);
+              
+              // Draw eyelids for expression
+              if (expressiveEyes && eyeExpression === 'happy') {
+                noFill();
+                stroke(180, 180, 200);
+                strokeWeight(2);
+                arc(eyeX, eyeY + size/8, size/1.2, size/2, 0, PI);
+                arc(this.X + this.R * 0.75, eyeY + size/8, size/1.2, size/2, 0, PI);
+                noStroke();
+              }
+              
+              eye = 1;
+            }
+          }
+        } else {
+          // Draw tail
+          noStroke();
+          fill(this.gray);
+          for (let side = -1; side <= 1; side += 2) {
+            // Tail segments
+            beginShape();
+            vertex(this.X + side * this.dX, this.Y - this.dY + this.R);
+            vertex(this.X2 + side * this.dX2, this.Y2 - this.dY2 + this.R2);
+            vertex(this.X2 + side * this.dX2, this.Y2 - this.dY2 - this.R2);
+            vertex(this.X + side * this.dX, this.Y - this.dY - this.R);
+            endShape(CLOSE);
+            
+            // Tail tip
+            beginShape();
+            vertex(this.X + side * this.dX, this.Y - this.dY + this.R);
+            vertex(this.X + side * this.dX - side * this.tailR, this.Y - this.dY);
+            vertex(this.X + side * this.dX, this.Y - this.dY - this.R);
+            vertex(this.X + side * this.dX + side * this.tailR, this.Y - this.dY);
+            endShape(CLOSE);
+            
+            // Tail connection
+            beginShape();
+            vertex(this.X + side * this.dX - side * this.tailR, this.Y - this.dY);
+            vertex(this.X2 + side * this.dX2 - side * this.tailR2, this.Y2 - this.dY2);
+            vertex(this.X2 + side * this.dX2 + side * this.tailR2, this.Y2 - this.dY2);
+            vertex(this.X + side * this.dX + side * this.tailR, this.Y - this.dY);
+            endShape(CLOSE);
+          }
+        }
+      }
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      // Re-center the whale
+      mouseX = width / 2;
+      mouseY = height / 2;
+      // Reinitialize layers to adjust to new size
+      initLayers();
+    }
+    
+    function mouseClicked() {
+      expressiveEyes = !expressiveEyes;
+      if (expressiveEyes) {
+        eyeExpression = random(['default', 'surprised', 'happy', 'curious']);
+      }
+    }
+    
+    function keyPressed() {
+      if (key === 's' || key === 'S') {
+        saveCanvas('whale_animation', 'png');
+      }
+    }
+  </script>
+</body>
+</html>

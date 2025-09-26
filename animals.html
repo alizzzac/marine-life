@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marine Wonders - Endangered Sea Animals</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" href="logo.jpg" type="image/jpeg">
+
+<!-- Favicon using your logo.png -->
+    <link rel="icon" type="image/png" href="logo.jpg">
+    <link rel="apple-touch-icon" href="logo.jpg">
+    <meta name="msapplication-TileImage" content="logo.png">
+    <meta name="theme-color" content="#0a2a43">
+    
+
+
+    <style>
+        /* NAVIGATION STYLES */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            /* VIBRANT COLOR PALETTE */
+            --deep-blue: #051937;
+            --electric-aqua: #00f9ff;
+            --neon-seafoam: #6fffe9;
+            --coral-pink: #ff6b6b;
+            --sunlight-yellow: #fffac2;
+            --purple-depth: #9d4edd;
+            --ocean-teal: #00c9b7;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #ff5e62, #ff9966, #ffcc33, #9d50bb, #4776e6);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* NAVIGATION STYLES */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .hamburger-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--electric-aqua);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 10001;
+        }
+
+        .hamburger-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 249, 255, 0.6);
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            margin: 2px 0;
+            background: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .hamburger-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 300px;
+            height: 100vh;
+            background: rgba(5, 20, 35, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            transition: right 0.4s ease;
+            padding: 80px 20px 20px;
+            overflow-y: auto;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .hamburger-nav.active {
+            right: 0;
+        }
+
+        .hamburger-tabs {
+            list-style: none;
+            width: 100%;
+        }
+
+        .hamburger-tab {
+            width: 100%;
+            margin-bottom: 5px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .hamburger-tab a {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            text-decoration: none;
+            color: white;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-tab a i {
+            font-size: 1.5rem;
+            width: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-tab a span {
+            margin-left: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .hamburger-tab:hover {
+            transform: translateX(-5px);
+        }
+
+        /* Different colors for each tab using the new palette */
+        .tab1 { background: var(--electric-aqua); }
+        .tab2 { background: var(--neon-seafoam); }
+        .tab3 { background: var(--coral-pink); }
+        .tab4 { background: #ffcc33; }
+        .tab5 { background: var(--purple-depth); }
+        .tab6 { background: #4776e6; }
+        .tab7 { background: var(--ocean-teal); }
+        .tab8 { background: #ff5e62; }
+
+        /* Active tab indicator */
+        .hamburger-tab.active {
+            box-shadow: inset 5px 0 0 white;
+        }
+
+        /* Responsive for navigation */
+        @media (max-width: 768px) {
+            .hamburger-nav {
+                width: 80%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hamburger-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .hamburger-btn span {
+                width: 22px;
+                height: 2.5px;
+            }
+        }
+
+        /* VIDEO LOADER STYLES */
+        .video-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--deep-blue), #0a2457);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: opacity 0.8s ease, visibility 0s linear 0.8s;
+        }
+        
+        .loader-video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .loader-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* INCREASED OPACITY FOR BETTER VISIBILITY */
+            opacity: 0.9;
+        }
+        
+        .loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* LIGHTER OVERLAY FOR BETTER VIDEO VISIBILITY */
+            background: linear-gradient(to bottom, rgba(5, 25, 55, 0.4), rgba(5, 25, 55, 0.6));
+        }
+        
+        .loader-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 90%;
+            width: 300px;
+            padding: 2rem;
+            background: rgba(5, 25, 55, 0.6);
+            border-radius: 1rem;
+            box-shadow: 0 0 1.5rem rgba(0, 249, 255, 0.3),
+                        inset 0 0 0.8rem rgba(0, 200, 255, 0.2);
+            backdrop-filter: blur(0.5rem);
+            border: 1px solid rgba(0, 249, 255, 0.2);
+        }
+        
+        .loader-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--sunlight-yellow);
+            margin-bottom: 1.5rem;
+        }
+        
+        .loader-logo i {
+            color: var(--electric-aqua);
+            font-size: 2rem;
+        }
+        
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(0, 249, 255, 0.2);
+            border-radius: 50%;
+            border-top: 5px solid var(--electric-aqua);
+            margin: 1.5rem auto;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .loader-text {
+            font-size: 1.1rem;
+            color: white;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+        
+        .skip-loader {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .skip-loader:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .video-loader.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* VIBRANT ANIMATIONS */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ENHANCED HEADER STYLES */
+        header {
+            position: relative;
+            text-align: center;
+            padding: 5rem 1.25rem;
+            background: linear-gradient(rgba(0, 10, 30, 0.7), rgba(0, 30, 60, 0.8)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23005197" fill-opacity="0.3" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,192C1248,192,1344,128,1392,96L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') bottom/cover no-repeat;
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header-content {
+            max-width: 900px;
+            z-index: 2;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 1.25rem;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+            background: linear-gradient(to right, #6fffe9, #00f9ff, #fffac2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px rgba(111, 255, 233, 0.5),
+                             0 0 10px rgba(0, 249, 255, 0.5),
+                             0 0 15px rgba(0, 249, 255, 0.3);
+            }
+            to {
+                text-shadow: 0 0 10px rgba(111, 255, 233, 0.7),
+                             0 0 20px rgba(0, 249, 255, 0.7),
+                             0 0 30px rgba(0, 249, 255, 0.5);
+            }
+        }
+        
+        .intro {
+            max-width: 50rem;
+            margin: 0 auto 3.125rem;
+            line-height: 1.6;
+            font-size: 1.3rem;
+            background: rgba(5, 25, 55, 0.6);
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0, 249, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .intro::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 4px;
+            background: linear-gradient(to right, #ff5e62, #ff9966, #ffcc33, #9d50bb, #4776e6);
+            border-radius: 2px;
+        }
+
+        .header-bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(20px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ocean-waves {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%2300f9ff" fill-opacity="0.3" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,192C1248,192,1344,128,1392,96L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
+            background-size: 1440px 100px;
+            animation: wave 10s linear infinite;
+        }
+
+        @keyframes wave {
+            0% {
+                background-position-x: 0;
+            }
+            100% {
+                background-position-x: 1440px;
+            }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1.5rem;
+            animation: bounce 2s infinite;
+            z-index: 2;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-20px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: rgba(5, 25, 55, 0.7);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            min-width: 150px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0, 249, 255, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--electric-aqua);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-text {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* RESPONSIVE HEADER STYLES */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.8rem;
+            }
+            
+            .intro {
+                font-size: 1.1rem;
+                padding: 1rem;
+            }
+            
+            .stats-container {
+                gap: 1rem;
+            }
+            
+            .stat-box {
+                min-width: 120px;
+                padding: 0.8rem 1rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            header {
+                padding: 3rem 1rem;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.8rem;
+            }
+            
+            .stat-box {
+                width: 80%;
+            }
+        }
+
+        /* MAIN CONTENT STYLES */
+        .temperature-section {
+            max-width: 75rem;
+            margin: 0 auto 2.5rem;
+            padding: 0 1.25rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.625rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+        }
+        
+        /* DARKER HEADING COLORS FOR BETTER CONTRAST */
+        .warm-section .section-title {
+            color: #cc7a00; /* Darker orange */
+        }
+        
+        .cold-section .section-title {
+            color: #1a4fba; /* Darker blue */
+        }
+        
+        .temperate-section .section-title {
+            color: #6a3093; /* Darker purple */
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.875rem;
+            padding: 1.25rem 0;
+        }
+        
+        .card {
+            flex: 1 1 18.75rem;
+            max-width: 21.875rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.9375rem;
+            overflow: hidden;
+            box-shadow: 0 0.625rem 1.25rem rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(0.3125rem);
+            position: relative;
+            opacity: 0;
+            transform: translateY(3.125rem);
+            transition: opacity 0.5s, transform 0.5s;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .card:hover {
+            transform: translateY(-0.625rem);
+            box-shadow: 0 0.9375rem 1.875rem rgba(0, 0, 0, 0.4);
+        }
+        
+        .card-image {
+            height: 12.5rem;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .card:hover .card-image img {
+            transform: scale(1.1);
+        }
+        
+        .card-content {
+            padding: 1.25rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-content p {
+            margin-top: auto; /* Pushes content to top and button to bottom */
+            margin-bottom: 15px; /* Adds space between text and button */
+        }
+        
+        h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #d05454c0;
+        }
+        
+        .temperature {
+            display: inline-block;
+            padding: 0.3125rem 0.625rem;
+            border-radius: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.9375rem;
+            align-self: flex-start;
+        }
+        
+        .warm {
+            background-color: #b7641b;
+        }
+        
+        .cold {
+            background-color: #2a5ac8;
+        }
+        
+        .temperate {
+            background-color: #a31dd8;
+        }
+        
+        .bubble {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .snowflake {
+            position: absolute;
+            color: white;
+            font-size: 1rem;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 1.875rem;
+            background-color: rgba(0, 0, 0, 0.5);
+            margin-top: 3.125rem;
+            backdrop-filter: blur(0.3125rem);
+        }
+        
+        .learn-more {
+            display: inline-block;
+            padding: 0.625rem 1.25rem;
+            background-color: #4776e6;
+            color: white;
+            text-decoration: none;
+            border-radius: 0.3125rem;
+            margin-top: 15px; /* Additional gap between text and button */
+            align-self: flex-start;
+            transition: all 0.3s;
+        }
+        
+        .learn-more:hover {
+            background-color: #3a5bc7;
+            transform: translateY(-0.125rem);
+        }
+        
+        @media (max-width: 48rem) {
+            .container {
+                gap: 1.25rem;
+                padding: 0.625rem;
+            }
+            
+            .card {
+                flex: 1 1 100%;
+                max-width: 100%;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            /* Improved loader mobile adjustments */
+            .loader-content {
+                padding: 1.5rem;
+                width: 85%;
+            }
+            
+            .loader-logo {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Animation keyframes */
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-3.125rem) translateX(0.625rem);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(-6.25rem) translateX(0);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-1.25rem) rotate(0deg);
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        /* Snowflake animation for cold water section */
+        .cold-section {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .snow-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .snowflake {
+            position: absolute;
+            color: white;
+            font-size: 1rem;
+            top: -10px;
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(105vh) rotate(360deg);
+            }
+        }
+
+        /* NEW STYLES FOR ENHANCED FOOTER */
+        .enhanced-footer {
+            background: linear-gradient(to right, var(--deep-blue), #0a2a5f);
+            padding: 3rem 1rem;
+            margin-top: 4rem;
+            border-top: 3px solid var(--electric-aqua);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-section {
+            padding: 1rem;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.2rem;
+            color: var(--neon-seafoam);
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--coral-pink);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--electric-aqua);
+        }
+        
+        .footer-links i {
+            font-size: 0.9rem;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.2rem;
+        }
+        
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            background: var(--electric-aqua);
+            transform: translateY(-3px);
+        }
+        
+        .newsletter-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .newsletter-input {
+            padding: 0.8rem;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .newsletter-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .subscribe-btn {
+            padding: 0.8rem;
+            border-radius: 5px;
+            border: none;
+            background: var(--electric-aqua);
+            color: var(--deep-blue);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .subscribe-btn:hover {
+            background: var(--neon-seafoam);
+        }
+        
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Call to Action Section */
+        .cta-section {
+            background: linear-gradient(to right, rgba(5, 25, 55, 0.8), rgba(9, 45, 95, 0.8)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%2300f9ff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,192C1248,192,1344,128,1392,96L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            padding: 4rem 1rem;
+            text-align: center;
+            margin: 3rem 0;
+            border-radius: 15px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--sunlight-yellow);
+        }
+        
+        .cta-text {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-button {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .cta-button.primary {
+            background: var(--electric-aqua);
+            color: var(--deep-blue);
+        }
+        
+        .cta-button.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid var(--electric-aqua);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cta-button.primary:hover {
+            background: var(--neon-seafoam);
+        }
+        
+        .cta-button.secondary:hover {
+            background: rgba(0, 249, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .cta-title {
+                font-size: 1.8rem;
+            }
+            
+            .cta-text {
+                font-size: 1rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-button {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Accessibility improvements */
+        .skip-to-content {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--electric-aqua);
+            color: var(--deep-blue);
+            padding: 8px;
+            z-index: 10000;
+            transition: top 0.3s;
+        }
+
+        .skip-to-content:focus {
+            top: 0;
+        }
+
+        /* Focus styles for better accessibility */
+        a:focus, button:focus {
+            outline: 2px solid var(--electric-aqua);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-to-content">Skip to Content</a>
+    
+    <!-- NAVIGATION -->
+    <!-- HAMBURGER MENU -->
+    <div class="hamburger-menu">
+        <div class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <!-- HAMBURGER NAVIGATION -->
+    <nav class="hamburger-nav" id="hamburgerNav" aria-label="Main navigation">
+        <ul class="hamburger-tabs">
+            <li class="hamburger-tab tab1">
+                <a href="index.html">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab2">
+                <a href="animals.html">
+                    <i class="fas fa-paw"></i>
+                    <span>Animals</span>
+                </a>
+                 <li class="hamburger-tab tab2">
+                <a href="pollution.html">
+                    <i class="fas fa-industry"></i>
+                    <span>man made pollution</span>
+                </a> 
+            </li>
+            <li class="hamburger-tab tab3">
+                <a href="chat.html">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>Conservation</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab3">
+                <a href="chat.html">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>game</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab4">
+                <a href="DONATE.HTML">
+                    <i class="fas fa-donate"></i>
+                    <span>Donate</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab5">
+                <a href="about.html">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab6">
+                <a href="contact.html">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab7">
+                <a href="news.html">
+                    <i class="fas fa-newspaper"></i>
+                    <span>News</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab8">
+                <a href="visit.html">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Visit</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <!-- VIDEO LOADER -->
+    <div class="video-loader" id="videoLoader">
+        <div class="loader-video-container">
+            <video class="loader-video" autoplay muted loop playsinline>
+                <source src="198790-908857541_small.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="loader-overlay"></div>
+        </div>
+        
+        <div class="loader-content">
+            <div class="loader-logo">
+                <i class="fas fa-water"></i>
+                <span>MARINE WONDERS</span>
+            </div>
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Diving into marine life...</div>
+        </div>
+        
+        <button class="skip-loader" id="skipLoader">Skip Intro</button>
+    </div>
+    
+    <!-- ENHANCED HEADER -->
+    <header id="main-content">
+        <div class="header-bubbles" id="headerBubbles"></div>
+        <div class="ocean-waves"></div>
+        
+        <div class="header-content">
+            <h1>Endangered Sea Animals</h1>
+            <p class="intro">Our oceans are home to incredible biodiversity, but many species are threatened by climate change, pollution, and human activities. Explore these endangered marine creatures from different temperature zones.</p>
+            
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-number">1,550+</div>
+                    <div class="stat-text">Marine Species Endangered</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">90%</div>
+                    <div class="stat-text">Big Fish Populations Depleted</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">50%</div>
+                    <div class="stat-text">Coral Reefs Lost</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </header>
+    
+    <main>
+        <section class="temperature-section warm-section">
+            <h2 class="section-title">Warm Water Species</h2>
+            <div class="container">
+                <div class="card" data-temperature="warm">
+                    <div class="card-image">
+                        <img src="kko.jpg" alt="Hawksbill Sea Turtle">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature warm">Warm Waters</span>
+                        <h2>Hawksbill Sea Turtle</h2>
+                        <p>Critically endangered due to habitat loss, pollution, and illegal trade of their beautiful shells. They play a crucial role in maintaining healthy coral reefs.</p>
+                        <a href="hawksbill.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="card" data-temperature="warm">
+                    <div class="card-image">
+                        <img src="kkk.jpg" alt="Whale Shark">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature warm">Warm Waters</span>
+                        <h2>Whale Shark</h2>
+                        <p>The largest fish in the sea is endangered due to bycatch, vessel strikes, and hunting. These gentle giants filter feed on plankton and small fish.</p>
+                        <a href="whale.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="card" data-temperature="warm">
+                    <div class="card-image">
+                        <img src="kkkk.webp" alt="Staghorn Coral">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature warm">Warm Waters</span>
+                        <h2>Staghorn Coral</h2>
+                        <p>This reef-building coral has declined by over 80% due to climate change, disease, and pollution. Coral reefs support 25% of all marine life.</p>
+                        <a href="staghorn.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="card" data-temperature="warm">
+                    <div class="card-image">
+                        <img src="lovek.webp" alt="Bluefin Tuna">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature warm">Warm Waters</span>
+                        <h2>Bluefin Tuna</h2>
+                        <p>Overfishing has brought this magnificent predator to the brink of extinction. They can reach speeds of 40 mph and cross entire oceans.</p>
+                        <a href="bluefin.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="card" data-temperature="warm">
+                    <div class="card-image">
+                        <img src="lordss.jpeg" alt="Dugong">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature warm">Warm Waters</span>
+                        <h2>Dugong</h2>
+                        <p>These gentle "sea cows" are vulnerable due to habitat loss and hunting. They're closely related to manatees and play a key role in marine ecosystems.</p>
+                        <a href="dugong.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="temperature-section temperate-section">
+            <h2 class="section-title">Temperate Water Species</h2>
+            <div class="container">
+                <div class="card" data-temperature="temperate">
+                    <div class="card-image">
+                        <img src="momo.jpg" alt="Vaquita">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature temperate">Temperate Waters</span>
+                        <h2>Vaquita</h2>
+                        <p>The world's most endangered marine mammal with fewer than 10 individuals remaining. Threatened by illegal fishing operations in the Gulf of California.</p>
+                        <a href="vaquita.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="card" data-temperature="temperate">
+                    <div class="card-image">
+                        <img src="hnm.jpg" alt="Sea Otter">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature temperate">Temperate Waters</span>
+                        <h2>Southern Sea Otter</h2>
+                        <p>Endangered due to oil spills, fishing gear entanglement, and habitat loss. These keystone species help maintain kelp forest ecosystems.</p>
+                        <a href="otter.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="card" data-temperature="temperate">
+                    <div class="card-image">
+                        <img src="lovek.jpg" alt="Blue Whale">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature temperate">Temperate Waters</span>
+                        <h2>Blue Whale</h2>
+                        <p>The largest animal ever known to have existed, endangered due to historical whaling and ship strikes. Populations are slowly recovering.</p>
+                        <a href="blue.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="card" data-temperature="temperate">
+                    <div class="card-image">
+                        <img src="olo.jpg" alt="North Atlantic Right Whale">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature temperate">Temperate Waters</span>
+                        <h2>North Atlantic Right Whale</h2>
+                        <p>Critically endangered with only about 350 remaining. Threatened by ship strikes and fishing gear entanglements.</p>
+                        <a href="north.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="temperature-section cold-section">
+            <!-- Snowflake container for the entire cold section -->
+            <div class="snow-container" id="snowContainer"></div>
+            
+            <h2 class="section-title">Cold Water Species</h2>
+            <div class="container">
+                <div class="card" data-temperature="cold">
+                    <div class="card-image">
+                        <img src="pol.jpg" alt="Polar Bear">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature cold">Cold Waters</span>
+                        <h2>Polar Bear</h2>
+                        <p>Vulnerable due to melting Arctic sea ice from climate change. These marine mammals rely on sea ice to hunt seals and travel.</p>
+                        <a href="polar.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="card" data-temperature="cold">
+                    <div class="card-image">
+                        <img src="lopl.jpg" alt="Narwhal">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature cold">Cold Waters</span>
+                        <h2>Narwhal</h2>
+                        <p>Near threatened due to climate change and hunting. Known as the "unicorns of the sea" for their long spiral tusks, they're sensitive to noise pollution.</p>
+                        <a href="narwhal.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="card" data-temperature="cold">
+                    <div class="card-image">
+                        <img src="ji.jpg" alt="Beluga Whale">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature cold">Cold Waters</span>
+                        <h2>Beluga Whale</h2>
+                        <p>Some populations are endangered due to pollution, habitat degradation, and climate change. Known for their distinctive white color and vocalizations.</p>
+                        <a href="beluga.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="card" data-temperature="cold">
+                    <div class="card-image">
+                        <img src="knop.webp" alt="Krill">
+                    </div>
+                    <div class="card-content">
+                        <span class="temperature cold">Cold Waters</span>
+                        <h2>Antarctic Krill</h2>
+                        <p>Declining due to climate change and commercial fishing. These tiny creatures form the base of the Antarctic food web, supporting whales, penguins, and seals.</p>
+                        <a href="antarctic.html" class="learn-more">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CALL TO ACTION SECTION -->
+        <section class="cta-section">
+            <div class="cta-content">
+                <h2 class="cta-title">Take Action to Protect Our Oceans</h2>
+                <p class="cta-text">Join thousands of marine conservation advocates working to protect endangered species and preserve our oceans for future generations.</p>
+                <div class="cta-buttons">
+                    <a href="donate.html" class="cta-button primary">
+                        <i class="fas fa-donate"></i> Support Our Mission
+                    </a>
+                    <a href="conservation.html" class="cta-button secondary">
+                        <i class="fas fa-hands-helping"></i> Get Involved
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- ENHANCED FOOTER -->
+    <footer class="enhanced-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Marine Wonders</h3>
+                <p>Dedicated to raising awareness about endangered marine species and promoting ocean conservation through education and action.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="animals.html"><i class="fas fa-paw"></i> Endangered Species</a></li>
+                    <li><a href="chat.html"><i class="fas fa-hand-holding-heart"></i> Conservation Efforts</a></li>
+                    <li><a href="donate.html"><i class="fas fa-donate"></i> Donate</a></li>
+                    <li><a href="visit.html"><i class="fas fa-map-marker-alt"></i> Visit Marine Sanctuaries</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <ul class="footer-links">
+                    <li><a href="news.html"><i class="fas fa-newspaper"></i> Latest News</a></li>
+                    <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact Us</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Stay Updated</h3>
+                <p>Subscribe to our newsletter for the latest updates on marine conservation efforts.</p>
+                <form class="newsletter-form">
+                    <input type="email" class="newsletter-input" placeholder="Your Email Address" required>
+                    <button type="submit" class="subscribe-btn">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2023 Marine Wonders Conservation Initiative. All rights reserved.</p>
+            <p>Committed to protecting our oceans and the incredible life within them.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // NAVIGATION FUNCTIONALITY
+        function setupNavigation() {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const hamburgerNav = document.getElementById('hamburgerNav');
+            
+            hamburgerBtn.addEventListener('click', function() {
+                this.classList.toggle('active');
+                hamburgerNav.classList.toggle('active');
+                this.setAttribute('aria-expanded', hamburgerNav.classList.contains('active'));
+                
+                // Prevent body scrolling when nav is open
+                if (hamburgerNav.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Close nav when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (hamburgerNav.classList.contains('active') && 
+                    !hamburgerNav.contains(e.target) && 
+                    !hamburgerBtn.contains(e.target)) {
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Add active class to clicked tab
+            document.querySelectorAll('.hamburger-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Close nav after selection
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                    document.body.style.overflow = '';
+                });
+            });
+        }
+
+        // VIDEO LOADER FUNCTIONALITY
+        const videoLoader = document.getElementById('videoLoader');
+        const skipLoaderBtn = document.getElementById('skipLoader');
+        const loaderVideo = document.querySelector('.loader-video');
+        
+        // Skip loader button functionality
+        skipLoaderBtn.addEventListener('click', hideLoader);
+        
+        // Try to play the video with sound muted
+        function playVideo() {
+            if (loaderVideo) {
+                loaderVideo.play().catch(e => {
+                    console.log("Video autoplay failed:", e);
+                });
+            }
+        }
+        
+        function hideLoader() {
+            videoLoader.classList.add('hide');
+            
+            // Pause video when loader is hidden
+            if (loaderVideo) {
+                loaderVideo.pause();
+            }
+            
+            // Remove from DOM after animation completes
+            setTimeout(() => {
+                videoLoader.style.display = 'none';
+                document.body.classList.add('loaded');
+                checkCards();
+            }, 800);
+        }
+
+        // ENHANCED HEADER FUNCTIONALITY
+        function createHeaderBubbles() {
+            const headerBubbles = document.getElementById('headerBubbles');
+            const header = document.querySelector('header');
+            const headerWidth = header.offsetWidth;
+            
+            // Create bubbles
+            for (let i = 0; i < 20; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                // Random size
+                const size = Math.random() * 30 + 10;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                
+                // Random position
+                const left = Math.random() * headerWidth;
+                bubble.style.left = `${left}px`;
+                
+                // Random opacity
+                bubble.style.opacity = Math.random() * 0.4 + 0.1;
+                
+                // Random animation duration and delay
+                const duration = Math.random() * 10 + 5;
+                const delay = Math.random() * 5;
+                bubble.style.animationDuration = `${duration}s`;
+                bubble.style.animationDelay = `${delay}s`;
+                
+                headerBubbles.appendChild(bubble);
+            }
+        }
+
+        /* CARD ANIMATION CODE */
+        function createBubbles(card) {
+            const cardRect = card.getBoundingClientRect();
+            const cardWidth = cardRect.width;
+            const cardHeight = cardRect.height;
+            
+            for (let i = 0; i < 15; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                const size = Math.random() * 15 + 5;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                
+                const left = Math.random() * cardWidth;
+                const top = Math.random() * cardHeight;
+                bubble.style.left = `${left}px`;
+                bubble.style.top = `${top}px`;
+                
+                bubble.style.opacity = Math.random() * 0.5 + 0.3;
+                
+                const duration = Math.random() * 3 + 2;
+                bubble.style.animation = `float ${duration}s infinite ease-in`;
+                
+                card.querySelector('.card-image').appendChild(bubble);
+            }
+        }
+        
+        function createSnowflakes(card) {
+            const cardRect = card.getBoundingClientRect();
+            const cardWidth = cardRect.width;
+            
+            for (let i = 0; i < 10; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.classList.add('snowflake');
+                snowflake.innerHTML = '❄';
+                
+                const size = Math.random() * 0.5 + 0.5;
+                snowflake.style.fontSize = `${size}rem`;
+                
+                const left = Math.random() * cardWidth;
+                snowflake.style.left = `${left}px`;
+                snowflake.style.top = `-20px`;
+                
+                snowflake.style.opacity = Math.random() * 0.7 + 0.3;
+                
+                const duration = Math.random() * 3 + 2;
+                const delay = Math.random() * 3;
+                snowflake.style.animation = `fall ${duration}s ${delay}s infinite linear`;
+                
+                card.querySelector('.card-image').appendChild(snowflake);
+            }
+        }
+        
+        // Create snowflakes for the entire cold section
+        function createSectionSnowflakes() {
+            const snowContainer = document.getElementById('snowContainer');
+            const coldSection = document.querySelector('.cold-section');
+            const sectionRect = coldSection.getBoundingClientRect();
+            const sectionWidth = sectionRect.width;
+            
+            // Create snowflakes
+            for (let i = 0; i < 30; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.classList.add('snowflake');
+                snowflake.innerHTML = '❄';
+                
+                // Random size
+                const size = Math.random() * 1 + 0.8;
+                snowflake.style.fontSize = `${size}rem`;
+                
+                // Random position within the cold section
+                const left = Math.random() * sectionWidth;
+                snowflake.style.left = `${left}px`;
+                
+                // Random opacity
+                snowflake.style.opacity = Math.random() * 0.8 + 0.2;
+                
+                // Random animation duration and delay
+                const duration = Math.random() * 10 + 5;
+                const delay = Math.random() * 5;
+                snowflake.style.animationDuration = `${duration}s`;
+                snowflake.style.animationDelay = `${delay}s`;
+                
+                snowContainer.appendChild(snowflake);
+            }
+        }
+        
+        function checkCards() {
+            const cards = document.querySelectorAll('.card');
+            const windowHeight = window.innerHeight;
+            
+            cards.forEach(card => {
+                const cardRect = card.getBoundingClientRect();
+                const cardTop = cardRect.top;
+                
+                if (cardTop < windowHeight - 100 && !card.classList.contains('visible')) {
+                    card.classList.add('visible');
+                    
+                    if (card.dataset.temperature === 'warm') {
+                        createBubbles(card);
+                    } else if (card.dataset.temperature === 'cold') {
+                        createSnowflakes(card);
+                    }
+                }
+            });
+        }
+
+        // Start loading with initial animation
+        document.addEventListener('DOMContentLoaded', () => {
+            setupNavigation();
+            
+            // Create header bubbles
+            createHeaderBubbles();
+            
+            // Create snowflakes for the cold section
+            createSectionSnowflakes();
+            
+            // Try to play the video
+            playVideo();
+            
+            // Show loader for a minimum time to prevent flash
+            setTimeout(() => {
+                hideLoader();
+            }, 4000); // Show for 4 seconds minimum
+        });
+        
+        // Hide loader when everything is loaded
+        window.addEventListener('load', () => {
+            // If the DOMContentLoaded timeout hasn't already hidden it
+            if (!videoLoader.classList.contains('hide')) {
+                // Wait at least 2 seconds after load to hide
+                setTimeout(hideLoader, 2000);
+            }
+        });
+        
+        window.addEventListener('scroll', checkCards);
+        window.addEventListener('resize', checkCards);
+        
+        // Initial check for cards in viewport
+        setTimeout(checkCards, 1000);
+    </script>
+</body>
+</html>

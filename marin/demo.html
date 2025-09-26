@@ -1,0 +1,683 @@
+Ocean Explorer Website Integration Solution
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ocean Explorer Gallery</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+      background: linear-gradient(135deg, #0a2a43, #1a4b6d, #0a2a43);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      height: 80px;
+      background: rgba(0, 20, 40, 0.8);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1001;
+      border-bottom: 1px solid rgba(64, 224, 208, 0.3);
+      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .logo {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #40e0d0, #00bfff, #1e90ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo i {
+      margin-right: 12px;
+      font-size: 1.8rem;
+    }
+
+    .menu-icon {
+      font-size: 2rem;
+      cursor: pointer;
+      transition: transform 0.4s ease;
+      color: #40e0d0;
+    }
+
+    .menu-icon:hover {
+      transform: rotate(90deg) scale(1.1);
+      color: #00bfff;
+    }
+
+    .fullscreen-menu {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 25, 45, 0.98);
+      color: #fff;
+      z-index: 1000;
+      transition: right 0.6s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 20px 20px;
+      overflow: hidden;
+    }
+
+    .fullscreen-menu.active {
+      right: 0;
+    }
+
+    .menu-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 1200px;
+      width: 100%;
+      padding: 20px;
+    }
+
+    .menu-content nav ul {
+      list-style: none;
+      margin-bottom: 50px;
+    }
+
+    .menu-content nav ul li {
+      margin: 25px 0;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s forwards;
+    }
+
+    .menu-content nav ul li:nth-child(1) { animation-delay: 0.2s; }
+    .menu-content nav ul li:nth-child(2) { animation-delay: 0.3s; }
+    .menu-content nav ul li:nth-child(3) { animation-delay: 0.4s; }
+    .menu-content nav ul li:nth-child(4) { animation-delay: 0.5s; }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .menu-content nav ul li a {
+      color: #fff;
+      font-size: 2rem;
+      text-decoration: none;
+      transition: all 0.4s;
+      display: inline-block;
+      padding: 12px 35px;
+      border-radius: 50px;
+      background: rgba(64, 224, 208, 0.1);
+      border: 1px solid rgba(64, 224, 208, 0.3);
+      backdrop-filter: blur(10px);
+      min-width: 250px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .menu-content nav ul li a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(64, 224, 208, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .menu-content nav ul li a:hover::before {
+      left: 100%;
+    }
+
+    .menu-content nav ul li a:hover {
+      background: rgba(30, 144, 255, 0.2);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .gallery-container {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      height: 450px;
+      margin-top: 30px;
+      overflow: hidden;
+      border-radius: 15px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(64, 224, 208, 0.3);
+    }
+
+    .gallery-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 15px;
+      opacity: 0;
+      transition: opacity 1.2s ease, transform 0.8s ease;
+      transform: scale(0.95);
+      cursor: pointer;
+    }
+
+    .gallery-image.active {
+      opacity: 1;
+      transform: scale(1);
+      z-index: 1;
+    }
+
+    .gallery-controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+      gap: 20px;
+    }
+
+    .control-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(64, 224, 208, 0.15);
+      border: 1px solid rgba(64, 224, 208, 0.4);
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      backdrop-filter: blur(5px);
+    }
+
+    .control-btn:hover {
+      background: rgba(30, 144, 255, 0.3);
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(64, 224, 208, 0.4);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 30px;
+      right: 40px;
+      font-size: 2.8rem;
+      color: #40e0d0;
+      cursor: pointer;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(64, 224, 208, 0.3);
+    }
+
+    .close-btn:hover {
+      background: rgba(30, 144, 255, 0.2);
+      transform: rotate(90deg);
+      color: #00bfff;
+    }
+
+    /* Image Modal */
+    .image-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 10, 20, 0.98);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      max-width: 90%;
+      max-height: 85%;
+      border-radius: 10px;
+      box-shadow: 0 0 40px rgba(64, 224, 208, 0.5);
+      animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 30px;
+      right: 40px;
+      font-size: 3.5rem;
+      color: #40e0d0;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .close-modal:hover {
+      color: #00bfff;
+      transform: rotate(90deg);
+    }
+
+    .image-info {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      background: rgba(0, 20, 40, 0.7);
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-size: 1.3rem;
+      text-align: center;
+      max-width: 80%;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(64, 224, 208, 0.3);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .bubbles {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: bubble 10s linear infinite;
+    }
+
+    .bubble:nth-child(1) {
+      left: 10%;
+      animation-delay: 0s;
+      width: 20px;
+      height: 20px;
+    }
+
+    .bubble:nth-child(2) {
+      left: 20%;
+      animation-delay: 2s;
+      width: 15px;
+      height: 15px;
+    }
+
+    .bubble:nth-child(3) {
+      left: 35%;
+      animation-delay: 4s;
+      width: 30px;
+      height: 30px;
+    }
+
+    .bubble:nth-child(4) {
+      left: 50%;
+      animation-delay: 0s;
+      width: 25px;
+      height: 25px;
+    }
+
+    .bubble:nth-child(5) {
+      left: 65%;
+      animation-delay: 3s;
+    }
+
+    .bubble:nth-child(6) {
+      left: 75%;
+      animation-delay: 6s;
+      width: 35px;
+      height: 35px;
+    }
+
+    .bubble:nth-child(7) {
+      left: 90%;
+      animation-delay: 8s;
+      width: 18px;
+      height: 18px;
+    }
+
+    @keyframes bubble {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+        opacity: 0.5;
+      }
+      50% {
+        transform: translateX(100px);
+        opacity: 0.7;
+      }
+      100% {
+        bottom: 1000px;
+        transform: translateX(-200px);
+        opacity: 0;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .menu-content {
+        flex-direction: row;
+        gap: 80px;
+      }
+      
+      .menu-content nav ul {
+        margin: 0;
+      }
+      
+      .menu-content nav ul li {
+        margin: 30px 0;
+      }
+      
+      .menu-content nav ul li a {
+        font-size: 2.2rem;
+      }
+      
+      .gallery-container {
+        height: 550px;
+      }
+    }
+    
+    .wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%2300bfff" fill-opacity="0.2" d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,250.7C960,267,1056,245,1152,224C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+      background-size: 1000px 100px;
+      animation: wave 15s linear infinite;
+    }
+    
+    .wave:nth-child(2) {
+      animation-delay: -5s;
+      opacity: 0.5;
+      bottom: 10px;
+    }
+    
+    .wave:nth-child(3) {
+      animation-delay: -2s;
+      opacity: 0.3;
+      bottom: 20px;
+    }
+    
+    @keyframes wave {
+      0% {
+        background-position-x: 0;
+      }
+      100% {
+        background-position-x: 1000px;
+      }
+    }
+    
+    .ocean-floor {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 150px;
+      background: linear-gradient(to top, #063852, #0a2a43);
+      z-index: -1;
+    }
+  </style>
+</head>
+<body>
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
+  <div class="wave"></div>
+  <div class="wave"></div>
+  <div class="wave"></div>
+  <div class="ocean-floor"></div>
+
+  <header>
+    <div class="logo">
+      <i class="fas fa-water"></i>
+      Ocean Explorer
+    </div>
+    <div class="menu-icon" id="menuToggle">
+      <i class="fas fa-fish"></i>
+    </div>
+  </header>
+
+  <div class="fullscreen-menu" id="fullscreenMenu">
+    <div class="close-btn" id="closeMenu">
+      <i class="fas fa-times"></i>
+    </div>
+    <div class="menu-content">
+      <nav>
+        <ul>
+          <li><a href="#"><i class="fas fa-home"></i> Ocean Home</a></li>
+          <li><a href="#"><i class="fas fa-ship"></i> Marine Life</a></li>
+          <li><a href="#"><i class="fas fa-camera"></i> Deep Sea Gallery</a></li>
+          <li><a href="#"><i class="fas fa-envelope"></i> Contact Divers</a></li>
+        </ul>
+      </nav>
+      
+      <div class="gallery-container">
+        <img src="https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=1200&q=80" alt="Coral Reef" class="gallery-image active">
+        <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80" alt="Underwater Cave" class="gallery-image">
+        <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=80" alt="Sea Turtle" class="gallery-image">
+        <img src="https://images.unsplash.com/photo-1532517891316-72a08e5c03a7?auto=format&fit=crop&w=1200&q=80" alt="Ocean Waves" class="gallery-image">
+        <img src="https://images.unsplash.com/photo-1551334787-21e6bd3ab135?auto=format&fit=crop&w=1200&q=80" alt="Dolphins" class="gallery-image">
+        <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80" alt="Whale" class="gallery-image">
+      </div>
+      
+      <div class="gallery-controls">
+        <button class="control-btn" id="prevBtn"><i class="fas fa-arrow-left"></i></button>
+        <button class="control-btn" id="nextBtn"><i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Modal -->
+  <div class="image-modal" id="imageModal">
+    <span class="close-modal" id="closeModal">
+      <i class="fas fa-times"></i>
+    </span>
+    <img src="" alt="Enlarged Ocean View" class="modal-content" id="modalImage">
+    <div class="image-info" id="imageInfo">Coral Reef Ecosystem</div>
+  </div>
+
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const fullscreenMenu = document.getElementById('fullscreenMenu');
+    const closeMenu = document.getElementById('closeMenu');
+    const galleryImages = document.querySelectorAll('.gallery-image');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const closeModal = document.getElementById('closeModal');
+    const imageInfo = document.getElementById('imageInfo');
+    
+    let currentImageIndex = 0;
+    let imageInterval;
+    
+    // Image titles for modal
+    const imageTitles = [
+      "Vibrant Coral Reef Ecosystem",
+      "Mysterious Underwater Cave System",
+      "Majestic Sea Turtle Swimming",
+      "Powerful Ocean Waves Crashing",
+      "Playful Dolphins in Open Waters",
+      "Giant Whale in Deep Blue Ocean"
+    ];
+    
+    // Toggle fullscreen menu
+    menuToggle.addEventListener('click', () => {
+      fullscreenMenu.classList.add('active');
+      startImageRotation();
+    });
+    
+    closeMenu.addEventListener('click', () => {
+      fullscreenMenu.classList.remove('active');
+      stopImageRotation();
+    });
+    
+    // Close menu when clicking outside content
+    fullscreenMenu.addEventListener('click', (e) => {
+      if (e.target === fullscreenMenu) {
+        fullscreenMenu.classList.remove('active');
+        stopImageRotation();
+      }
+    });
+    
+    // Image rotation functions
+    function startImageRotation() {
+      stopImageRotation();
+      imageInterval = setInterval(() => {
+        showNextImage();
+      }, 4000);
+    }
+    
+    function stopImageRotation() {
+      clearInterval(imageInterval);
+    }
+    
+    function showNextImage() {
+      galleryImages[currentImageIndex].classList.remove('active');
+      currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+      galleryImages[currentImageIndex].classList.add('active');
+    }
+    
+    function showPrevImage() {
+      galleryImages[currentImageIndex].classList.remove('active');
+      currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+      galleryImages[currentImageIndex].classList.add('active');
+    }
+    
+    // Navigation controls
+    prevBtn.addEventListener('click', () => {
+      stopImageRotation();
+      showPrevImage();
+      setTimeout(startImageRotation, 10000);
+    });
+    
+    nextBtn.addEventListener('click', () => {
+      stopImageRotation();
+      showNextImage();
+      setTimeout(startImageRotation, 10000);
+    });
+    
+    // Enlarge image functionality
+    galleryImages.forEach((image, index) => {
+      image.addEventListener('click', () => {
+        modalImage.src = image.src;
+        imageInfo.textContent = imageTitles[index];
+        modal.style.display = 'flex';
+      });
+    });
+    
+    // Close modal
+    closeModal.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+    
+    // Close modal when clicking outside the image
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (fullscreenMenu.classList.contains('active')) {
+        if (e.key === 'ArrowRight') {
+          stopImageRotation();
+          showNextImage();
+          setTimeout(startImageRotation, 10000);
+        } else if (e.key === 'ArrowLeft') {
+          stopImageRotation();
+          showPrevImage();
+          setTimeout(startImageRotation, 10000);
+        } else if (e.key === 'Escape') {
+          fullscreenMenu.classList.remove('active');
+          stopImageRotation();
+        }
+      }
+      
+      if (modal.style.display === 'flex' && e.key === 'Escape') {
+        modal.style.display = 'none';
+      }
+    });
+    
+    // Create bubbles
+    function createBubbles() {
+      const bubblesContainer = document.querySelector('.bubbles');
+      if (!bubblesContainer) return;
+      
+      for (let i = 0; i < 15; i++) {
+        const bubble = document.createElement('div');
+        bubble.classList.add('bubble');
+        bubble.style.left = Math.random() * 100 + '%';
+        bubble.style.animationDelay = Math.random() * 10 + 's';
+        bubble.style.width = (Math.random() * 30 + 10) + 'px';
+        bubble.style.height = bubble.style.width;
+        bubblesContainer.appendChild(bubble);
+      }
+    }
+    
+    // Initialize
+    window.addEventListener('load', () => {
+      createBubbles();
+    });
+  </script>
+</body>

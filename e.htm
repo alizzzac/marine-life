@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Adventure Games</title>
+    <!-- Favicon -->
+    <link rel="icon" href="logo.jpg" type="image/jpg">
+    <style>
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+            background: #0a2e38; /* Fallback background */
+        }
+        
+        /* Loading Screen Styles */
+        .loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0a2e38;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .loader-video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .loader-video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .loading-text {
+            position: absolute;
+            color: #4bc8eb;
+            font-size: clamp(1.5em, 6vw, 3em);
+            text-align: center;
+            text-shadow: 0 0 20px rgba(75, 200, 235, 0.9);
+            animation: pulse 1.5s infinite alternate;
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        /* Video Background Styles */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .video-background video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 20, 40, 0.5);
+            z-index: -1;
+        }
+
+        /* Main Content Styles */
+        h1 {
+            text-align: center;
+            margin: 20px 0 30px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+            font-size: clamp(1.8em, 6vw, 3em);
+            position: relative;
+            padding: 0 15px;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        .card {
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: #333;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+            opacity: 0;
+            animation: cardAppear 0.5s forwards;
+        }
+        
+        @keyframes cardAppear {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+        
+        .card-image {
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .card h2 {
+            margin: 0 0 12px 0;
+            color: #0d47a1;
+            font-size: 1.3em;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .card p {
+            margin: 0;
+            color: #555;
+            line-height: 1.4;
+            font-size: 0.95em;
+        }
+        
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .play-button::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 25px solid #0d47a1;
+            margin-left: 6px;
+        }
+        
+        .card:hover .play-button {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        
+        /* Individual card images */
+        .card1 .card-image { background-image: url('maze.jpg'); }
+        .card2 .card-image { background-image: url('mkm.jpg'); }
+        .card3 .card-image { background-image: url('polo.jpg'); }
+        .card4 .card-image { background-image: url('fishi.jpg'); }
+        .card5 .card-image { background-image: url('QUIZ.jpg'); }
+        .card6 .card-image { background-image: url('quize.jpg'); }
+        
+        /* Animation delays for cards */
+        .card1 { animation-delay: 0.1s; }
+        .card2 { animation-delay: 0.2s; }
+        .card3 { animation-delay: 0.3s; }
+        .card4 { animation-delay: 0.4s; }
+        .card5 { animation-delay: 0.5s; }
+        .card6 { animation-delay: 0.6s; }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            h1 {
+                margin: 15px 0 25px;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 0 10px;
+            }
+            
+            .card {
+                max-width: 400px;
+                margin: 0 auto;
+                width: 100%;
+            }
+            
+            .card-image {
+                height: 160px;
+            }
+            
+            .card-content {
+                padding: 18px;
+            }
+            
+            .play-button {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .play-button::after {
+                border-top: 12px solid transparent;
+                border-bottom: 12px solid transparent;
+                border-left: 20px solid #0d47a1;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .loading-text {
+                font-size: 1.8em;
+            }
+            
+            .card-image {
+                height: 140px;
+            }
+            
+            .card-content {
+                padding: 15px;
+            }
+            
+            .card h2 {
+                font-size: 1.2em;
+                margin-bottom: 10px;
+            }
+            
+            .card p {
+                font-size: 0.9em;
+            }
+        }
+        
+        /* Touch device adjustments */
+        @media (hover: none) {
+            .card:hover {
+                transform: none;
+            }
+            
+            .card .play-button {
+                opacity: 0.8;
+            }
+        }
+
+        /* Points System Styles */
+        .points-header {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            font-weight: bold;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .points-header:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .points-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .points-icon {
+            font-size: 1.2em;
+        }
+
+        #totalPoints {
+            font-size: 1.2em;
+            color: #ffeb3b;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        /* Points Notification */
+        .points-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .points-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .points-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .points-amount {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            animation: bounce 0.5s ease;
+        }
+
+        .points-message {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Points and Discount Section */
+        .points-discount-section {
+            background: rgba(248, 250, 252, 0.9);
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 20px auto;
+            max-width: 800px;
+            color: #333;
+            backdrop-filter: blur(5px);
+        }
+
+        .points-discount-section h4 {
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .discount-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .discount-option {
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .discount-option:hover {
+            border-color: #3b82f6;
+            transform: translateY(-3px);
+        }
+
+        .discount-option.selected {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .discount-percent {
+            font-weight: bold;
+            color: #10b981;
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .discount-points {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .discount-desc {
+            font-size: 0.8rem;
+            color: #4b5563;
+        }
+
+        .points-balance {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #1e3a8a;
+            margin-top: 1rem;
+        }
+
+        .points-balance span {
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        /* Ocean Assistant Styles */
+        .ocean-assistant {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .assistant-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #4bc8eb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            border: 3px solid white;
+            overflow: hidden;
+        }
+
+        .assistant-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .assistant-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .assistant-chat {
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            transform: scale(0);
+            transform-origin: bottom left;
+            opacity: 0;
+            transition: all 0.3s ease;
+            color: #333;
+        }
+
+        .assistant-chat.active {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            color: #0d47a1;
+            font-size: 1.1em;
+        }
+
+        .close-chat {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .chat-messages {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 12px;
+        }
+
+        .assistant-message {
+            background: #e3f2fd;
+            margin-right: 20px;
+            position: relative;
+        }
+
+        .assistant-message::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 10px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: #e3f2fd transparent;
+        }
+
+        .user-message {
+            background: #bbdefb;
+            margin-left: 20px;
+            text-align: right;
+        }
+
+        .chat-input {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .chat-input button {
+            background: #4bc8eb;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            margin-left: 5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .typing-indicator {
+            display: none;
+            font-style: italic;
+            color: #666;
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4bc8eb;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite both;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        /* Responsive adjustments for assistant */
+        @media (max-width: 768px) {
+            .ocean-assistant {
+                bottom: 10px;
+                left: 10px;
+            }
+
+            .assistant-avatar {
+                width: 60px;
+                height: 60px;
+            }
+
+            .assistant-chat {
+                width: 250px;
+                bottom: 80px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .assistant-chat {
+                width: 220px;
+                padding: 10px;
+            }
+
+            .chat-messages {
+                max-height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Full Screen Loading Animation -->
+    <div class="loader-wrapper" id="loader">
+        <div class="loader-video-container">
+            <video autoplay muted loop playsinline>
+                <source src="251963_small.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <div class="loading-text">Diving into Adventure...</div>
+    </div>
+    
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted loop playsinline id="bgVideo">
+            <source src="13704-250154065_small.mp4" type="video/mp4">
+            <img src="13704-250154065_small.mp4" alt="Ocean background">
+        </video>
+    </div>
+    <div class="video-overlay"></div>
+    
+    <!-- Points Display -->
+    <div class="points-header">
+        <div class="points-container">
+            <span class="points-icon">🌊</span>
+            <span id="totalPoints">0</span> Conservation Points
+        </div>
+    </div>
+    
+    <!-- Ocean Assistant -->
+    <div class="ocean-assistant">
+        <div class="assistant-avatar" id="assistantAvatar">
+            <img src="https://i.imgur.com/JQ9qyYp.png" alt="Coral the Ocean Guide">
+        </div>
+        <div class="assistant-chat" id="assistantChat">
+            <div class="chat-header">
+                <h3>Coral the Ocean Guide</h3>
+                <button class="close-chat" id="closeChat">×</button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message assistant-message">
+                    Welcome to Ocean Adventures! I'm Coral, your guide. How can I help you explore today?
+                </div>
+            </div>
+            <div class="typing-indicator" id="typingIndicator">
+                Coral is typing <span></span><span></span><span></span>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="Ask me about the games...">
+                <button id="sendMessage">→</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <h1>Ocean Adventure Games</h1>
+    
+    <!-- Points Discount Section -->
+    <div class="points-discount-section">
+        <h4>Redeem Conservation Points</h4>
+        <div class="discount-options">
+            <div class="discount-option" onclick="PointsSystem.applyDiscount(5)">
+                <div class="discount-percent">5% Off</div>
+                <div class="discount-points">50 points</div>
+                <div class="discount-desc">Small discount for your impact</div>
+            </div>
+            <div class="discount-option" onclick="PointsSystem.applyDiscount(10)">
+                <div class="discount-percent">10% Off</div>
+                <div class="discount-points">100 points</div>
+                <div class="discount-desc">Great savings for ocean heroes</div>
+            </div>
+            <div class="discount-option" onclick="PointsSystem.applyDiscount(15)">
+                <div class="discount-percent">15% Off</div>
+                <div class="discount-points">150 points</div>
+                <div class="discount-desc">Maximum savings for top guardians</div>
+            </div>
+        </div>
+        <div class="points-balance">
+            Your points balance: <span id="userPointsBalance">0</span>
+        </div>
+    </div>
+    
+    <div class="cards-container">
+        <!-- Card 1 - Fish Maze -->
+        <div class="card card1" onclick="window.location.href='maze.html';">
+            <div class="card-image">
+                <div class="play-button"></div>
+            </div>
+            <div class="card-content">
+                <h2>Fish Maze</h2>
+                <p>Navigate through coral labyrinths and escape hungry predators in this exciting underwater challenge!</p>
+            </div>
+        </div>
+        
+        <!-- Card 2 - Sea Crush -->
+        <div class="card card2" onclick="window.location.href='sea.html';">
+            <div class="card-image">
+                <div class="play-button"></div>
+            </div>
+            <div class="card-content">
+                <h2>Sea Crush</h2>
+                <p>Match colorful sea creatures in this addictive puzzle game beneath the waves!</p>
+            </div>
+        </div>
+        
+        <!-- Card 3 - Ocean Puzzle -->
+        <div class="card card3" onclick="window.location.href='puzzel.html';">
+            <div class="card-image">
+                <div class="play-button"></div>
+            </div>
+            <div class="card-content">
+                <h2>Ocean Puzzle</h2>
+                <p>Piece together beautiful underwater scenes in this relaxing jigsaw game.</p>
+            </div>
+        </div>
+        
+        <!-- Card 4 - Deep Dive -->
+        <div class="card card4" onclick="window.location.href='jump.html';">
+            <div class="card-image">
+                <div class="play-button"></div>
+            </div>
+            <div class="card-content">
+                <h2>Deep Dive</h2>
+                <p>Explore mysterious shipwrecks and collect treasures in this adventure game.</p>
+            </div>
+        </div>
+        
+        <!-- Card 5 - Coral Match -->
+        <div class="card card5" onclick="window.location.href='match.html';">
+            <div class="card-image">
+                <div class="play-button"></div>
+            </div>
+            <div class="card-content">
+                <h2>Coral Match</h2>
+                <p>Rebuild the coral reef by matching colorful marine life in pairs.</p>
+            </div>
+        </div>
+        
+        <!-- Card 6 - Treasure Hunt -->
+        <div class="card card6" onclick="window.location.href='quiz.html';">
+            <div class="card-image">
+                <div class="play-button"></div>
+            </div>
+            <div class="card-content">
+                <h2>Treasure Hunt</h2>
+                <p>Search for lost treasures while avoiding dangerous sea creatures!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Points System
+        const PointsSystem = {
+            points: 0,
+            selectedDiscount: 0,
+            
+            // Initialize points system
+            init: function() {
+                this.loadPoints();
+                this.updateDisplay();
+                this.setupEventListeners();
+                
+                // Check for returning players with points
+                const tempPoints = localStorage.getItem('tempPoints');
+                if (tempPoints) {
+                    this.addPoints(parseInt(tempPoints), 'Recent Game');
+                    localStorage.removeItem('tempPoints');
+                }
+            },
+            
+            // Load points from localStorage
+            loadPoints: function() {
+                this.points = parseInt(localStorage.getItem('conservationPoints')) || 0;
+            },
+            
+            // Save points to localStorage
+            savePoints: function() {
+                localStorage.setItem('conservationPoints', this.points);
+            },
+            
+            // Add points with notification
+            addPoints: function(amount, source = '') {
+                this.points += amount;
+                this.savePoints();
+                this.updateDisplay();
+                this.showNotification(amount, source);
+                
+                // Update discount section balance
+                document.getElementById('userPointsBalance').textContent = this.points;
+                
+                return this.points;
+            },
+            
+            // Update the points display
+            updateDisplay: function() {
+                const display = document.getElementById('totalPoints');
+                if (display) {
+                    display.textContent = this.points;
+                    
+                    // Add animation
+                    display.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        display.style.transform = 'scale(1)';
+                    }, 300);
+                }
+                
+                // Update discount section balance
+                document.getElementById('userPointsBalance').textContent = this.points;
+            },
+            
+            // Show points earned notification
+            showNotification: function(amount, source) {
+                const notification = document.createElement('div');
+                notification.className = 'points-notification';
+                
+                let message = `+${amount} Conservation Points`;
+                if (source) message += ` from ${source}`;
+                
+                notification.innerHTML = `
+                    <div class="points-content">
+                        <span class="points-amount">+${amount}</span>
+                        <span class="points-message">${source ? 'From ' + source : 'Points Earned!'}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Trigger animation
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 10);
+                
+                // Remove after delay
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 500);
+                }, 3000);
+            },
+            
+            // Apply discount from points
+            applyDiscount: function(percent) {
+                const pointsNeeded = percent * 10;
+                
+                if (this.points < pointsNeeded) {
+                    alert(`You need ${pointsNeeded} points for this discount. You have ${this.points} points.`);
+                    return;
+                }
+                
+                this.selectedDiscount = percent;
+                
+                // Update UI
+                document.querySelectorAll('.discount-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                event.currentTarget.classList.add('selected');
+                
+                alert(`${percent}% discount applied! ${pointsNeeded} points will be deducted at checkout.`);
+            },
+            
+            // Setup event listeners
+            setupEventListeners: function() {
+                // For demonstration - in a real app you'd have a checkout system
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'd') {
+                        // Demo - add 100 points when 'd' key is pressed
+                        this.addPoints(100, 'Demo');
+                    }
+                });
+            }
+        };
+
+        // Ocean Assistant System
+        const OceanAssistant = {
+            isOpen: false,
+            messages: [
+                {
+                    sender: 'assistant',
+                    content: 'Welcome to Ocean Adventures! I\'m Coral, your guide. How can I help you explore today?'
+                }
+            ],
+            
+            init: function() {
+                this.setupEventListeners();
+                this.renderMessages();
+                
+                // Add welcome message after a delay
+                setTimeout(() => {
+                    this.addMessage('assistant', 'You can ask me about any of the games, conservation points, or ocean facts!');
+                }, 2000);
+            },
+            
+            setupEventListeners: function() {
+                const avatar = document.getElementById('assistantAvatar');
+                const closeBtn = document.getElementById('closeChat');
+                const sendBtn = document.getElementById('sendMessage');
+                const chatInput = document.getElementById('chatInput');
+                
+                avatar.addEventListener('click', () => this.toggleChat());
+                closeBtn.addEventListener('click', () => this.toggleChat());
+                sendBtn.addEventListener('click', () => this.handleUserMessage());
+                
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.handleUserMessage();
+                    }
+                });
+            },
+            
+            toggleChat: function() {
+                const chat = document.getElementById('assistantChat');
+                this.isOpen = !this.isOpen;
+                
+                if (this.isOpen) {
+                    chat.classList.add('active');
+                    document.getElementById('chatInput').focus();
+                } else {
+                    chat.classList.remove('active');
+                }
+            },
+            
+            handleUserMessage: function() {
+                const input = document.getElementById('chatInput');
+                const message = input.value.trim();
+                
+                if (message) {
+                    this.addMessage('user', message);
+                    input.value = '';
+                    this.showTypingIndicator();
+                    
+                    // Simulate assistant response after a delay
+                    setTimeout(() => {
+                        this.generateResponse(message);
+                        this.hideTypingIndicator();
+                    }, 1000 + Math.random() * 2000);
+                }
+            },
+            
+            addMessage: function(sender, content) {
+                this.messages.push({ sender, content });
+                this.renderMessages();
+                
+                // Scroll to bottom of chat
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            },
+            
+            renderMessages: function() {
+                const container = document.getElementById('chatMessages');
+                container.innerHTML = '';
+                
+                this.messages.forEach(msg => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${msg.sender}-message`;
+                    messageDiv.textContent = msg.content;
+                    container.appendChild(messageDiv);
+                });
+            },
+            
+            showTypingIndicator: function() {
+                document.getElementById('typingIndicator').style.display = 'block';
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            },
+            
+            hideTypingIndicator: function() {
+                document.getElementById('typingIndicator').style.display = 'none';
+            },
+            
+            generateResponse: function(userMessage) {
+                const lowerMsg = userMessage.toLowerCase();
+                let response = '';
+                
+                // Game information responses
+                if (lowerMsg.includes('maze') || lowerMsg.includes('fish maze')) {
+                    response = 'The Fish Maze game lets you navigate through beautiful coral labyrinths while avoiding predators! Collect points by finding hidden treasures.';
+                } 
+                else if (lowerMsg.includes('crush') || lowerMsg.includes('sea crush')) {
+                    response = 'Sea Crush is a fun matching game where you pair colorful sea creatures. Match 3 or more to clear the board and earn conservation points!';
+                }
+                else if (lowerMsg.includes('puzzle') || lowerMsg.includes('ocean puzzle')) {
+                    response = 'Ocean Puzzle features stunning underwater scenes. Piece together jigsaw puzzles of coral reefs, shipwrecks, and marine life. Perfect for relaxing!';
+                }
+                else if (lowerMsg.includes('dive') || lowerMsg.includes('deep dive')) {
+                    response = 'In Deep Dive, you explore mysterious shipwrecks and collect treasures. Watch out for sharks and other dangers lurking in the depths!';
+                }
+                else if (lowerMsg.includes('match') || lowerMsg.includes('coral match')) {
+                    response = 'Coral Match helps rebuild damaged reefs by matching marine life pairs. Each match helps restore the coral ecosystem in the game!';
+                }
+                else if (lowerMsg.includes('treasure') || lowerMsg.includes('treasure hunt')) {
+                    response = 'Treasure Hunt is an exciting game where you search for lost artifacts while learning about ocean conservation. The more you find, the more points you earn!';
+                }
+                // Points system responses
+                else if (lowerMsg.includes('point') || lowerMsg.includes('reward')) {
+                    response = 'You earn Conservation Points by playing games and completing challenges. These points can be redeemed for discounts on ocean conservation donations!';
+                }
+                else if (lowerMsg.includes('discount') || lowerMsg.includes('redeem')) {
+                    response = 'Check out the "Redeem Conservation Points" section above the games. You can exchange points for 5%, 10%, or 15% discounts!';
+                }
+                // General help
+                else if (lowerMsg.includes('help') || lowerMsg.includes('what can you do')) {
+                    response = 'I can tell you about all the games, explain the points system, share ocean facts, or just chat! Try asking about a specific game or feature.';
+                }
+                // Ocean facts
+                else if (lowerMsg.includes('fact') || lowerMsg.includes('learn')) {
+                    const facts = [
+                        'Did you know coral reefs cover less than 1% of the ocean floor but support 25% of all marine life?',
+                        'The ocean produces over half of the world\'s oxygen!',
+                        'Scientists estimate there may be more historical artifacts in the ocean than in all the world\'s museums combined.',
+                        'The Great Barrier Reef is the largest living structure on Earth, visible from space!',
+                        'More than 80% of the ocean remains unexplored and unmapped.'
+                    ];
+                    response = facts[Math.floor(Math.random() * facts.length)];
+                }
+                // Greetings
+                else if (lowerMsg.includes('hi') || lowerMsg.includes('hello') || lowerMsg.includes('hey')) {
+                    response = 'Hello there! Ready to dive into some ocean adventures?';
+                }
+                // Default response
+                else {
+                    const defaults = [
+                        'That\'s interesting! Have you tried any of our ocean games yet?',
+                        'I love talking about the ocean! Did you know you can earn points by playing our games?',
+                        'The ocean is full of wonders. Which game would you like to learn more about?',
+                        'I\'m here to help with anything about our ocean adventures. Try asking about a specific game!'
+                    ];
+                    response = defaults[Math.floor(Math.random() * defaults.length)];
+                }
+                
+                this.addMessage('assistant', response);
+            }
+        };
+
+        // Game Communication Functions
+        function awardGamePoints(amount, gameName) {
+            try {
+                // Try to communicate with parent window
+                if (window.opener && !window.opener.closed && window.opener.PointsSystem) {
+                    window.opener.PointsSystem.addPoints(amount, gameName);
+                } else {
+                    // Fallback to localStorage if parent window isn't available
+                    const current = parseInt(localStorage.getItem('conservationPoints')) || 0;
+                    localStorage.setItem('conservationPoints', current + amount);
+                    localStorage.setItem('tempPoints', amount); // For when returning to main page
+                    
+                    // Show local notification
+                    const notification = document.createElement('div');
+                    notification.className = 'points-notification';
+                    notification.innerHTML = `
+                        <div class="points-content">
+                            <span class="points-amount">+${amount}</span>
+                            <span class="points-message">From ${gameName}</span>
+                        </div>
+                    `;
+                    document.body.appendChild(notification);
+                    setTimeout(() => notification.classList.add('show'), 10);
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                        setTimeout(() => notification.remove(), 500);
+                    }, 3000);
+                }
+            } catch (e) {
+                console.error('Points communication error:', e);
+                // Fallback handling
+                localStorage.setItem('tempPoints', amount);
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            PointsSystem.init();
+            OceanAssistant.init();
+            
+            // Preload assets
+            const bgVideo = document.getElementById('bgVideo');
+            
+            // Try to play video (muted autoplay is usually allowed)
+            const playPromise = bgVideo.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(e => {
+                    console.log("Background video autoplay prevented");
+                });
+            }
+            
+            // Hide loader after everything is loaded
+            window.addEventListener('load', function() {
+                const loader = document.getElementById('loader');
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        
+                        // Animate cards sequentially
+                        const cards = document.querySelectorAll('.card');
+                        cards.forEach((card, index) => {
+                            setTimeout(() => {
+                                card.style.animation = 'cardAppear 0.5s forwards';
+                            }, 150 * index);
+                        });
+                    }, 500);
+                }, 1500); // Minimum display time
+            });
+            
+            // Fallback in case load event doesn't fire
+            setTimeout(function() {
+                const loader = document.getElementById('loader');
+                if (loader.style.display !== 'none') {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 500);
+                    
+                    // Still animate cards if loader was showing
+                    const cards = document.querySelectorAll('.card');
+                    cards.forEach((card, index) => {
+                        setTimeout(() => {
+                            card.style.animation = 'cardAppear 0.5s forwards';
+                        }, 150 * index);
+                    });
+                }
+            }, 4000); // Maximum wait time
+            
+            // Touch device support
+            if ('ontouchstart' in window) {
+                // Make cards more touch-friendly
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    card.addEventListener('touchstart', function() {
+                        this.classList.add('active');
+                    });
+                    
+                    card.addEventListener('touchend', function() {
+                        this.classList.remove('active');
+                    });
+                });
+            }
+        });
+
+        // For game pages - this would be in each game's JavaScript file
+        // Example for maze.html:
+        /*
+        function onGameComplete(score) {
+            // Calculate points based on score
+            const pointsEarned = Math.floor(score / 10); // Example calculation
+            
+            // Award points
+            if (window.opener) {
+                // If opened from main page
+                window.opener.awardGamePoints(pointsEarned, "Fish Maze Game");
+            } else {
+                // Standalone or for testing
+                awardGamePoints(pointsEarned, "Fish Maze Game");
+            }
+            
+            // Show in-game message
+            alert(`You earned ${pointsEarned} conservation points!`);
+        }
+        */
+    </script>
+</body>
+</html>

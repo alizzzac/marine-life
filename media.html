@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ocean Social Feed</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa 0%, #80deea 50%, #4dd0e1 100%);
+      min-height: 100vh;
+      color: #01579b;
+    }
+
+    /* Bubbles Animation */
+    .bubbles-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      backdrop-filter: blur(4px);
+      animation: float linear infinite;
+    }
+
+    .bubble-large {
+      background: linear-gradient(135deg, rgba(2, 119, 189, 0.3), rgba(0, 150, 136, 0.3));
+    }
+
+    .bubble-small {
+      background: linear-gradient(135deg, rgba(0, 188, 212, 0.2), rgba(0, 172, 193, 0.2));
+      animation: float-slow linear infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes float-slow {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      15% {
+        opacity: 0.8;
+      }
+      85% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-100px) rotate(180deg);
+        opacity: 0;
+      }
+    }
+
+    /* Loading Screen */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      background: rgba(0, 150, 136, 0.1);
+      backdrop-filter: blur(5px);
+      transition: opacity 1s ease-out;
+    }
+
+    .loading-content {
+      text-align: center;
+    }
+
+    .loading-title {
+      font-size: 3rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #00796b, #0288d1);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 2rem;
+    }
+
+    .loading-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: bounce 1.4s ease-in-out infinite both;
+    }
+
+    .dot:nth-child(1) {
+      background: #00796b;
+      animation-delay: -0.32s;
+    }
+    .dot:nth-child(2) {
+      background: #0288d1;
+      animation-delay: -0.16s;
+    }
+    .dot:nth-child(3) {
+      background: #00acc1;
+    }
+
+    @keyframes bounce {
+      0%, 80%, 100% {
+        transform: scale(0);
+      }
+      40% {
+        transform: scale(1);
+      }
+    }
+
+    /* Main Content */
+    .main-content {
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 1s ease-out;
+      padding: 2rem 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section {
+      padding: 2rem 0;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #00796b, #0288d1, #00acc1);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: #0277bd;
+      font-size: 1.2rem;
+      margin-bottom: 3rem;
+    }
+
+    /* Instagram Posts */
+    .instagram-posts {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 0 auto;
+    }
+
+    .post-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 131, 143, 0.2);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 0.8s ease-out;
+      border: 1px solid #b2ebf2;
+    }
+
+    .post-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      background: rgba(178, 235, 242, 0.3);
+      border-bottom: 1px solid #b2ebf2;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0288d1, #00796b);
+      padding: 2px;
+    }
+
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: white;
+      padding: 1px;
+    }
+
+    .username {
+      font-weight: 600;
+      color: #01579b;
+    }
+
+    .post-image {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-bottom: 1px solid #b2ebf2;
+      border-top: 1px solid #b2ebf2;
+    }
+
+    .post-actions {
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .action-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .action-group {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      transition: transform 0.2s;
+      color: #0288d1;
+      font-size: 1.2rem;
+    }
+
+    .action-btn:hover {
+      transform: scale(1.1);
+      color: #00796b;
+    }
+
+    .likes {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #01579b;
+    }
+
+    .caption {
+      margin-bottom: 0.5rem;
+      color: #0277bd;
+      line-height: 1.4;
+    }
+
+    .caption .username {
+      margin-right: 0.5rem;
+    }
+
+    .time-ago {
+      color: #00838f;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* YouTube Section */
+    .youtube-section {
+      opacity: 0;
+      transition: opacity 1s ease-out;
+    }
+
+    .youtube-section.visible {
+      opacity: 1;
+    }
+
+    .youtube-section .section-title {
+      background: linear-gradient(135deg, #006064, #00838f);
+    }
+
+    .youtube-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 0 auto;
+    }
+
+    .youtube-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 131, 143, 0.2);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(100px);
+      transition: all 0.8s ease-out;
+      border: 1px solid #b2ebf2;
+    }
+
+    .youtube-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      overflow: hidden;
+    }
+
+    .video-thumbnail {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .video-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+
+    .play-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 131, 143, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .video-thumbnail:hover .play-overlay {
+      opacity: 1;
+    }
+
+    .play-button {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #00838f;
+      transition: transform 0.2s;
+    }
+
+    .play-button:hover {
+      transform: scale(1.1);
+    }
+
+    .video-duration {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0, 96, 100, 0.8);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+
+    .video-content {
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .video-info {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .channel-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 2px solid #b2ebf2;
+    }
+
+    .video-details {
+      flex: 1;
+    }
+
+    .video-title {
+      font-weight: 600;
+      color: #01579b;
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .channel-name {
+      color: #00838f;
+      font-size: 0.875rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .video-stats {
+      color: #4fb3bf;
+      font-size: 0.875rem;
+    }
+
+    /* YouTube iframe styling */
+    .youtube-iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Twitter Section */
+    .twitter-section {
+      opacity: 0;
+      transition: opacity 1s ease-out;
+    }
+
+    .twitter-section.visible {
+      opacity: 1;
+    }
+
+    .twitter-section .section-title {
+      background: linear-gradient(135deg, #00acc1, #00838f);
+    }
+
+    .twitter-posts {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 0 auto;
+    }
+
+    .twitter-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 131, 143, 0.2);
+      padding: 1.5rem;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 0.8s ease-out;
+      border: 1px solid #b2ebf2;
+    }
+
+    .twitter-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tweet-header {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .tweet-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 2px solid #b2ebf2;
+    }
+
+    .tweet-user-info {
+      flex: 1;
+    }
+
+    .tweet-user-name {
+      font-weight: 600;
+      color: #01579b;
+      margin-right: 0.5rem;
+    }
+
+    .tweet-handle {
+      color: #00838f;
+      margin-right: 0.5rem;
+    }
+
+    .tweet-time {
+      color: #4fb3bf;
+    }
+
+    .tweet-content {
+      color: #0277bd;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    .tweet-actions {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 1rem;
+      border-top: 1px solid #b2ebf2;
+    }
+
+    .tweet-action {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #00838f;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: color 0.2s;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .tweet-action:hover {
+      color: #006064;
+      background: rgba(178, 235, 242, 0.3);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .loading-title {
+        font-size: 2rem;
+      }
+
+      .instagram-posts,
+      .youtube-grid,
+      .twitter-posts {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .section-title {
+        font-size: 1.5rem;
+      }
+
+      .section-subtitle {
+        font-size: 1rem;
+      }
+
+      .main-content {
+        padding: 1rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Bubbles Container -->
+  <div class="bubbles-container" id="bubbles1"></div>
+
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-content">
+      <h1 class="loading-title">Diving Into Content</h1>
+      <div class="loading-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+    <!-- Instagram Section -->
+    <section class="section">
+      <h1 class="section-title">Ocean Social Feed</h1>
+      <p class="section-subtitle">
+        Discover amazing marine life and ocean conservation content
+      </p>
+      <div class="instagram-posts" id="instagramPosts"></div>
+    </section>
+
+    <!-- YouTube Section -->
+    <section class="section youtube-section" id="youtubeSection">
+      <h2 class="section-title">Marine Tutorials</h2>
+      <p class="section-subtitle">
+        Learn about ocean conservation with these amazing videos
+      </p>
+      <div class="youtube-grid" id="youtubeGrid"></div>
+    </section>
+
+    <!-- Twitter Section -->
+    <section class="section twitter-section" id="twitterSection">
+      <h2 class="section-title">Ocean Insights</h2>
+      <p class="section-subtitle">
+        Latest updates from the marine conservation community
+      </p>
+      <div class="twitter-posts" id="twitterPosts"></div>
+    </section>
+  </div>
+
+  <script>
+    // Data - Ocean theme content with real YouTube IDs for ocean/marine content
+    const instagramPosts = [
+      {
+        id: '1',
+        username: 'ocean_lover',
+        userImage: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        postImage: 'https://images.pexels.com/photos/847393/pexels-photo-847393.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+        likes: 3247,
+        caption: 'Just witnessed the most beautiful coral reef today! 🐠 The colors were absolutely breathtaking. We must protect these underwater treasures! #SaveOurOceans',
+        timeAgo: '2 hours ago',
+      },
+      {
+        id: '2',
+        username: 'marine_biologist',
+        userImage: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        postImage: 'https://images.pexels.com/photos/2765872/pexels-photo-2765872.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+        likes: 2156,
+        caption: 'Research update: Our team discovered a new species of seahorse! 🐡 These delicate creatures are indicators of ocean health. More studies needed! #MarineBiology',
+        timeAgo: '5 hours ago',
+      },
+      {
+        id: '3',
+        username: 'surfer_dude',
+        userImage: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        postImage: 'https://images.pexels.com/photos/1533720/pexels-photo-1533720.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+        likes: 1821,
+        caption: 'Morning waves were epic today! 🌊 Remember to always use reef-safe sunscreen to protect our oceans while enjoying the surf. #SustainableSurfing',
+        timeAgo: '8 hours ago',
+      },
+      {
+        id: '4',
+        username: 'coral_guardian',
+        userImage: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        postImage: 'https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+        likes: 4532,
+        caption: 'Coral restoration project update: Our nursery is thriving! 🪸 Each polyp planted brings hope for ocean recovery. Join our adoption program! #CoralRestoration',
+        timeAgo: '12 hours ago',
+      },
+      {
+        id: '5',
+        username: 'whale_watcher',
+        userImage: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        postImage: 'https://images.pexels.com/photos/847483/pexels-photo-847483.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+        likes: 2987,
+        caption: "Humpback whale sighting today! 🐋 These majestic creatures travel thousands of miles each year. Let's keep their migration routes plastic-free! #WhaleConservation",
+        timeAgo: '1 day ago',
+      },
+      {
+        id: '6',
+        username: 'deep_sea_explorer',
+        userImage: 'https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        postImage: 'https://images.pexels.com/photos/281260/pexels-photo-281260.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+        likes: 3654,
+        caption: "Exploring the midnight zone today! 🌊 The deep sea holds so many mysteries - we've only explored about 5% of our oceans. #DeepSeaExploration",
+        timeAgo: '1 day ago',
+      },
+    ];
+
+    // YouTube videos with working embed codes
+    const youtubeVideos = [
+      {
+        id: '1',
+        youtubeId: 'VJeKNuTicrY', // Coral Reef Restoration
+        channelName: 'Ocean Conservancy',
+        channelImage: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        thumbnail: 'https://i.ytimg.com/vi/VJeKNuTicrY/hqdefault.jpg',
+        title: 'Coral Reef Restoration: Bringing Oceans Back to Life',
+        views: '1.2M views',
+        timeAgo: '2 weeks ago',
+        duration: '20:15',
+        url: 'https://www.youtube.com/watch?v=VJeKNuTicrY'
+      },
+      {
+        id: '2',
+        youtubeId: 'hFzFjoX2cGg', // Secret Lives of Seahorses
+        channelName: 'Marine Biology Explained',
+        channelImage: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        thumbnail: 'https://i.ytimg.com/vi/hFzFjoX2cGg/hqdefault.jpg',
+        title: 'The Secret Lives of Seahorses - Full Documentary',
+        views: '856K views',
+        timeAgo: '1 week ago',
+        duration: '15:42',
+        url: 'https://www.youtube.com/watch?v=hFzFjoX2cGg'
+      },
+      {
+        id: '3',
+        youtubeId: 'u7deClndzQw', // Midnight Zone Exploration
+        channelName: 'Deep Sea Discoveries',
+        channelImage: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        thumbnail: 'https://i.ytimg.com/vi/u7deClndzQw/hqdefault.jpg',
+        title: 'Exploring the Midnight Zone: Creatures of the Deep',
+        views: '2.1M views',
+        timeAgo: '3 weeks ago',
+        duration: '45:30',
+        url: 'https://www.youtube.com/watch?v=u7deClndzQw'
+      },
+      {
+        id: '4',
+        youtubeId: 'V6yMjLaX_D0', // Whale Migration
+        channelName: 'Whale Research Institute',
+        channelImage: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        thumbnail: 'https://i.ytimg.com/vi/V6yMjLaX_D0/hqdefault.jpg',
+        title: 'Humpback Whale Migration: 25,000 Mile Journey',
+        views: '3.4M views',
+        timeAgo: '1 month ago',
+        duration: '32:18',
+        url: 'https://www.youtube.com/watch?v=V6yMjLaX_D0'
+      },
+      {
+        id: '5',
+        youtubeId: 'WfGMYdalClU', // Turtle Rescue
+        channelName: 'Turtle Conservation',
+        channelImage: 'https://images.pexels.com/photos/1181717/pexels-photo-1181717.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        thumbnail: 'https://i.ytimg.com/vi/WfGMYdalClU/hqdefault.jpg',
+        title: 'Sea Turtle Rescue and Rehabilitation Program',
+        views: '987K views',
+        timeAgo: '2 months ago',
+        duration: '18:45',
+        url: 'https://www.youtube.com/watch?v=WfGMYdalClU'
+      },
+      {
+        id: '6',
+        youtubeId: 'RS7IzU2VJIQ', // Pacific Garbage Patch
+        channelName: 'Plastic Free Oceans',
+        channelImage: 'https://images.pexels.com/photos/1181605/pexels-photo-1181605.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        thumbnail: 'https://i.ytimg.com/vi/RS7IzU2VJIQ/hqdefault.jpg',
+        title: 'The Great Pacific Garbage Patch: Solutions and Hope',
+        views: '2.8M views',
+        timeAgo: '3 months ago',
+        duration: '28:33',
+        url: 'https://www.youtube.com/watch?v=RS7IzU2VJIQ'
+      }
+    ];
+
+    const twitterPosts = [
+      {
+        id: '1',
+        username: 'Ocean Research',
+        handle: 'ocean_research',
+        userImage: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        content: "Breaking: Scientists discover new coral species that thrives in cooler waters. Could this be nature's response to climate change? More research needed! 🌊🐠 #MarineScience",
+        likes: 2847,
+        retweets: 1256,
+        replies: 342,
+        timeAgo: '2h',
+      },
+      {
+        id: '2',
+        username: 'Save Our Seas',
+        handle: 'saveourseas',
+        userImage: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        content: "Plastic pollution isn't just ugly - it's deadly. 100,000 marine creatures die from plastic entanglement annually. Your choices matter: refuse single-use plastics! ♻️ #PlasticFreeOceans",
+        likes: 1923,
+        retweets: 876,
+        replies: 234,
+        timeAgo: '4h',
+      },
+      {
+        id: '3',
+        username: 'Marine Life',
+        handle: 'marinelife',
+        userImage: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        content: "Did you know? The ocean produces over half of the world's oxygen and absorbs 50x more CO2 than our atmosphere. Protecting oceans = protecting ourselves! 🌍💙 #OceanFacts",
+        likes: 3421,
+        retweets: 1654,
+        replies: 567,
+        timeAgo: '6h',
+      },
+      {
+        id: '4',
+        username: 'Whale Watch Society',
+        handle: 'whalewatch',
+        userImage: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        content: "INCREDIBLE: Blue whale spotted off California coast with her calf! These gentle giants can grow up to 100 feet long. Reminder that ship strikes are their biggest threat. 🐋 #WhaleConservation",
+        likes: 4521,
+        retweets: 2134,
+        replies: 678,
+        timeAgo: '8h',
+      },
+      {
+        id: '5',
+        username: 'Coral Restoration',
+        handle: 'coralrestore',
+        userImage: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        content: "Update from our restoration site: 85% survival rate for transplanted corals! 🪸 Small victories add up. Every healthy coral polyp is a win for ocean biodiversity. #CoralRestoration #HopeForReefs",
+        likes: 1876,
+        retweets: 945,
+        replies: 287,
+        timeAgo: '12h',
+      },
+      {
+        id: '6',
+        username: 'Deep Sea Explorer',
+        handle: 'deepsea_explore',
+        userImage: 'https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
+        content: "At 3,000 meters deep, we found bioluminescent creatures that look like living stars ✨ The deep ocean is Earth's final frontier - more mysterious than space! #DeepSea #MarineExploration",
+        likes: 5234,
+        retweets: 2876,
+        replies: 892,
+        timeAgo: '1d',
+      },
+    ];
+
+    // Create bubbles
+    function createBubbles(container, count = 25) {
+      container.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const bubble = document.createElement('div');
+        const isLarge = Math.random() > 0.4;
+        const size = isLarge ? 20 + Math.random() * 60 : 10 + Math.random() * 30;
+
+        bubble.className = `bubble ${isLarge ? 'bubble-large' : 'bubble-small'}`;
+        bubble.style.left = Math.random() * 100 + '%';
+        bubble.style.width = size + 'px';
+        bubble.style.height = size + 'px';
+        bubble.style.animationDelay = Math.random() * 3 + 's';
+        bubble.style.animationDuration = 3 + Math.random() * 4 + 's';
+
+        container.appendChild(bubble);
+      }
+    }
+
+    // Create Instagram posts
+    function createInstagramPosts() {
+      const container = document.getElementById('instagramPosts');
+      container.innerHTML = '';
+
+      instagramPosts.forEach((post, index) => {
+        const postElement = document.createElement('div');
+        postElement.className = 'post-card';
+        postElement.innerHTML = `
+          <div class="post-header">
+            <div class="user-info">
+              <div class="user-avatar">
+                <img src="${post.userImage}" alt="${post.username}">
+              </div>
+              <span class="username">${post.username}</span>
+            </div>
+            <button class="action-btn">⋯</button>
+          </div>
+          <img src="${post.postImage}" alt="Post" class="post-image">
+          <div class="post-actions">
+            <div class="action-buttons">
+              <div class="action-group">
+                <button class="action-btn">♡</button>
+                <button class="action-btn">💬</button>
+                <button class="action-btn">📤</button>
+              </div>
+              <button class="action-btn">🔖</button>
+            </div>
+            <div class="likes">${post.likes.toLocaleString()} likes</div>
+            <div class="caption">
+              <span class="username">${post.username}</span>
+              ${post.caption}
+            </div>
+            <div class="time-ago">${post.timeAgo}</div>
+          </div>
+        `;
+        container.appendChild(postElement);
+
+        // Animate in
+        setTimeout(() => {
+          postElement.classList.add('visible');
+        }, index * 200);
+      });
+    }
+
+    // Create YouTube videos
+    function createYouTubeVideos() {
+      const container = document.getElementById('youtubeGrid');
+      container.innerHTML = '';
+
+      youtubeVideos.forEach((video, index) => {
+        const videoElement = document.createElement('div');
+        videoElement.className = 'youtube-card';
+        videoElement.innerHTML = `
+          <div class="video-container">
+            <div class="video-thumbnail" data-video-id="${video.youtubeId}" data-video-url="${video.url}">
+              <img src="${video.thumbnail}" alt="${video.title}">
+              <div class="play-overlay">
+                <div class="play-button">▶</div>
+              </div>
+              <div class="video-duration">${video.duration}</div>
+            </div>
+          </div>
+          <div class="video-content">
+            <div class="video-info">
+              <img src="${video.channelImage}" alt="${video.channelName}" class="channel-avatar">
+              <div class="video-details">
+                <h3 class="video-title">${video.title}</h3>
+                <div class="channel-name">${video.channelName}</div>
+                <div class="video-stats">${video.views} • ${video.timeAgo}</div>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(videoElement);
+
+        // Animate in
+        setTimeout(() => {
+          videoElement.classList.add('visible');
+        }, index * 300);
+
+        // Add click handler for video play
+        const thumbnail = videoElement.querySelector('.video-thumbnail');
+        thumbnail.addEventListener('click', function() {
+          const videoId = this.dataset.videoId;
+          const iframe = document.createElement('iframe');
+          iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&enablejsapi=1`;
+          iframe.frameBorder = '0';
+          iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+          iframe.allowFullscreen = true;
+          iframe.className = 'youtube-iframe';
+          
+          // Replace thumbnail with iframe
+          this.innerHTML = '';
+          this.appendChild(iframe);
+          this.style.pointerEvents = 'none';
+        });
+      });
+    }
+
+    // Create Twitter posts
+    function createTwitterPosts() {
+      const container = document.getElementById('twitterPosts');
+      container.innerHTML = '';
+
+      twitterPosts.forEach((post, index) => {
+        const postElement = document.createElement('div');
+        postElement.className = 'twitter-card';
+        postElement.innerHTML = `
+          <div class="tweet-header">
+            <img src="${post.userImage}" alt="${post.username}" class="tweet-avatar">
+            <div class="tweet-user-info">
+              <span class="tweet-user-name">${post.username}</span>
+              <span class="tweet-handle">@${post.handle}</span>
+              <span class="tweet-time">• ${post.timeAgo}</span>
+            </div>
+          </div>
+          <div class="tweet-content">${post.content}</div>
+          <div class="tweet-actions">
+            <div class="tweet-action">💬 ${post.replies}</div>
+            <div class="tweet-action">🔄 ${post.retweets}</div>
+            <div class="tweet-action">♡ ${post.likes}</div>
+            <div class="tweet-action">📤</div>
+          </div>
+        `;
+        container.appendChild(postElement);
+
+        // Animate in
+        setTimeout(() => {
+          postElement.classList.add('visible');
+        }, index * 200);
+      });
+    }
+
+    // Handle scroll animations
+    function handleScroll() {
+      const scrollY = window.scrollY;
+
+      // Show YouTube section when scrolled to it
+      if (scrollY > 600 && !window.showYouTube) {
+        window.showYouTube = true;
+        document.getElementById('youtubeSection').classList.add('visible');
+        createYouTubeVideos();
+      }
+
+      // Show Twitter section when scrolled to it
+      if (scrollY > 1800 && !window.showTwitter) {
+        window.showTwitter = true;
+        document.getElementById('twitterSection').classList.add('visible');
+        createTwitterPosts();
+      }
+    }
+
+    // Initialize the page
+    function init() {
+      // Create initial bubbles
+      createBubbles(document.getElementById('bubbles1'));
+
+      // Hide loading screen after delay
+      setTimeout(() => {
+        document.getElementById('loadingScreen').style.opacity = '0';
+        
+        // Show main content after loading screen fades
+        setTimeout(() => {
+          document.getElementById('mainContent').style.opacity = '1';
+          createInstagramPosts();
+        }, 500);
+      }, 2000);
+
+      // Add scroll event listener
+      window.addEventListener('scroll', handleScroll);
+    }
+
+    // Start the application
+    window.onload = init;
+  </script>
+</body>
+</html>

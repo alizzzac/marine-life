@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luna - Ocean Conservation AI Assistant</title>
+    <meta name="description" content="Luna is an AI assistant dedicated to ocean conservation and marine ecosystem education">
+    <link rel="icon" href="logo.jpg" type="image/jpeg">
+    <link rel="preload" href="213616_small.mp4" as="video" type="video/mp4">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --ocean-blue: #0c4a6e;
+            --deep-blue: #0f172a;
+            --accent-cyan: #06b6d4;
+            --purple-accent: #8b5cf6;
+            --coral-pink: #f472b6;
+            --success-green: #10b981;
+            --warning-yellow: #f59e0b;
+            --text-white: #ffffff;
+            --text-gray: #e2e8f0;
+            --glass-bg: rgba(15, 23, 42, 0.85);
+            --glass-border: rgba(148, 163, 184, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            position: relative;
+            background: #0f172a;
+        }
+
+        /* Skip to content link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent-cyan);
+            color: var(--deep-blue);
+            padding: 8px;
+            z-index: 100;
+            transition: top 0.3s;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Underwater Background */
+        .underwater-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: url('j.jpg') center center;
+            background-size: cover;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        .underwater-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            animation: overlayShift 25s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        /* Video Loader */
+        .video-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: var(--deep-blue);
+            transition: opacity 0.8s, visibility 0.8s;
+        }
+
+        .video-loader video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+        }
+
+        .loading-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--text-white);
+            z-index: 10;
+        }
+
+        .loading-text {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: var(--accent-cyan);
+            animation: pulse 2s infinite;
+            text-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+        }
+
+        .progress-bar {
+            width: 320px;
+            height: 6px;
+            background: var(--glass-bg);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px auto;
+            border: 1px solid var(--glass-border);
+        }
+
+        .progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--purple-accent));
+            animation: progress 3.5s forwards;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.02); }
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            padding: 20px;
+            opacity: 0;
+            animation: fadeIn 1s forwards 0.5s;
+            box-sizing: border-box;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Chat Interface */
+        .chat-interface {
+            width: 100%;
+            max-width: 580px;
+            max-height: calc(100vh - 40px);
+            background: var(--glass-bg);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header with Avatar */
+        .chat-header {
+            text-align: center;
+            padding: 30px 25px;
+            background: rgba(15, 23, 42, 0.6);
+            border-bottom: 1px solid var(--glass-border);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .luna-avatar {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .jellyfish-icon {
+            font-size: 80px;
+            color: #a855f7;
+            animation: float 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.8));
+            text-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
+        }
+
+        .jellyfish-tentacles {
+            font-size: 40px;
+            color: #06b6d4;
+            margin-top: -15px;
+            animation: wave 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.8));
+            text-shadow: 0 0 25px rgba(6, 182, 212, 0.5);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-1deg); }
+            50% { transform: translateY(-15px) rotate(1deg); }
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+
+        .chat-title {
+            font-size: 1.8rem;
+            color: var(--accent-cyan);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+        }
+
+        .chat-subtitle {
+            color: var(--text-gray);
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            min-height: 200px;
+            max-height: calc(100vh - 350px);
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: rgba(15, 23, 42, 0.3);
+            scroll-behavior: smooth;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--accent-cyan);
+            border-radius: 3px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            opacity: 0;
+            animation: messageIn 0.5s forwards;
+            position: relative;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+            color: var(--text-white);
+            align-self: flex-end;
+            border-bottom-right-radius: 6px;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.5);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .message.bot {
+            background: rgba(139, 92, 246, 0.25);
+            color: var(--text-white);
+            align-self: flex-start;
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            border-bottom-left-radius: 6px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .message-sender {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .message-content {
+            overflow-wrap: break-word;
+        }
+
+        .message-content a {
+            color: var(--accent-cyan);
+            text-decoration: underline;
+        }
+
+        .message-content strong {
+            color: var(--coral-pink);
+        }
+
+        .message-content em {
+            color: var(--warning-yellow);
+            font-style: italic;
+        }
+
+        @keyframes messageIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 18px;
+            border-bottom-left-radius: 6px;
+            max-width: 120px;
+            align-self: flex-start;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            margin-left: 10px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+
+        /* Controls */
+        .chat-controls {
+            padding: 15px 25px;
+            background: rgba(15, 23, 42, 0.6);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .voice-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        .voice-toggle input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent-cyan);
+        }
+
+        .voice-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        .voice-status i {
+            color: var(--success-green);
+        }
+
+        /* Input Area */
+        .chat-input-area {
+            padding: 20px 25px;
+            background: rgba(15, 23, 42, 0.8);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-white);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            min-width: 0;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .chat-input::placeholder {
+            color: rgba(226, 232, 240, 0.6);
+        }
+
+        .input-btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+            color: var(--text-white);
+            min-width: 48px;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.6);
+            animation: buttonGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes buttonGlow {
+            0% {
+                box-shadow: 0 4px 20px rgba(6, 182, 212, 0.6);
+                background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+            }
+            100% {
+                box-shadow: 0 6px 25px rgba(139, 92, 246, 0.7);
+                background: linear-gradient(135deg, #8b5cf6, #06b6d4, #ec4899);
+            }
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(6, 182, 212, 0.8);
+        }
+
+        .voice-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+            border: 1px solid var(--glass-border);
+            min-width: 48px;
+        }
+
+        .voice-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .voice-btn.listening {
+            background: var(--coral-pink);
+            color: var(--text-white);
+            animation: pulse-listening 1.5s infinite;
+        }
+
+        @keyframes pulse-listening {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatParticle 8s infinite linear;
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.9;
+            }
+            90% {
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(-100px) translateX(50px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 25px 15px;
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .quick-action-btn {
+            padding: 8px 12px;
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-action-btn:hover {
+            background: rgba(6, 182, 212, 0.25);
+            transform: translateY(-1px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .chat-header {
+                padding: 20px 15px;
+            }
+
+            .jellyfish-icon {
+                font-size: 60px;
+            }
+
+            .jellyfish-tentacles {
+                font-size: 30px;
+            }
+
+            .chat-title {
+                font-size: 1.5rem;
+            }
+
+            .chat-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .chat-messages {
+                padding: 20px;
+                max-height: calc(100vh - 320px);
+            }
+
+            .message {
+                max-width: 90%;
+                padding: 12px 16px;
+            }
+
+            .chat-input-area {
+                padding: 15px 20px;
+            }
+
+            .chat-input {
+                padding: 12px 15px;
+            }
+
+            .input-btn {
+                padding: 10px 14px;
+            }
+
+            .quick-actions {
+                padding: 0 20px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 10px;
+            }
+
+            .chat-interface {
+                max-height: calc(100vh - 20px);
+                border-radius: 16px;
+            }
+
+            .chat-header {
+                padding: 15px 10px;
+            }
+
+            .jellyfish-icon {
+                font-size: 50px;
+            }
+
+            .jellyfish-tentacles {
+                font-size: 25px;
+            }
+
+            .chat-title {
+                font-size: 1.3rem;
+            }
+
+            .chat-subtitle {
+                font-size: 0.8rem;
+            }
+
+            .chat-messages {
+                padding: 15px;
+                max-height: calc(100vh - 300px);
+            }
+
+            .message {
+                max-width: 95%;
+                padding: 10px 14px;
+                font-size: 0.9rem;
+            }
+
+            .message-sender {
+                font-size: 0.8rem;
+            }
+
+            .chat-controls, .chat-input-area {
+                padding: 12px 15px;
+            }
+
+            .voice-toggle span, .voice-status span {
+                font-size: 0.8rem;
+            }
+
+            .chat-input {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+
+            .input-btn {
+                padding: 8px 12px;
+                min-width: 42px;
+            }
+
+            .loading-text {
+                font-size: 1.8rem;
+            }
+
+            .progress-bar {
+                width: 250px;
+            }
+
+            .quick-actions {
+                padding: 0 15px 10px;
+            }
+
+            .quick-action-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .chat-header {
+                padding: 15px;
+            }
+
+            .jellyfish-icon {
+                font-size: 40px;
+                margin-bottom: 10px;
+            }
+
+            .jellyfish-tentacles {
+                font-size: 20px;
+            }
+
+            .chat-title {
+                font-size: 1.2rem;
+                margin-bottom: 5px;
+            }
+
+            .chat-subtitle {
+                font-size: 0.8rem;
+            }
+
+            .chat-messages {
+                max-height: calc(100vh - 250px);
+                padding: 15px;
+            }
+
+            .message {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Accessibility */
+        button:focus, input:focus {
+            outline: 2px solid var(--accent-cyan);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* NAVIGATION STYLES */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .hamburger-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #4db8ff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .hamburger-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(77, 184, 255, 0.6);
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            margin: 2px 0;
+            background: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .hamburger-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 300px;
+            height: 100vh;
+            background: rgba(5, 20, 35, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 999;
+            transition: right 0.4s ease;
+            padding: 80px 20px 20px;
+            overflow-y: auto;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .hamburger-nav.active {
+            right: 0;
+        }
+
+        .hamburger-tabs {
+            list-style: none;
+            width: 100%;
+        }
+
+        .hamburger-tab {
+            width: 100%;
+            margin-bottom: 5px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .hamburger-tab a {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            text-decoration: none;
+            color: white;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-tab a i {
+            font-size: 1.5rem;
+            width: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-tab a span {
+            margin-left: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .hamburger-tab:hover {
+            transform: translateX(-5px);
+        }
+
+        /* Different colors for each tab */
+        .tab1 { background: #4db8ff; }
+        .tab2 { background: #00ffaa; }
+        .tab3 { background: #ff7f50; }
+        .tab4 { background: #ff8e53; }
+        .tab5 { background: #9b5de5; }
+        .tab6 { background: #00bbf9; }
+        .tab7 { background: #00f5d4; }
+        .tab8 { background: #f15bb5; }
+        .tab9 { background: #404dfe; }
+        .tab10 { background: #ff6b6b; } /* New tab color for Man Made Pollution */
+
+        /* Active tab indicator */
+        .hamburger-tab.active {
+            box-shadow: inset 5px 0 0 white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hamburger-nav {
+                width: 80%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hamburger-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .hamburger-btn span {
+                width: 22px;
+                height: 2.5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Accessibility Skip Link -->
+    <a href="#chatInput" class="skip-link">Skip to chat</a>
+
+    <!-- NAVIGATION -->
+    <!-- HAMBURGER MENU -->
+    <div class="hamburger-menu">
+        <div class="hamburger-btn" id="hamburgerBtn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <!-- HAMBURGER NAVIGATION -->
+    <nav class="hamburger-nav" id="hamburgerNav">
+        <ul class="hamburger-tabs">
+            <li class="hamburger-tab tab1">
+                <a href="gemes.html">
+                    <i class="fas fa-gamepad"></i>
+                    <span>Games</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab2">
+                <a href="chat.html">
+                    <i class="fas fa-comments"></i>
+                    <span>Convo</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab3">
+                <a href="DONATE.HTML">
+                    <i class="fas fa-donate"></i>
+                    <span>Donate</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab4">
+                <a href="animals.html">
+                    <i class="fas fa-paw"></i>
+                    <span>Animals</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab10">
+                <a href="pollution.html">
+                    <i class="fas fa-industry"></i>
+                    <span>Man Made Pollution</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab5">
+                <a href="about.html">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab6">
+                <a href="contact.html">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab7">
+                <a href="news.html">
+                    <i class="fas fa-newspaper"></i>
+                    <span>News</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab8">
+                <a href="visit.html">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Visit</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab9">
+                <a href="index.html">
+                    <i class="fas fa-user"></i>
+                    <span>home</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Underwater Background -->
+    <div class="underwater-background"></div>
+    <div class="underwater-overlay"></div>
+
+    <!-- Video Loader -->
+    <div class="video-loader" id="videoLoader">
+        <video autoplay muted loop playsinline>
+            <source src="213616_small.mp4" type="video/mp4">
+        </video>
+        <div class="loading-content">
+            <div class="loading-text">Diving into the Ocean...</div>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="chat-interface">
+            <!-- Header with Avatar -->
+            <div class="chat-header">
+                <div class="luna-avatar">
+                    <div class="jellyfish-icon">🪼</div>
+                    <div class="jellyfish-tentacles">~~~</div>
+                </div>
+                <h1 class="chat-title">Luna</h1>
+                <p class="chat-subtitle">AI Ocean Conservation Assistant</p>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="message-sender">Luna:</div>
+                    <div class="message-content">
+                        Hello! I'm Luna, your AI ocean conservation assistant. I'm here to share knowledge about marine ecosystems and how we can protect them. What would you like to learn about today?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions" id="quickActions">
+                <button class="quick-action-btn" data-prompt="Tell me about plastic pollution">Plastic Pollution</button>
+                <button class="quick-action-btn" data-prompt="How can I help ocean conservation?">How to Help</button>
+                <button class="quick-action-btn" data-prompt="Share an ocean fact">Ocean Fact</button>
+                <button class="quick-action-btn" data-prompt="What's happening to coral reefs?">Coral Reefs</button>
+            </div>
+
+            <!-- Controls -->
+            <div class="chat-controls">
+                <label class="voice-toggle">
+                    <input type="checkbox" id="voiceResponses" checked>
+                    <span>Voice responses</span>
+                </label>
+                <div class="voice-status" id="voiceStatus">
+                    <i class="fas fa-microphone"></i>
+                    <span>Ready</span>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="chat-input-area">
+                <input 
+                    type="text" 
+                    class="chat-input" 
+                    id="chatInput"
+                    placeholder="Ask about ocean conservation..."
+                    aria-label="Chat input"
+                >
+                <button class="input-btn send-btn" id="sendBtn" aria-label="Send message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+                <button class="input-btn voice-btn" id="voiceBtn" aria-label="Voice input">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const voiceResponses = document.getElementById('voiceResponses');
+        const voiceStatus = document.getElementById('voiceStatus');
+        const videoLoader = document.getElementById('videoLoader');
+        const quickActions = document.getElementById('quickActions');
+        const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+
+        // Conversation history
+        let conversationHistory = [];
+
+        // Load conversation from localStorage if available
+        function loadConversation() {
+            const savedConversation = localStorage.getItem('lunaConversation');
+            if (savedConversation) {
+                conversationHistory = JSON.parse(savedConversation);
+                // Don't restore initial message if we have history
+                if (conversationHistory.length > 0) {
+                    chatMessages.innerHTML = '';
+                    conversationHistory.forEach(msg => {
+                        addMessage(msg.content, msg.isUser, false);
+                    });
+                }
+            }
+        }
+
+        // Save conversation to localStorage
+        function saveConversation() {
+            localStorage.setItem('lunaConversation', JSON.stringify(conversationHistory));
+        }
+
+        // Clear conversation history
+        function clearConversation() {
+            conversationHistory = [];
+            saveConversation();
+            chatMessages.innerHTML = '';
+            // Add initial bot message
+            addMessage(
+                "Hello! I'm Luna, your AI ocean conservation assistant. I'm here to share knowledge about marine ecosystems and how we can protect them. What would you like to learn about today?",
+                false,
+                false
+            );
+        }
+
+        // Hide video loader after animation
+        setTimeout(() => {
+            videoLoader.style.opacity = '0';
+            videoLoader.style.visibility = 'hidden';
+            loadConversation();
+        }, 4000);
+
+        // Create floating particles
+        function createParticle() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                return;
+            }
+
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            const size = Math.random() * 20 + 8;
+            const colors = [
+                'rgba(6, 182, 212, 0.8)', 
+                'rgba(139, 92, 246, 0.8)', 
+                'rgba(244, 114, 182, 0.8)',
+                'rgba(16, 185, 129, 0.8)',
+                'rgba(245, 158, 11, 0.8)',
+                'rgba(236, 72, 153, 0.8)'
+            ];
+            
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = (Math.random() * 8 + 6) + 's';
+            particle.style.filter = 'blur(1px)';
+            
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 14000);
+        }
+
+        // Create particles periodically
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            setInterval(createParticle, 1500);
+        }
+
+        // Speech Synthesis
+        const synthesis = window.speechSynthesis;
+        let lunaVoice = null;
+
+        function initVoices() {
+            const voices = synthesis.getVoices();
+            const preferredVoices = [
+                'Google UK English Female',
+                'Microsoft Zira Desktop',
+                'Samantha',
+                'Karen',
+                'Victoria',
+                'Serena', // macOS
+                'Allison', // macOS
+                'Ava' // iOS
+            ];
+            
+            // First try to find exact matches
+            for (const voiceName of preferredVoices) {
+                const voice = voices.find(v => v.name === voiceName);
+                if (voice) {
+                    lunaVoice = voice;
+                    break;
+                }
+            }
+            
+            // If no exact match, look for partial matches
+            if (!lunaVoice) {
+                for (const voiceName of preferredVoices) {
+                    const voice = voices.find(v => v.name.includes(voiceName));
+                    if (voice) {
+                        lunaVoice = voice;
+                        break;
+                    }
+                }
+            }
+            
+            // Fallback to any English female voice
+            if (!lunaVoice) {
+                lunaVoice = voices.find(v => 
+                    v.lang.startsWith('en') && 
+                    (v.name.toLowerCase().includes('female') || 
+                     v.name.includes('Zira') || 
+                     v.name.includes('Samantha'))
+                );
+            }
+            
+            // Final fallback to any English voice
+            if (!lunaVoice) {
+                lunaVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+            }
+        }
+
+        // Initialize voices when they load
+        initVoices();
+        if (synthesis.onvoiceschanged !== undefined) {
+            synthesis.onvoiceschanged = initVoices;
+        }
+
+        function speakText(text) {
+            if (!voiceResponses.checked || !synthesis) return;
+            
+            // Clean the text for speech
+            const cleanText = text.replace(/Luna:\s*/g, '')
+                                .replace(/<[^>]*>?/gm, '')
+                                .replace(/\*/g, ''); // Remove any markdown
+            
+            if (!cleanText.trim()) return;
+            
+            // Cancel any current speech
+            if (synthesis.speaking) {
+                synthesis.cancel();
+            }
+            
+            // Create utterance
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.voice = lunaVoice;
+            utterance.volume = 1;
+            
+            // Adjust speech parameters based on content
+            if (cleanText.includes('!') || cleanText.includes('important')) {
+                // Exciting/important content
+                utterance.rate = 0.95;
+                utterance.pitch = 1.15;
+            } else if (cleanText.includes('?') || cleanText.includes('wonder')) {
+                // Question or curious content
+                utterance.rate = 0.9;
+                utterance.pitch = 1.2;
+                utterance.text = utterance.text.replace('?', '? ...'); // Add pause for questions
+            } else {
+                // Normal content
+                utterance.rate = 0.92;
+                utterance.pitch = 1.1;
+            }
+            
+            // Add slight pauses after commas and periods
+            utterance.text = utterance.text
+                .replace(/,/g, ', ...')
+                .replace(/\. /g, '. ... ');
+            
+            // Event listeners for the utterance
+            utterance.onstart = () => {
+                voiceStatus.innerHTML = '<i class="fas fa-volume-up"></i><span>Speaking</span>';
+            };
+            
+            utterance.onend = () => {
+                voiceStatus.innerHTML = '<i class="fas fa-microphone"></i><span>Ready</span>';
+            };
+            
+            utterance.onerror = (event) => {
+                console.error('Speech error:', event);
+                voiceStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Speech Error</span>';
+                setTimeout(() => {
+                    voiceStatus.innerHTML = '<i class="fas fa-microphone"></i><span>Ready</span>';
+                }, 3000);
+            };
+            
+            // Speak the text
+            try {
+                synthesis.speak(utterance);
+            } catch (error) {
+                console.error('Speech synthesis failed:', error);
+                voiceStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Speech Failed</span>';
+                setTimeout(() => {
+                    voiceStatus.innerHTML = '<i class="fas fa-microphone"></i><span>Ready</span>';
+                }, 3000);
+            }
+        }
+
+        // Speech Recognition
+        let recognition;
+        let isListening = false;
+
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                voiceBtn.classList.add('listening');
+                voiceStatus.innerHTML = '<i class="fas fa-circle"></i><span>Listening...</span>';
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                chatInput.value = transcript;
+                voiceStatus.innerHTML = '<i class="fas fa-check"></i><span>Recognized</span>';
+                setTimeout(() => {
+                    voiceStatus.innerHTML = '<i class="fas fa-microphone"></i><span>Ready</span>';
+                }, 2000);
+                sendMessage();
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                voiceBtn.classList.remove('listening');
+                if (voiceStatus.textContent.includes('Listening')) {
+                    voiceStatus.innerHTML = '<i class="fas fa-microphone"></i><span>Ready</span>';
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                voiceStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>Error: ${event.error}</span>`;
+                isListening = false;
+                voiceBtn.classList.remove('listening');
+                setTimeout(() => {
+                    voiceStatus.innerHTML = '<i class="fas fa-microphone"></i><span>Ready</span>';
+                }, 3000);
+            };
+        } else {
+            voiceBtn.disabled = true;
+            voiceStatus.innerHTML = '<i class="fas fa-microphone-slash"></i><span>Not supported</span>';
+        }
+
+        voiceBtn.addEventListener('click', () => {
+            if (!recognition) return;
+            
+            if (isListening) {
+                recognition.stop();
+            } else {
+                try {
+                    recognition.start();
+                    chatInput.focus();
+                } catch (error) {
+                    console.error('Speech recognition start error:', error);
+                    voiceStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Error</span>';
+                    setTimeout(() => {
+                        voiceStatus.innerHTML = '<i class="fas fa-microphone"></i><span>Ready</span>';
+                    }, 3000);
+                }
+            }
+        });
+
+        // Message Functions
+        function addMessage(content, isUser = false, saveToHistory = true) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            messageDiv.innerHTML = `
+                <div class="message-sender">${isUser ? 'You' : 'Luna'}:</div>
+                <div class="message-content">${formatMessageContent(content)}</div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            if (saveToHistory) {
+                conversationHistory.push({
+                    content: content,
+                    isUser: isUser,
+                    timestamp: new Date().toISOString()
+                });
+                saveConversation();
+            }
+        }
+
+        // Format message content with markdown-like syntax
+        function formatMessageContent(text) {
+            // Convert **bold** to <strong>
+            let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Convert *italic* to <em>
+            formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            // Convert links
+            formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+            return formatted;
+        }
+
+        function showTyping() {
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            typingIndicator.innerHTML = `
+                <span>Luna is typing</span>
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            chatMessages.appendChild(typingIndicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return typingIndicator;
+        }
+
+        // Enhanced bot responses with markdown support
+        function getBotResponse(userMessage) {
+            const lowerMsg = userMessage.toLowerCase();
+            
+            const responses = {
+                'plastic|pollution': "**Plastic pollution** is one of the biggest threats to our oceans. Every year, about *8 million metric tons* of plastic enter our oceans. This plastic breaks down into microplastics that enter the food chain. \n\nYou can help by:\n- Reducing single-use plastics\n- Participating in beach cleanups\n- Supporting policies that limit plastic production\n- Choosing reusable alternatives",
+                'coral|reef': "**Coral reefs** are often called the 'rainforests of the sea' because they support *25% of all marine life* while covering less than 1% of the ocean floor. They're threatened by:\n\n- **Climate change** (causing coral bleaching)\n- **Pollution** (from agricultural runoff)\n- **Overfishing** (disrupting ecosystem balance)\n- **Ocean acidification**\n\nLearn more at [NOAA Coral Reef Conservation](https://coralreef.noaa.gov/)",
+                'climate|warming': "The ocean absorbs *30% of our CO₂ emissions* and *90% of excess heat* from global warming. This causes:\n\n1. **Ocean acidification** - making it harder for shellfish to form shells\n2. **Coral bleaching** - corals expel their symbiotic algae\n3. **Sea level rise** - from thermal expansion and melting ice\n4. **Changes in currents** - affecting weather patterns\n\nEvery action to reduce your carbon footprint helps!",
+                'species|endangered': "Many marine species are threatened, including:\n\n- **Sea turtles** (6 of 7 species endangered)\n- **Whales** (North Atlantic right whale critically endangered)\n- **Sharks** (1/3 of shark species threatened)\n- **Corals** (50% of reefs already lost)\n\nThreats include overfishing, habitat destruction, pollution, and climate change. Supporting marine protected areas can help.",
+                'fish|overfishing': "**Overfishing** affects nearly *90% of the world's fish stocks*. Key issues:\n\n- **Bycatch** - unintended capture of non-target species\n- **Destructive fishing methods** like bottom trawling\n- **Illegal fishing** accounts for up to 30% of catch\n\nLook for **MSC-certified** seafood and support sustainable fishing practices.",
+                'hello|hi|hey': "**Hello!** I'm Luna, your guide to ocean conservation. I can share information about:\n\n- Marine ecosystems\n- Conservation efforts\n- How you can help\n\nWhat interests you most about our oceans? 🌊",
+                'help|save|what can i do': "**Everyone can help protect our oceans!** Here's how:\n\n1. **Reduce plastic use** - Bring reusable bags/bottles\n2. **Choose sustainable seafood** - Look for MSC/ASC labels\n3. **Conserve water** - Less runoff = less pollution\n4. **Reduce carbon footprint** - Oceans absorb CO₂\n5. **Support orgs** like [Oceana](https://oceana.org) or [Sea Shepherd](https://seashepherd.org)\n6. **Educate others** - Share what you learn!",
+                'fact|interesting|tell me something': [
+                    "**Did you know?** The ocean produces *over half* of the world's oxygen through phytoplankton photosynthesis!",
+                    "**Ocean fact:** Less than *20% of the ocean floor* has been mapped in detail - we know more about Mars!",
+                    "**Fun fact:** The Great Barrier Reef is visible from space and is Earth's *largest living structure*!",
+                    "**Amazing:** Whales play a crucial role by cycling nutrients through ocean ecosystems in what's called the *'whale pump'*!",
+                    "**Did you know?** Ocean currents help regulate Earth's climate by transporting heat around the globe!"
+                ],
+                'thanks|thank you': "You're welcome! *Protecting our oceans is a team effort.* If you have more questions or want to learn how you can contribute, just ask! 🌊💙",
+                'ocean|sea': "The ocean covers *over 70% of Earth's surface* and contains *97% of the planet's water*. Vital functions:\n\n- **Climate regulation** - absorbs heat and CO₂\n- **Oxygen production** - phytoplankton\n- **Food source** - for billions of people\n- **Biodiversity** - home to countless species\n\nProtecting this vital ecosystem is crucial for all life on Earth.",
+                'clear|reset|start over': "Sure! Conversation cleared. What would you like to learn about our oceans today?",
+                'conservation|protect': "**Ocean conservation** involves protecting marine ecosystems through:\n\n1. **Marine Protected Areas** - safe havens for wildlife\n2. **Sustainable fishing** - ensuring fish populations recover\n3. **Pollution reduction** - especially plastics and chemicals\n4. **Climate action** - reducing CO₂ emissions\n5. **Education** - raising awareness about ocean issues\n\nWould you like details on any of these approaches?"
+            };
+
+            // Check for clear/reset command first
+            if (lowerMsg.includes('clear') || lowerMsg.includes('reset') || lowerMsg.includes('start over')) {
+                clearConversation();
+                return "Sure! Conversation cleared. What would you like to learn about our oceans today?";
+            }
+
+            for (const [keywords, response] of Object.entries(responses)) {
+                if (keywords.split('|').some(keyword => lowerMsg.includes(keyword))) {
+                    if (Array.isArray(response)) {
+                        return response[Math.floor(Math.random() * response.length)] + " Would you like to learn more about ocean conservation?";
+                    }
+                    return response;
+                }
+            }
+
+            return "That's a great question about our oceans! I'd love to help you learn more about marine conservation. Could you tell me what specific aspect interests you most?";
+        }
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, true);
+            chatInput.value = '';
+
+            const typingIndicator = showTyping();
+
+            setTimeout(() => {
+                typingIndicator.remove();
+                const response = getBotResponse(message);
+                addMessage(response, false);
+                
+                // Delay speech slightly to allow message to render
+                setTimeout(() => {
+                    speakText(response);
+                }, 300);
+            }, 1200 + Math.random() * 800);
+        }
+
+        // Quick action buttons
+        quickActionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const prompt = btn.getAttribute('data-prompt');
+                chatInput.value = prompt;
+                sendMessage();
+            });
+        });
+
+        // Event Listeners
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                chatInput.focus();
+                if (voiceResponses.checked) {
+                    speakText("Hello! I'm Luna, your AI ocean conservation assistant. I'm here to help you learn about protecting our beautiful oceans.");
+                }
+            }, 4500);
+        });
+
+        // Accessibility
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && synthesis?.speaking) {
+                synthesis.cancel();
+            }
+        });
+
+        // Handle window resize
+        function adjustChatHeight() {
+            const chatInterface = document.querySelector('.chat-interface');
+            const headerHeight = document.querySelector('.chat-header').offsetHeight;
+            const controlsHeight = document.querySelector('.chat-controls').offsetHeight;
+            const inputHeight = document.querySelector('.chat-input-area').offsetHeight;
+            const quickActionsHeight = document.querySelector('.quick-actions')?.offsetHeight || 0;
+            
+            const availableHeight = window.innerHeight - headerHeight - controlsHeight - inputHeight - quickActionsHeight - 40;
+            chatMessages.style.maxHeight = `${Math.max(200, availableHeight)}px`;
+        }
+
+        window.addEventListener('resize', adjustChatHeight);
+        window.addEventListener('load', adjustChatHeight);
+
+        // NAVIGATION FUNCTIONALITY
+        function setupNavigation() {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const hamburgerNav = document.getElementById('hamburgerNav');
+            
+            hamburgerBtn.addEventListener('click', function() {
+                this.classList.toggle('active');
+                hamburgerNav.classList.toggle('active');
+                
+                // Prevent body scrolling when nav is open
+                if (hamburgerNav.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Close nav when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (hamburgerNav.classList.contains('active') && 
+                    !hamburgerNav.contains(e.target) && 
+                    !hamburgerBtn.contains(e.target)) {
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Add active class to clicked tab
+            document.querySelectorAll('.hamburger-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Close nav after selection
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setupNavigation();
+        });
+    </script>
+</body>
+</html>

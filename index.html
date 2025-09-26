@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Exploration | Colorful Marine Life</title>
+    
+    <!-- Favicon using your logo.png -->
+    <link rel="icon" type="image/png" href="logo.jpg">
+    <link rel="apple-touch-icon" href="logo.jpg">
+    <meta name="msapplication-TileImage" content="logo.png">
+    <meta name="theme-color" content="#0a2a43">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --deep-blue: #0a2a43;
+            --ocean-teal: #1d5572;
+            --coral: #ff6b6b;
+            --sunset: #ff8e53;
+            --aqua: #4db8ff;
+            --seafoam: #00ffaa;
+            --sand: #f5d7a1;
+            --nav-width: 80px;
+            --nav-expanded: 220px;
+            --pollution: #ff9900; /* New color for pollution tab */
+        }
+
+        body {
+            background: linear-gradient(rgba(5, 20, 35, 0.4), 
+                        rgba(5, 20, 35, 0.4)), 
+                        url('sea.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: white;
+            font-family: 'Quicksand', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: padding 0.4s ease;
+        }
+
+        /* Logo Styles */
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+        
+        .logo img {
+            height: 50px;
+            width: auto;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .loader-logo img {
+            height: 100px;
+            width: auto;
+            animation: pulse 2s infinite;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .logo img {
+                height: 40px;
+            }
+            .loader-logo img {
+                height: 80px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .logo img {
+                height: 35px;
+            }
+            .loader-logo img {
+                height: 70px;
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Video Loader Styles */
+        .video-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--deep-blue);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: opacity 1.5s ease, visibility 1.5s ease;
+        }
+        
+        .video-loader video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+        }
+        
+        .loader-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 800px;
+            padding: 20px;
+        }
+        
+        .loader-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .loader-spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 8px solid var(--aqua);
+            margin: 30px auto;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .loader-text {
+            font-size: 1.5rem;
+            color: #e0f7ff;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+            margin-top: 20px;
+            font-weight: 600;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .video-loader.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .ocean-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* HAMBURGER MENU STYLES */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .hamburger-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--aqua);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(77, 184, 255, 0.6);
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            margin: 2px 0;
+            background: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .hamburger-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 300px;
+            height: 100vh;
+            background: rgba(5, 20, 35, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 999;
+            transition: right 0.4s ease;
+            padding: 80px 20px 20px;
+            overflow-y: auto;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .hamburger-nav.active {
+            right: 0;
+        }
+
+        .hamburger-tabs {
+            list-style: none;
+            width: 100%;
+        }
+
+        .hamburger-tab {
+            width: 100%;
+            margin-bottom: 5px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .hamburger-tab a {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            text-decoration: none;
+            color: white;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-tab a i {
+            font-size: 1.5rem;
+            width: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-tab a span {
+            margin-left: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .hamburger-tab:hover {
+            transform: translateX(-5px);
+        }
+
+        /* Different colors for each tab */
+        .tab1 { background: var(--aqua); }
+        .tab2 { background: var(--seafoam); }
+        .tab3 { background: var(--coral); }
+        .tab4 { background: var(--sunset); }
+        .tab5 { background: #9b5de5; }
+        .tab6 { background: #00bbf9; }
+        .tab7 { background: #00f5d4; }
+        .tab8 { background: #f15bb5; }
+        .tab9 { background: #51f97b; }
+        .tab10 { background: var(--pollution); } /* New pollution tab color */
+
+        /* Active tab indicator */
+        .hamburger-tab.active {
+            box-shadow: inset 5px 0 0 white;
+        }
+
+        /* Mobile bottom navigation */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(5, 20, 35, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 10px 0;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .mobile-nav-tabs {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+            width: 100%;
+        }
+
+        .mobile-nav-tab {
+            flex: 1;
+            text-align: center;
+        }
+
+        .mobile-nav-tab a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            padding: 8px 5px;
+            font-size: 0.8rem;
+        }
+
+        .mobile-nav-tab a i {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .mobile-nav-tab a span {
+            font-size: 0.7rem;
+        }
+
+        /* More Menu Modal */
+        .more-menu-modal {
+            display: none;
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            background: rgba(5, 20, 35, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            z-index: 1002;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .more-menu-modal ul {
+            list-style: none;
+        }
+
+        .more-menu-modal ul li {
+            margin-bottom: 15px;
+        }
+
+        .more-menu-modal ul li:last-child {
+            margin-bottom: 0;
+        }
+
+        .more-menu-modal ul li a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+        }
+
+        .more-menu-modal ul li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hamburger-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .hamburger-btn span {
+                width: 22px;
+                height: 2.5px;
+            }
+            
+            .hamburger-nav {
+                width: 80%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .mobile-bottom-nav {
+                display: block;
+            }
+            
+            body {
+                padding-bottom: 70px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hamburger-btn {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .hamburger-btn span {
+                width: 20px;
+            }
+        }
+
+        /* Touch device adjustments */
+        @media (hover: none) and (pointer: coarse) {
+            /* Improve touch targets */
+            .hamburger-tab a {
+                padding: 20px;
+            }
+            
+            /* Mobile bottom nav adjustments */
+            .mobile-nav-tab a {
+                padding: 10px 5px;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 10%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            position: relative;
+            z-index: 2;
+            background: rgba(5, 20, 35, 0.3);
+            padding: 3rem;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(77, 184, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero h1 {
+            font-size: 5.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(45deg, var(--aqua), var(--seafoam));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero h1 span {
+            display: block;
+            font-size: 6rem;
+            margin-top: -1rem;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            line-height: 1.8;
+            margin: 2rem auto 3rem;
+            max-width: 700px;
+            color: #e0f7ff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+        }
+
+        .divider {
+            width: 150px;
+            height: 5px;
+            background: linear-gradient(90deg, var(--aqua), var(--seafoam));
+            margin: 2rem auto;
+            border-radius: 3px;
+            box-shadow: 0 0 10px rgba(77, 184, 255, 0.5);
+        }
+
+        /* CTA Button */
+        .cta-button {
+            background: linear-gradient(45deg, var(--coral), var(--sunset));
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.6);
+        }
+
+        /* Fish Animation */
+        .fish-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .fish {
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.9;
+            animation: swim linear infinite;
+            text-shadow: 0 0 10px rgba(77, 184, 255, 0.5);
+            z-index: 1;
+            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.7));
+        }
+
+        @keyframes swim {
+            0% {
+                transform: translateX(-150px);
+            }
+            100% {
+                transform: translateX(calc(100vw + 150px));
+            }
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            animation: float linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh);
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 0;
+            background: rgba(5, 20, 35, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.8rem;
+            margin-bottom: 4rem;
+            color: var(--aqua);
+            position: relative;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 0 0 10px rgba(77, 184, 255, 0.4);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 5px;
+            background: linear-gradient(90deg, var(--aqua), var(--seafoam));
+            border-radius: 3px;
+            box-shadow: 0 0 10px rgba(77, 184, 255, 0.5);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: transform 0.4s, box-shadow 0.4s;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .feature-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--aqua), var(--deep-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 3rem;
+            color: white;
+            box-shadow: 0 0 20px rgba(77, 184, 255, 0.5);
+        }
+
+        .feature-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--aqua);
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-card p {
+            color: #b3e0ff;
+            line-height: 1.7;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Gallery Section */
+        .gallery {
+            padding: 6rem 0;
+            text-align: center;
+            background: rgba(5, 20, 35, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.8rem;
+            margin-top: 3rem;
+        }
+
+        .gallery-item {
+            height: 300px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transition: transform 0.4s;
+            border: 2px solid rgba(77, 184, 255, 0.3);
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            border-color: var(--aqua);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s;
+            filter: brightness(0.9);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.15);
+            filter: brightness(1);
+        }
+
+        .gallery-item .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(transparent, rgba(0, 30, 60, 0.8));
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .gallery-item h3 {
+            color: white;
+            font-size: 1.5rem;
+            text-align: left;
+            margin-bottom: 0.5rem;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+        }
+
+        .gallery-item p {
+            color: var(--seafoam);
+            text-align: left;
+            font-size: 0.9rem;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Footer */
+        .ocean-footer {
+            background: rgba(5, 20, 35, 0.8);
+            padding: 4rem 0 2rem;
+            margin-top: 2rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            color: var(--aqua);
+            position: relative;
+            padding-bottom: 10px;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--aqua);
+        }
+
+        .footer-column p {
+            color: #b3e0ff;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-column ul li a {
+            color: #b3e0ff;
+            text-decoration: none;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .footer-column ul li a:hover {
+            color: var(--aqua);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: var(--aqua);
+            transition: all 0.3s;
+            font-size: 1.3rem;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .social-icons a:hover {
+            background: var(--aqua);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(77, 184, 255, 0.5);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2.5rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #b3e0ff;
+            font-size: 0.95rem;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Voice Control Button */
+        .voice-control {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--coral);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .voice-control:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .voice-control i {
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .voice-control.muted {
+            background: rgba(255, 107, 107, 0.5);
+        }
+
+        /* Responsive Design Improvements */
+        @media (max-width: 1100px) {
+            .hero h1 {
+                font-size: 4.8rem;
+            }
+            
+            .hero h1 span {
+                font-size: 5.2rem;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .hero h1 {
+                font-size: 4rem;
+            }
+            
+            .hero h1 span {
+                font-size: 4.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 3.2rem;
+            }
+            
+            .hero h1 span {
+                font-size: 3.6rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .hero-content {
+                padding: 2rem;
+            }
+            
+            .section-title {
+                font-size: 2.4rem;
+            }
+            
+            .feature-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+            
+            .feature-card h3 {
+                font-size: 1.6rem;
+            }
+            
+            .gallery-item {
+                height: 250px;
+            }
+            
+            .voice-control {
+                bottom: 80px;
+                left: 15px;
+                width: 45px;
+                height: 45px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero {
+                min-height: 80vh;
+                padding: 0 5%;
+            }
+            
+            .hero h1 {
+                font-size: 2.8rem;
+                line-height: 1.3; /* Increased line height for better spacing */
+                margin-bottom: 0.8rem; /* Added margin for better spacing */
+            }
+            
+            .hero h1 span {
+                font-size: 3.2rem;
+                margin-top: 0.5rem; /* Changed from negative to positive margin for better spacing */
+                line-height: 1.2; /* Added line height for better spacing */
+            }
+            
+            .hero p {
+                font-size: 1rem;
+                margin: 1.5rem auto 2rem;
+                line-height: 1.6; /* Added line height for better readability */
+            }
+            
+            .hero-content {
+                padding: 1.5rem;
+            }
+            
+            .divider {
+                width: 100px;
+                margin: 1.5rem auto;
+            }
+            
+            .cta-button {
+                padding: 0.8rem 1.8rem;
+                font-size: 1rem;
+            }
+            
+            .features, .gallery {
+                padding: 4rem 0;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+                margin-bottom: 3rem;
+                line-height: 1.3; /* Added line height for better spacing */
+                padding: 0 10px; /* Added padding to prevent text from touching edges */
+            }
+            
+            .section-title::after {
+                bottom: -12px; /* Adjusted position for better spacing */
+            }
+            
+            .features-grid, .gallery-grid {
+                gap: 1.5rem;
+            }
+            
+            .feature-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .feature-card h3 {
+                margin-bottom: 1.2rem; /* Increased margin for better spacing */
+                line-height: 1.3; /* Added line height for better spacing */
+            }
+            
+            .footer-content {
+                gap: 2rem;
+            }
+            
+            .footer-column h3 {
+                font-size: 1.4rem;
+                margin-bottom: 1.2rem; /* Increased margin for better spacing */
+            }
+            
+            .voice-control {
+                bottom: 70px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .voice-control i {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+                line-height: 1.4; /* Further increased line height for very small screens */
+                margin-bottom: 0.5rem; /* Adjusted margin */
+            }
+            
+            .hero h1 span {
+                font-size: 2.6rem;
+                margin-top: 0.3rem; /* Adjusted margin */
+                line-height: 1.3; /* Further increased line height */
+            }
+            
+            .hero p {
+                font-size: 0.95rem;
+                line-height: 1.7; /* Increased line height for better readability */
+                margin: 1.2rem auto 1.8rem; /* Adjusted margins */
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+                line-height: 1.4; /* Increased line height for better spacing */
+                margin-bottom: 2.5rem; /* Adjusted margin */
+            }
+            
+            .feature-card {
+                padding: 1.5rem 1.2rem;
+            }
+            
+            .feature-card h3 {
+                font-size: 1.4rem;
+                margin-bottom: 1rem; /* Adjusted margin */
+                line-height: 1.4; /* Increased line height */
+            }
+            
+            .feature-card p {
+                font-size: 0.9rem;
+                line-height: 1.6; /* Increased line height for better readability */
+            }
+            
+            .gallery-item {
+                height: 200px;
+            }
+            
+            .gallery-item h3 {
+                font-size: 1.3rem;
+                margin-bottom: 0.3rem; /* Added margin for better spacing */
+            }
+            
+            .gallery-item p {
+                font-size: 0.85rem;
+                line-height: 1.4; /* Increased line height for better readability */
+            }
+            
+            .footer-column {
+                text-align: center;
+            }
+            
+            .footer-column h3::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .social-icons {
+                justify-content: center;
+            }
+            
+            .loader-text {
+                font-size: 1.1rem;
+                line-height: 1.5; /* Added line height for better readability */
+            }
+            
+            .loader-spinner {
+                width: 60px;
+                height: 60px;
+                border-width: 6px;
+            }
+            
+            .voice-control {
+                bottom: 75px;
+                left: 10px;
+            }
+        }
+        
+        @media (max-width: 380px) {
+            .hero h1 {
+                font-size: 1.9rem;
+                line-height: 1.5; /* Maximum line height for smallest screens */
+            }
+            
+            .hero h1 span {
+                font-size: 2.2rem;
+                margin-top: 0.2rem; /* Minimal margin */
+                line-height: 1.4; /* Maximum line height */
+            }
+            
+            .hero-content {
+                padding: 1.2rem;
+            }
+            
+            .features-grid, .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.6rem;
+                line-height: 1.5; /* Maximum line height for smallest screens */
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .hero-content, .feature-card, .gallery-item .overlay {
+                border: 2px solid white;
+            }
+            
+            .feature-icon {
+                box-shadow: 0 0 10px white;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .fish, .bubble {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Video Loader -->
+    <div class="video-loader" id="videoLoader">
+        <video autoplay muted loop>
+            <source src="coverr-temp-ewik5f07ba6f-8811-4687-8251-11c2977063e7-mp4-2576-1080p.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="loader-content">
+            <div class="loader-logo">
+                <img src="logo.png" alt="OceanWonders Logo">
+            </div>
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Diving into the wonders of the ocean...</div>
+        </div>
+    </div>
+
+    <!-- Logo -->
+    <div class="logo">
+        <img src="logie.jpg" alt="OceanWonders Logo">
+    </div>
+
+    <!-- Voice Control Button -->
+    <div class="voice-control" id="voiceControl">
+        <i class="fas fa-volume-up"></i>
+    </div>
+
+    <!-- HAMBURGER MENU -->
+    <div class="hamburger-menu">
+        <div class="hamburger-btn" id="hamburgerBtn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <!-- HAMBURGER NAVIGATION -->
+    <nav class="hamburger-nav" id="hamburgerNav">
+        <ul class="hamburger-tabs">
+            <li class="hamburger-tab tab1">
+                <a href="gemes.html">
+                    <i class="fas fa-gamepad"></i>
+                    <span>Games</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab2">
+                <a href="chat.html">
+                    <i class="fas fa-comments"></i>
+                    <span>Convo</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab3">
+                <a href="DONATE.HTML">
+                    <i class="fas fa-donate"></i>
+                    <span>Donate</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab4">
+                <a href="animals.html">
+                    <i class="fas fa-paw"></i>
+                    <span>Animals</span>
+                </a>
+            </li>
+            <!-- New Pollution Tab -->
+            <li class="hamburger-tab tab10">
+                <a href="pollution.html">
+                    <i class="fas fa-trash"></i>
+                    <span>Man Made Pollution</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab5">
+                <a href="about.html">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab6">
+                <a href="contact.html">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab7">
+                <a href="news.html">
+                    <i class="fas fa-newspaper"></i>
+                    <span>News</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab8">
+                <a href="visit.html">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Visit</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab9">
+                <a href="index.html">
+                    <i class="fas fa-user"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <ul class="mobile-nav-tabs">
+            <li class="mobile-nav-tab">
+                <a href="gemes.html">
+                    <i class="fas fa-gamepad"></i>
+                    <span>Games</span>
+                </a>
+            </li>
+            <li class="mobile-nav-tab">
+                <a href="chat.html">
+                    <i class="fas fa-comments"></i>
+                    <span>Convo</span>
+                </a>
+            </li>
+            <li class="mobile-nav-tab">
+                <a href="animals.html">
+                    <i class="fas fa-paw"></i>
+                    <span>Animals</span>
+                </a>
+            </li>
+            <!-- New Pollution Tab in Mobile Navigation -->
+            <li class="mobile-nav-tab">
+                <a href="pollution.html">
+                    <i class="fas fa-trash"></i>
+                    <span>Pollution</span>
+                </a>
+            </li>
+            <li class="mobile-nav-tab">
+                <a href="index.html" id="more-menu">
+                    <i class="fas fa-ellipsis-h"></i>
+                    <span>More</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- More Menu Modal -->
+    <div class="more-menu-modal" id="moreMenuModal">
+        <ul>
+            <li>
+                <a href="DONATE.HTML">
+                    <i class="fas fa-donate"></i>
+                    <span>Donate</span>
+                </a>
+            </li>
+            <li>
+                <a href="about.html">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </a>
+            </li>
+            <li>
+                <a href="contact.html">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact</span>
+                </a>
+            </li>
+            <li>
+                <a href="news.html">
+                    <i class="fas fa-newspaper"></i>
+                    <span>News</span>
+                </a>
+            </li>
+            <li>
+                <a href="visit.html">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Visit</span>
+                </a>
+            </li>
+            <li>
+                <a href="login.html">
+                    <i class="fas fa-user"></i>
+                    <span>Login</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="fish-animation">
+            <!-- Fish will be generated by JS -->
+        </div>
+        
+        <div class="hero-content">
+            <h1>DISCOVER THE WONDERS<br><span>UNDER THE SEA</span></h1>
+            <div class="divider"></div>
+            <p>Explore the vibrant underwater world of colorful fish and marine life. Learn about their habitats, behaviors, and the vital role they play in our ocean's rich biodiversity ecosystem.</p>
+            <button class="cta-button">Dive In</button>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="ocean-container">
+            <h2 class="section-title">Ocean Exploration</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-fish"></i>
+                    </div>
+                    <h3>Marine Species</h3>
+                    <p>Discover thousands of marine species with detailed information about their habitats and unique behaviors in our comprehensive database.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <h3>Coral Reefs</h3>
+                    <p>Explore the vibrant ecosystems of coral reefs, home to some of the most colorful and diverse marine life on our planet.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <h3>Conservation</h3>
+                    <p>Learn how you can contribute to protecting our oceans and preserving marine biodiversity for future generations.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-binoculars"></i>
+                    </div>
+                    <h3>Deep Sea Exploration</h3>
+                    <p>Dive into the mysteries of the deep sea and discover the unique creatures that live in the darkest parts of the ocean.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Facts Section -->
+    <section id="facts" class="features">
+        <div class="ocean-container">
+            <h2 class="section-title">Amazing Ocean Facts</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <h3>Ocean Depths</h3>
+                    <p>The average depth of the ocean is about 12,100 feet. The deepest part is called the Challenger Deep in the Mariana Trench.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-fish"></i>
+                    </div>
+                    <h3>Marine Biodiversity</h3>
+                    <p>Scientists estimate that about one million species of animals live in the ocean, with 95% being invertebrates.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <h3>Coral Reefs</h3>
+                    <p>Coral reefs cover less than 1% of the ocean floor, yet they support about 25% of all marine creatures.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-wind"></i>
+                    </div>
+                    <h3>Ocean Currents</h3>
+                    <p>Ocean currents are like giant conveyor belts moving water and heat around the globe, influencing our climate.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Animals Section -->
+    <section id="animals" class="features">
+        <div class="ocean-container">
+            <h2 class="section-title">Marine Animals</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-fish"></i>
+                    </div>
+                    <h3>Tropical Fish</h3>
+                    <p>Discover the vibrant world of tropical fish species that inhabit coral reefs around the world.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-otter"></i>
+                    </div>
+                    <h3>Marine Mammals</h3>
+                    <p>Learn about dolphins, whales, seals, and other intelligent marine mammals.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shrimp"></i>
+                    </div>
+                    <h3>Crustaceans</h3>
+                    <p>Explore the diverse world of crabs, lobsters, shrimp, and other crustaceans.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-spider"></i>
+                    </div>
+                    <h3>Other Invertebrates</h3>
+                    <p>Discover jellyfish, octopuses, sea stars, and other fascinating invertebrates.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery">
+        <div class="ocean-container">
+            <h2 class="section-title">Colorful Marine Life</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="cc.jpg" alt="Clownfish">
+                    <div class="overlay">
+                        <h3>Clownfish</h3>
+                        <p>Coral reefs, symbiotic with sea anemones</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="a.jpg" alt="Angelfish">
+                    <div class="overlay">
+                        <h3>Angelfish</h3>
+                        <p>Colorful reef dwellers with distinctive shapes</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="pa.jpg" alt="Parrotfish">
+                    <div class="overlay">
+                        <h3>Parrotfish</h3>
+                        <p>Essential for coral reef health and sand production</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="fl.jpg" alt="Butterflyfish">
+                    <div class="overlay">
+                        <h3>Butterflyfish</h3>
+                        <p>Brightly colored with intricate patterns</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="bu.jpg" alt="Blue Tang">
+                    <div class="overlay">
+                        <h3>Blue Tang</h3>
+                        <p>Bright blue fish with distinctive tail pattern</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="ho.jpg" alt="Seahorse">
+                    <div class="overlay">
+                        <h3>Seahorse</h3>
+                        <p>Unique fish with horse-like head and curled tail</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="ocean-footer">
+        <div class="ocean-container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>OceanWonders</h3>
+                    <p>We are dedicated to marine conservation and education. Our mission is to raise awareness about ocean biodiversity and inspire action to protect our marine ecosystems.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="chat.html"><i class="fas fa-chevron-right"></i> Conversation</a></li>
+                        <li><a href="gemes.html"><i class="fas fa-chevron-right"></i> Game</a></li>
+                        <li><a href="animals.html"><i class="fas fa-chevron-right"></i> Animals</a></li>
+                        <li><a href="about.html"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                        <li><a href="DONATE.HTML"><i class="fas fa-chevron-right"></i> Donate</a></li>
+                        <li><a href="news.html"><i class="fas fa-chevron-right"></i> Awareness</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><a href="visit.html"><i class="fas fa-map-marker-alt"></i> Visit Marine Center</a></li>
+                        <li><a href="contact.html"><i class="fas fa-phone"></i> +1 (555) 123-4567</a></li>
+                        <li><a href="contact.html"><i class="fas fa-envelope"></i> info@oceanwonders.org</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 OceanWonders. All rights reserved. Dedicated to marine conservation and education.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Create fish and bubbles for the animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const fishContainer = document.querySelector('.fish-animation');
+            
+            // Create fish with different types
+            const fishTypes = [
+                '<i class="fas fa-fish"></i>',
+                '<i class="fas fa-fish" style="transform: scaleX(-1)"></i>',
+                '<i class="fas fa-fish" style="color: #ff6b6b"></i>',
+                '<i class="fas fa-fish" style="color: #ff8e53"></i>',
+                '<i class="fas fa-fish" style="color: #00ffaa"></i>',
+                '<i class="fas fa-fish" style="transform: scaleX(-1); color: #4db8ff"></i>'
+            ];
+            
+            for (let i = 0; i < 20; i++) {
+                const fish = document.createElement('div');
+                fish.classList.add('fish');
+                fish.innerHTML = fishTypes[Math.floor(Math.random() * fishTypes.length)];
+                
+                // Random position and animation
+                const topPos = Math.floor(Math.random() * 80) + 5;
+                const duration = Math.floor(Math.random() * 40) + 20;
+                const delay = 0; // Start immediately
+                const size = Math.floor(Math.random() * 3) + 2;
+                const flip = Math.random() > 0.5 ? 'scaleX(-1)' : 'scaleX(1)';
+                
+                fish.style.top = `${topPos}%`;
+                fish.style.animationDuration = `${duration}s`;
+                fish.style.animationDelay = `${delay}s`;
+                fish.style.fontSize = `${size}rem`;
+                fish.style.opacity = `${Math.random() * 0.6 + 0.4}`;
+                fish.style.transform = flip;
+                
+                fishContainer.appendChild(fish);
+            }
+            
+            // Create bubbles
+            for (let i = 0; i < 50; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                // Random properties
+                const size = Math.floor(Math.random() * 30) + 10;
+                const left = Math.floor(Math.random() * 100);
+                const duration = Math.floor(Math.random() * 15) + 10;
+                const delay = Math.floor(Math.random() * 5);
+                
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${left}%`;
+                bubble.style.animationDuration = `${duration}s`;
+                bubble.style.animationDelay = `${delay}s`;
+                
+                fishContainer.appendChild(bubble);
+            }
+            
+            // Hero content animation
+            const heroContent = document.querySelector('.hero-content');
+            heroContent.style.opacity = '0';
+            heroContent.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                heroContent.style.transition = 'opacity 1s ease, transform 1s ease';
+                heroContent.style.opacity = '1';
+                heroContent.style.transform = 'translateY(0)';
+            }, 300);
+            
+            // Button hover effects
+            const buttons = document.querySelectorAll('.cta-button');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        window.scrollTo({
+                            top: target.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Video loader functionality
+            const videoLoader = document.getElementById('videoLoader');
+            const video = document.querySelector('.video-loader video');
+            
+            // Hide loader when page finishes loading
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    videoLoader.classList.add('hide');
+                    setTimeout(function() {
+                        videoLoader.style.display = 'none';
+                    }, 1500);
+                }, 2000); // Show loader for at least 2 seconds
+            });
+            
+            // Fallback in case video doesn't load
+            setTimeout(function() {
+                if (!videoLoader.classList.contains('hide')) {
+                    videoLoader.classList.add('hide');
+                    setTimeout(function() {
+                        videoLoader.style.display = 'none';
+                    }, 1500);
+                }
+            }, 5000);
+            
+            // Hamburger menu functionality
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const hamburgerNav = document.getElementById('hamburgerNav');
+            
+            hamburgerBtn.addEventListener('click', function() {
+                this.classList.toggle('active');
+                hamburgerNav.classList.toggle('active');
+                
+                // Prevent body scrolling when nav is open
+                if (hamburgerNav.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Close nav when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (hamburgerNav.classList.contains('active') && 
+                    !hamburgerNav.contains(e.target) && 
+                    !hamburgerBtn.contains(e.target)) {
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Add active class to clicked tab
+            document.querySelectorAll('.hamburger-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Close nav after selection
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
+
+            // Adjust fish animation for mobile devices
+            function adjustFishAnimation() {
+                const fishElements = document.querySelectorAll('.fish');
+                if (window.innerWidth <= 768) {
+                    // Reduce number of fish on mobile
+                    if (fishElements.length > 10) {
+                        for (let i = 10; i < fishElements.length; i++) {
+                            fishElements[i].style.display = 'none';
+                        }
+                    }
+                } else {
+                    // Show all fish on larger screens
+                    fishElements.forEach(fish => {
+                        fish.style.display = 'block';
+                    });
+                }
+            }
+
+            // Initial adjustment
+            adjustFishAnimation();
+            
+            // Adjust on resize
+            window.addEventListener('resize', adjustFishAnimation);
+            
+            // Mobile bottom nav more menu functionality
+            const moreMenuBtn = document.getElementById('more-menu');
+            const moreMenuModal = document.getElementById('moreMenuModal');
+            
+            if (moreMenuBtn && moreMenuModal) {
+                moreMenuBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (moreMenuModal.style.display === 'block') {
+                        moreMenuModal.style.display = 'none';
+                    } else {
+                        moreMenuModal.style.display = 'block';
+                    }
+                });
+                
+                // Close more menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!moreMenuBtn.contains(e.target) && !moreMenuModal.contains(e.target)) {
+                        moreMenuModal.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Set active nav item based on current page
+            function setActiveNavItem() {
+                const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+                const navLinks = document.querySelectorAll('.hamburger-tab a, .mobile-nav-tab a');
+                
+                navLinks.forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href === currentPage) {
+                        link.parentElement.classList.add('active');
+                    }
+                });
+            }
+            
+            setActiveNavItem();
+            
+            // Voice welcome functionality
+            const voiceControl = document.getElementById('voiceControl');
+            let isMuted = false;
+            
+            // Function to speak text with a female voice
+            function speakWelcome() {
+                if (isMuted) return;
+                
+                if ('speechSynthesis' in window) {
+                    const welcomeMessage = new SpeechSynthesisUtterance();
+                    welcomeMessage.text = "Welcome to Ocean Wonders! Discover the vibrant underwater world of colorful fish and marine life. Dive in to explore the ocean's rich biodiversity.";
+                    welcomeMessage.volume = 0.8;
+                    welcomeMessage.rate = 1;
+                    welcomeMessage.pitch = 1.1;
+                    
+                    // Try to find a female voice
+                    const voices = speechSynthesis.getVoices();
+                    let femaleVoice = voices.find(voice => 
+                        voice.name.includes('Female') || 
+                        voice.name.includes('Woman') || 
+                        voice.name.includes('Zira') || 
+                        voice.name.includes('Samantha')
+                    );
+                    
+                    if (femaleVoice) {
+                        welcomeMessage.voice = femaleVoice;
+                    }
+                    
+                    speechSynthesis.speak(welcomeMessage);
+                }
+            }
+            
+            // Play welcome message after page loads
+            setTimeout(speakWelcome, 2500);
+            
+            // Voice control button functionality
+            voiceControl.addEventListener('click', function() {
+                isMuted = !isMuted;
+                
+                if (isMuted) {
+                    speechSynthesis.cancel();
+                    this.classList.add('muted');
+                    this.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else {
+                    this.classList.remove('muted');
+                    this.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    speakWelcome();
+                }
+            });
+            
+            // Ensure voices are loaded
+            if ('speechSynthesis' in window) {
+                speechSynthesis.onvoiceschanged = function() {
+                    // Voices are now loaded
+                };
+            }
+        });
+    </script>
+</body>
+</html>

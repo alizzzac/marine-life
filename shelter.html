@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Pollution Awareness</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a2a43 0%, #163850 30%, #1a4b6d 70%, #0a2a43 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(32, 156, 238, 0.3) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 255, 255, 0.3) 0%, transparent 40%);
+            z-index: -1;
+        }
+
+        /* Navigation Styles */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .hamburger-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #00f9ff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+            z-index: 10001;
+            border: none;
+            outline: none;
+        }
+
+        .hamburger-btn:hover, .hamburger-btn:focus {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 249, 255, 0.6);
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            margin: 2px 0;
+            background: white;
+            border-radius: 3px;
+            transition: all 0.4s ease;
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .hamburger-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: min(85vw, 300px);
+            height: 100vh;
+            background: rgba(5, 20, 35, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            transition: right 0.4s ease;
+            padding: calc(50px + 30px) 20px 20px;
+            overflow-y: auto;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .hamburger-nav.active {
+            right: 0;
+        }
+
+        .hamburger-tabs {
+            list-style: none;
+            width: 100%;
+        }
+
+        .hamburger-tab {
+            width: 100%;
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border-radius: 10px;
+        }
+
+        .hamburger-tab a {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            text-decoration: none;
+            color: white;
+            position: relative;
+            z-index: 2;
+            transition: all 0.4s ease;
+            min-height: 50px;
+        }
+
+        .hamburger-tab a i {
+            font-size: 1.6rem;
+            width: 40px;
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+
+        .hamburger-tab a span {
+            margin-left: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .hamburger-tab:hover {
+            transform: translateX(-5px);
+        }
+
+        /* Tab colors */
+        .tab1 { background: #00f9ff; }
+        .tab2 { background: #6fffe9; }
+        .tab3 { background: #ff6b6b; }
+        .tab4 { background: #ffcc33; }
+        .tab5 { background: #9d4edd; }
+        .tab6 { background: #4776e6; }
+        .tab7 { background: #00c9b7; }
+        .tab8 { background: #ff5e62; }
+        .tab9 { background: #dd1f1f; }
+        .tab10 { background: #ff4757; }
+
+        .hamburger-tab.active {
+            box-shadow: inset 5px 0 0 rgba(255, 255, 255, 0.5);
+        }
+
+        /* Bubble animation */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            z-index: -1;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        header {
+            text-align: center;
+            margin: 80px 0 40px 0;
+            max-width: 800px;
+            z-index: 1;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #209cee, #00ffff, #209cee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(32, 156, 238, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: #a0e0ff;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            height: 550px;
+            perspective: 1200px;
+            margin: 0 auto;
+            z-index: 1;
+        }
+
+        .carousel {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate 35s infinite linear;
+        }
+
+        .carousel.paused {
+            animation-play-state: paused;
+        }
+
+        .card {
+            position: absolute;
+            width: 320px;
+            height: 480px;
+            left: 50%;
+            top: 50%;
+            margin-left: -160px;
+            margin-top: -240px;
+            border-radius: 20px;
+            transform-style: preserve-3d;
+            transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            overflow: hidden;
+            border: 3px solid rgba(32, 156, 238, 0.7);
+            background: linear-gradient(145deg, rgba(10, 42, 67, 0.9), rgba(15, 52, 80, 0.9));
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            opacity: 0.9;
+        }
+
+        .card:hover {
+            box-shadow: 0 0 40px rgba(32, 156, 238, 0.9), 0 0 80px rgba(0, 255, 255, 0.6);
+            transform: scale(1.05) translateZ(40px);
+            opacity: 1;
+            z-index: 20;
+        }
+
+        .card.active {
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.9), 0 0 100px rgba(0, 255, 255, 0.5);
+            z-index: 15;
+            opacity: 1;
+        }
+
+        .card-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .card:hover .card-wrapper {
+            transform: translateZ(30px) rotateX(5deg) rotateY(3deg);
+        }
+
+        .cover-image {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px 20px 0 0;
+            transition: all 0.7s ease;
+            filter: brightness(0.8);
+        }
+
+        .card:hover .cover-image {
+            height: 45%;
+            filter: brightness(1.1) contrast(1.1);
+            transform: scale(1.03);
+        }
+
+        .title {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: white;
+            text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.9);
+            transition: all 0.7s ease;
+            z-index: 2;
+            padding: 0 20px;
+        }
+
+        .card:hover .title {
+            transform: translateY(-180px) translateZ(40px);
+            font-size: 2rem;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+        }
+
+        .info-content {
+            position: absolute;
+            top: 55%;
+            padding: 20px;
+            color: #e0f7ff;
+            transition: all 0.7s ease;
+            opacity: 0;
+            transform: translateY(40px);
+            text-align: center;
+            width: 100%;
+            height: 45%;
+            overflow-y: auto;
+            backdrop-filter: blur(5px);
+            background: rgba(5, 25, 40, 0.7);
+        }
+
+        .card:hover .info-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .info-content h3 {
+            color: #209cee;
+            margin-bottom: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(32, 156, 238, 0.7);
+        }
+
+        .info-content p {
+            line-height: 1.6;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .fact-box {
+            background: linear-gradient(145deg, rgba(32, 156, 238, 0.3), rgba(0, 255, 255, 0.2));
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 12px;
+            border-left: 4px solid #209cee;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            font-size: 0.95rem;
+        }
+
+        .character {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: all 0.7s ease;
+            border-radius: 20px;
+            z-index: 1;
+            filter: blur(2px);
+        }
+
+        .card:hover .character {
+            opacity: 0.25;
+            transform: scale(1.05);
+            filter: blur(1px);
+        }
+
+        .arrows {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .arrow {
+            width: 70px;
+            height: 70px;
+            background: rgba(10, 42, 67, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+            border: 2px solid rgba(32, 156, 238, 0.7);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .arrow:hover {
+            background: rgba(32, 156, 238, 0.9);
+            transform: scale(1.2);
+            box-shadow: 0 0 25px rgba(32, 156, 238, 0.8);
+        }
+
+        .arrow i {
+            font-size: 32px;
+            color: white;
+        }
+
+        .instructions {
+            text-align: center;
+            margin-top: 40px;
+            color: #a0e0ff;
+            font-size: 1.1rem;
+            max-width: 650px;
+            z-index: 1;
+            line-height: 1.6;
+            animation: pulseText 3s infinite;
+        }
+
+        .voice-controls {
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 1;
+            flex-wrap: wrap;
+        }
+
+        .voice-btn {
+            padding: 14px 24px;
+            background: rgba(32, 156, 238, 0.5);
+            border: 2px solid rgba(32, 156, 238, 0.7);
+            color: white;
+            border-radius: 35px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .voice-btn:hover {
+            background: rgba(32, 156, 238, 0.7);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(32, 156, 238, 0.6);
+        }
+
+        .voice-btn.active {
+            background: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.7);
+        }
+
+        .ocean-floor {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(to top, #074a60, transparent);
+            z-index: 0;
+        }
+
+        .voice-indicator {
+            position: fixed;
+            bottom: 140px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 12px 25px;
+            border-radius: 35px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(32, 156, 238, 0.7);
+            box-shadow: 0 0 20px rgba(32, 156, 238, 0.5);
+        }
+
+        .voice-indicator.active {
+            display: flex;
+        }
+
+        .pulse {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #209cee;
+            animation: pulse 1.5s infinite;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            animation: fadeIn 2s ease-out;
+        }
+
+        .stat {
+            background: rgba(10, 42, 67, 0.8);
+            padding: 15px 20px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 200px;
+            border: 1px solid rgba(32, 156, 238, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s ease;
+        }
+
+        .stat:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #00ffff;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #a0e0ff;
+        }
+
+        /* New class to disable hover effects */
+        .disable-hover .card:hover {
+            transform: none !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8) !important;
+            z-index: auto !important;
+        }
+        
+        .disable-hover .card:hover .cover-image {
+            height: 50% !important;
+            filter: brightness(0.8) !important;
+            transform: none !important;
+        }
+        
+        .disable-hover .card:hover .title {
+            transform: none !important;
+            font-size: 1.9rem !important;
+            text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.9) !important;
+        }
+        
+        .disable-hover .card:hover .info-content {
+            opacity: 0 !important;
+            transform: translateY(40px) !important;
+        }
+        
+        .disable-hover .card:hover .character {
+            opacity: 0 !important;
+            transform: none !important;
+            filter: blur(2px) !important;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotateY(0);
+            }
+            to {
+                transform: rotateY(360deg);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-30px) rotate(5deg);
+            }
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(32, 156, 238, 0.7);
+            }
+            70% {
+                transform: scale(1.2);
+                box-shadow: 0 0 0 15px rgba(32, 156, 238, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(32, 156, 238, 0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulseText {
+            0% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+                text-shadow: 0 0 10px rgba(160, 224, 255, 0.8);
+            }
+            100% {
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 20px rgba(32, 156, 238, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(32, 156, 238, 0.9), 0 0 80px rgba(0, 255, 255, 0.6);
+            }
+            100% {
+                box-shadow: 0 0 20px rgba(32, 156, 238, 0.7);
+            }
+        }
+
+        /* Scrollbar styling */
+        .info-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .info-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .info-content::-webkit-scrollbar-thumb {
+            background: rgba(32, 156, 238, 0.6);
+            border-radius: 10px;
+        }
+
+        .info-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(32, 156, 238, 0.8);
+        }
+
+        /* Focus card animation */
+        @keyframes focusCard {
+            0% {
+                transform: translateZ(0);
+            }
+            50% {
+                transform: translateZ(60px);
+            }
+            100% {
+                transform: translateZ(40px);
+            }
+        }
+
+        .card.focus {
+            animation: focusCard 1s forwards;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.9), 0 0 100px rgba(0, 255, 255, 0.5);
+            z-index: 25;
+        }
+
+        @media (max-width: 900px) {
+            .carousel-container {
+                height: 480px;
+            }
+            
+            .card {
+                width: 280px;
+                height: 400px;
+                margin-left: -140px;
+                margin-top: -200px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .title {
+                font-size: 1.6rem;
+            }
+            
+            .info-content {
+                padding: 15px;
+            }
+            
+            .info-content h3 {
+                font-size: 1.4rem;
+            }
+            
+            .info-content p {
+                font-size: 0.95rem;
+            }
+            
+            .voice-controls {
+                gap: 15px;
+            }
+            
+            .voice-btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+            
+            .stat {
+                min-width: 160px;
+                padding: 12px 15px;
+            }
+            
+            .stat-number {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .carousel-container {
+                height: 420px;
+            }
+            
+            .card {
+                width: 240px;
+                height: 360px;
+                margin-left: -120px;
+                margin-top: -180px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .title {
+                font-size: 1.4rem;
+            }
+            
+            .info-content {
+                padding: 12px;
+            }
+            
+            .info-content h3 {
+                font-size: 1.2rem;
+            }
+            
+            .info-content p {
+                font-size: 0.9rem;
+            }
+            
+            .arrow {
+                width: 55px;
+                height: 55px;
+                margin: 0 15px;
+            }
+            
+            .arrow i {
+                font-size: 25px;
+            }
+            
+            .voice-controls {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="hamburger-menu">
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+    <nav class="hamburger-nav" id="hamburgerNav" role="navigation">
+        <ul class="hamburger-tabs">
+            <li class="hamburger-tab tab1">
+                <a href="gemes.html">
+                    <i class="fas fa-gamepad" aria-hidden="true"></i>
+                    <span>Games</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab2">
+                <a href="chat.html">
+                    <i class="fas fa-comments" aria-hidden="true"></i>
+                    <span>Convo</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab3">
+                <a href="DONATE.HTML">
+                    <i class="fas fa-donate" aria-hidden="true"></i>
+                    <span>Donate</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab4">
+                <a href="animals.html">
+                    <i class="fas fa-paw" aria-hidden="true"></i>
+                    <span>Animals</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab5">
+                <a href="about.html">
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
+                    <span>About</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab6">
+                <a href="contact.html">
+                    <i class="fas fa-envelope" aria-hidden="true"></i>
+                    <span>Contact</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab7">
+                <a href="news.html">
+                    <i class="fas fa-newspaper" aria-hidden="true"></i>
+                    <span>News</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab8">
+                <a href="visit.html">
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                    <span>Visit</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab9">
+                <a href="index.html">
+                    <i class="fas fa-home" aria-hidden="true"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab10 active">
+                <a href="shelter.html">
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span>Ocean Pollution</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="ocean-floor"></div>
+    
+    <header>
+        <h1>Marine Pollution Crisis</h1>
+        <p class="subtitle">Understanding the threats to our oceans and how we can help preserve marine ecosystems</p>
+    </header>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-number">8M</div>
+            <div class="stat-label">Tons of plastic enter oceans yearly</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">90%</div>
+            <div class="stat-label">Of marine species affected by plastic</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">700</div>
+            <div class="stat-label">Marine species facing extinction</div>
+        </div>
+    </div>
+
+    <div class="carousel-container">
+        <div class="carousel" id="carousel">
+            <!-- Cards will be generated by JavaScript -->
+        </div>
+        
+        <div class="arrows">
+            <div class="arrow left" id="leftArrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            <div class="arrow right" id="rightArrow">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="voice-controls">
+        <div class="voice-btn" id="playBtn">
+            <i class="fas fa-play"></i> Play All Information
+        </div>
+        <div class="voice-btn" id="pauseBtn">
+            <i class="fas fa-pause"></i> Pause
+        </div>
+        <div class="voice-btn" id="stopBtn">
+            <i class="fas fa-stop"></i> Stop
+        </div>
+    </div>
+
+    <div class="voice-indicator" id="voiceIndicator">
+        <div class="pulse"></div>
+        <span>Reading information...</span>
+    </div>
+
+    <p class="instructions">Hover over a card to see details • Click to hear the information • Use controls for playback</p>
+
+    <script>
+        // Navigation functionality
+        function setupNavigation() {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const hamburgerNav = document.getElementById('hamburgerNav');
+            
+            hamburgerBtn.addEventListener('click', function() {
+                const isActive = this.classList.contains('active');
+                this.classList.toggle('active');
+                hamburgerNav.classList.toggle('active');
+                
+                // Update ARIA attributes
+                this.setAttribute('aria-expanded', !isActive);
+                hamburgerNav.setAttribute('aria-hidden', isActive);
+                
+                // Prevent body scrolling when nav is open
+                if (hamburgerNav.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Close nav when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (hamburgerNav.classList.contains('active') && 
+                    !hamburgerNav.contains(e.target) && 
+                    !hamburgerBtn.contains(e.target)) {
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                    hamburgerNav.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Handle keyboard navigation
+            hamburgerBtn.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+
+            // Add active class to clicked tab
+            document.querySelectorAll('.hamburger-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Close nav after selection
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                    hamburgerNav.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = '';
+                });
+            });
+        }
+
+        // Handle escape key for navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const hamburgerNav = document.getElementById('hamburgerNav');
+                const hamburgerBtn = document.getElementById('hamburgerBtn');
+                if (hamburgerNav && hamburgerNav.classList.contains('active')) {
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                    hamburgerNav.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+
+        // Ocean Pollution Carousel functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const carousel = document.getElementById('carousel');
+            const leftArrow = document.getElementById('leftArrow');
+            const rightArrow = document.getElementById('rightArrow');
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const voiceIndicator = document.getElementById('voiceIndicator');
+            
+            // Speech synthesis setup
+            const speech = window.speechSynthesis;
+            let currentUtterance = null;
+            let isReading = false;
+            let readQueue = [];
+            let currentCardIndex = 0;
+            
+            // Create floating bubbles
+            createBubbles();
+            
+            // Marine pollution data with updated image URLs
+            const pollutionData = [
+                {
+                    title: "Plastic Pollution",
+                    cover: "kol.jpg",
+                    character: "https://images.unsplash.com/photo-1598755257130-c2aaca1f061c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                    info: {
+                        problem: "Over 8 million tons of plastic enter oceans each year, equivalent to a truckload every minute",
+                        impact: "Kills over 100,000 marine animals annually, enters the food chain through microplastics, damages coral reefs and ecosystems",
+                        sources: "Single-use plastics (bags, bottles, straws), fishing gear, microbeads in cosmetics, industrial waste",
+                        solution: "Reduce plastic consumption, improve waste management systems, participate in beach cleanups, support plastic alternatives",
+                        fact: "There will be more plastic than fish in the ocean by 2050 if current trends continue. Microplastics have been found in Arctic ice and the deepest ocean trenches."
+                    }
+                },
+                {
+                    title: "Oil Spills",
+                    cover: "jjj.jpg",
+                    character: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                    info: {
+                        problem: "Accidental and intentional oil releases into marine environments, with over 1,000 large spills recorded since the 1970s",
+                        impact: "Coats marine life causing hypothermia and poisoning, destroys coastal habitats, persists in sediments for decades, impacts fishing and tourism industries",
+                        sources: "Tanker accidents, offshore drilling operations, pipeline leaks, illegal tank cleaning, natural seeps",
+                        solution: "Stricter safety regulations for oil tankers, improved spill response technology, transition to renewable energy, increased use of double-hulled tankers",
+                        fact: "The Deepwater Horizon spill in 2010 released approximately 4.9 million barrels of oil into the Gulf of Mexico, affecting over 1,300 miles of coastline and causing an estimated $17.2 billion in environmental damage."
+                    }
+                },
+                {
+                    title: "Chemical Pollution",
+                    cover: "plpp.jpg",
+                    character: "https://images.unsplash.com/photo-1455656678494-36ceb0d8d1af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                    info: {
+                        problem: "Toxic chemicals from industry, agriculture, and urban runoff entering waterways at an alarming rate",
+                        impact: "Creates dead zones where oxygen levels are too low to support life, causes hormonal changes in marine organisms, bioaccumulates in the food chain, affects human health through seafood consumption",
+                        sources: "Industrial discharge, agricultural pesticides and fertilizers, mining operations, wastewater treatment plants, pharmaceutical residues",
+                        solution: "Implement advanced wastewater treatment, regulate agricultural runoff, enforce stricter industrial waste standards, promote organic farming practices",
+                        fact: "The Gulf of Mexico has a dead zone of over 6,000 square miles due to fertilizer runoff from the Mississippi River. This hypoxic area is unable to support most marine life and has been steadily growing since measurements began in 1985."
+                    }
+                },
+                {
+                    title: "Noise Pollution",
+                    cover: "hhhi.jpg",
+                    character: "https://images.unsplash.com/photo-1615529162921-f5d0c07042a7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                    info: {
+                        problem: "Human-made underwater noise disrupting marine environments, with ocean noise doubling each decade in some regions",
+                        impact: "Disorients marine mammals leading to strandings, masks biological sounds essential for communication and navigation, causes chronic stress, alters predator-prey relationships",
+                        sources: "Commercial shipping, military sonar, oil exploration seismic surveys, construction activities, recreational boating",
+                        solution: "Develop quieter ship designs, establish marine quiet zones, regulate sonar use in sensitive areas, implement speed restrictions in critical habitats",
+                        fact: "Ocean noise pollution has doubled each decade for the past 60 years in some regions. The low-frequency noise from shipping has reduced the communication range of whales by up to 90%, affecting their ability to find mates and navigate."
+                    }
+                },
+                {
+                    title: "Overfishing",
+                    cover: "lizza.jpg",
+                    character: "https://images.unsplash.com/photo-1598755257130-c2aaca1f061c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                    info: {
+                        problem: "Harvesting fish faster than populations can reproduce, with global fish consumption doubling since the 1960s",
+                        impact: "Depletes target species beyond recovery, disrupts marine food webs, damages seafloor habitats through destructive fishing practices, threatens food security for coastal communities",
+                        sources: "Industrial fishing fleets, bycatch (non-target species caught accidentally), illegal unreported and unregulated fishing, subsidies that promote overcapacity",
+                        solution: "Establish science-based catch limits, create marine protected areas, reduce bycatch through improved fishing gear, eliminate harmful subsidies, promote sustainable aquaculture",
+                        fact: "Nearly 90% of the world's marine fish stocks are now fully exploited, overexploited or depleted. Since 1950, more than 90% of large predatory fish such as sharks, tuna and marlin have disappeared from the world's oceans."
+                    }
+                }
+            ];
+            
+            // Generate pollution cards
+            pollutionData.forEach((issue, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = index;
+                
+                // Increase the radius to prevent overlapping
+                const angle = (360 / pollutionData.length) * index;
+                card.style.transform = `rotateY(${angle}deg) translateZ(650px)`;
+                
+                card.innerHTML = `
+                    <div class="card-wrapper">
+                        <div class="cover-image" style="background-image: url('${issue.cover}')"></div>
+                        <div class="title">${issue.title}</div>
+                        <div class="character" style="background-image: url('${issue.character}')"></div>
+                        <div class="info-content">
+                            <h3>${issue.title}</h3>
+                            <p><strong>Problem:</strong> ${issue.info.problem}</p>
+                            <p><strong>Impact:</strong> ${issue.info.impact}</p>
+                            <p><strong>Main Sources:</strong> ${issue.info.sources}</p>
+                            <p><strong>Solutions:</strong> ${issue.info.solution}</p>
+                            <div class="fact-box">
+                                <strong>Did you know?</strong> ${issue.info.fact}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add click event for voice narration
+                card.addEventListener('click', () => {
+                    stopSpeech();
+                    speakCardInfo(index);
+                    highlightCard(index);
+                });
+                
+                carousel.appendChild(card);
+            });
+            
+            // Function to speak card information
+            function speakCardInfo(index) {
+                const issue = pollutionData[index];
+                const text = `
+                    ${issue.title}. 
+                    Problem: ${issue.info.problem}. 
+                    Impact: ${issue.info.impact}. 
+                    Main Sources: ${issue.info.sources}. 
+                    Solutions: ${issue.info.solution}. 
+                    Fact: ${issue.info.fact}
+                `;
+                
+                // Create speech utterance
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                utterance.volume = 1;
+                
+                // Set up event handlers
+                utterance.onstart = () => {
+                    isReading = true;
+                    voiceIndicator.classList.add('active');
+                    highlightCard(index);
+                    
+                    // Add focus animation to the card
+                    const cards = document.querySelectorAll('.card');
+                    if (cards[index]) {
+                        cards[index].classList.add('focus');
+                    }
+                };
+                
+                utterance.onend = () => {
+                    isReading = false;
+                    voiceIndicator.classList.remove('active');
+                    removeCardHighlight();
+                    
+                    // Remove focus animation
+                    const cards = document.querySelectorAll('.card');
+                    cards.forEach(card => card.classList.remove('focus'));
+                };
+                
+                utterance.onerror = (event) => {
+                    console.error('Speech synthesis error:', event);
+                    isReading = false;
+                    voiceIndicator.classList.remove('active');
+                    removeCardHighlight();
+                    
+                    // Remove focus animation
+                    const cards = document.querySelectorAll('.card');
+                    cards.forEach(card => card.classList.remove('focus'));
+                };
+                
+                // Speak the text
+                speech.speak(utterance);
+                currentUtterance = utterance;
+            }
+            
+            // Function to highlight the active card
+            function highlightCard(index) {
+                // Remove active class from all cards
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                
+                // Add active class to the current card
+                const cards = document.querySelectorAll('.card');
+                if (cards[index]) {
+                    cards[index].classList.add('active');
+                }
+            }
+            
+            // Function to remove card highlight
+            function removeCardHighlight() {
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('active');
+                });
+            }
+            
+            // Function to stop speech
+            function stopSpeech() {
+                if (speech.speaking) {
+                    speech.cancel();
+                }
+                isReading = false;
+                voiceIndicator.classList.remove('active');
+                removeCardHighlight();
+                
+                // Remove focus animation
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => card.classList.remove('focus'));
+            }
+            
+            // Function to play all cards in sequence
+            function playAll() {
+                stopSpeech();
+                readQueue = [...pollutionData.keys()]; // Create array of indices
+                currentCardIndex = 0;
+                
+                // Start with the first card
+                if (readQueue.length > 0) {
+                    speakCardInfo(readQueue[currentCardIndex]);
+                    
+                    // Set up handler for when each utterance ends
+                    if (currentUtterance) {
+                        currentUtterance.onend = () => {
+                            currentCardIndex++;
+                            if (currentCardIndex < readQueue.length) {
+                                setTimeout(() => speakCardInfo(readQueue[currentCardIndex]), 1000);
+                            }
+                        };
+                    }
+                }
+            }
+            
+            // Event listeners for voice controls
+            playBtn.addEventListener('click', playAll);
+            
+            pauseBtn.addEventListener('click', () => {
+                if (speech.speaking && !speech.paused) {
+                    speech.pause();
+                    voiceIndicator.querySelector('span').textContent = 'Paused...';
+                } else if (speech.speaking && speech.paused) {
+                    speech.resume();
+                    voiceIndicator.querySelector('span').textContent = 'Reading information...';
+                }
+            });
+            
+            stopBtn.addEventListener('click', stopSpeech);
+            
+            // Carousel rotation control
+            let currentAngle = 0;
+            const cardCount = pollutionData.length;
+            const angleIncrement = 360 / cardCount;
+            let isAutoRotating = true;
+            
+            // Pause auto-rotation when interacting with carousel
+            carousel.addEventListener('mouseenter', () => {
+                carousel.classList.add('paused');
+            });
+            
+            carousel.addEventListener('mouseleave', () => {
+                if (isAutoRotating) {
+                    carousel.classList.remove('paused');
+                }
+            });
+            
+            // Manual rotation with arrows
+            leftArrow.addEventListener('click', () => {
+                rotateCarousel(angleIncrement);
+            });
+            
+            rightArrow.addEventListener('click', () => {
+                rotateCarousel(-angleIncrement);
+            });
+            
+            // Add event listeners to disable hover effects when interacting with controls
+            const controlElements = [leftArrow, rightArrow, playBtn, pauseBtn, stopBtn];
+            
+            controlElements.forEach(element => {
+                element.addEventListener('mouseenter', () => {
+                    document.body.classList.add('disable-hover');
+                });
+                
+                element.addEventListener('mouseleave', () => {
+                    document.body.classList.remove('disable-hover');
+                });
+            });
+            
+            function rotateCarousel(angle) {
+                // Pause auto-rotation when user interacts
+                carousel.classList.add('paused');
+                isAutoRotating = false;
+                
+                currentAngle += angle;
+                carousel.style.transform = `rotateY(${currentAngle}deg)`;
+                
+                // Restart auto-rotation after 10 seconds of inactivity
+                clearTimeout(window.rotationTimeout);
+                window.rotationTimeout = setTimeout(() => {
+                    isAutoRotating = true;
+                    carousel.classList.remove('paused');
+                }, 10000);
+            }
+            
+            // Create floating bubbles
+            function createBubbles() {
+                const bubbleCount = 25;
+                for (let i = 0; i < bubbleCount; i++) {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble';
+                    
+                    const size = Math.random() * 50 + 10;
+                    bubble.style.width = `${size}px`;
+                    bubble.style.height = `${size}px`;
+                    
+                    bubble.style.left = `${Math.random() * 100}%`;
+                    bubble.style.top = `${Math.random() * 100}%`;
+                    
+                    const animationDuration = Math.random() * 20 + 10;
+                    bubble.style.animation = `float ${animationDuration}s infinite ease-in-out`;
+                    bubble.style.animationDelay = `${Math.random() * 5}s`;
+                    
+                    document.body.appendChild(bubble);
+                }
+            }
+            
+            // Touch events for mobile
+            let touchStartX = 0;
+            const carouselContainer = document.querySelector('.carousel-container');
+            
+            carouselContainer.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+                carousel.classList.add('paused');
+            }, {passive: true});
+            
+            carouselContainer.addEventListener('touchend', e => {
+                const touchEndX = e.changedTouches[0].screenX;
+                const diff = touchEndX - touchStartX;
+                
+                if (Math.abs(diff) > 50) { // Minimum swipe distance
+                    if (diff > 0) {
+                        rotateCarousel(angleIncrement); // Swipe right
+                    } else {
+                        rotateCarousel(-angleIncrement); // Swipe left
+                    }
+                }
+                
+                // Restart auto-rotation after 10 seconds
+                clearTimeout(window.rotationTimeout);
+                window.rotationTimeout = setTimeout(() => {
+                    isAutoRotating = true;
+                    carousel.classList.remove('paused');
+                }, 10000);
+            }, {passive: true});
+            
+            // Initialize navigation
+            setupNavigation();
+        });
+    </script>
+</body>
+</html> make it responsive

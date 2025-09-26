@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beluga Whale - Arctic Marine Species</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo.jpg">
+  <link rel="apple-touch-icon" href="logo.jpg">
+  <meta name="msapplication-TileImage" content="logo.png">
+  <meta name="theme-color" content="#0a2a43">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --arctic-blue: #607d8b;
+      --ice-blue: #b3e5fc;
+      --light-blue: #e1f5fe;
+      --warning-orange: rgba(255, 138, 101, 0.4);
+      --white: #ffffff;
+      --dark-arctic: #455a64;
+      --nav-aqua: #4db8ff;
+      --nav-seafoam: #00ffaa;
+      --nav-coral: #ff7f50;
+      --nav-sunset: #ff8e53;
+      --nav-pollution: #ff6b6b; /* New color for pollution tab */
+    }
+
+    /* NAVIGATION STYLES */
+    .hamburger-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .hamburger-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--nav-aqua);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 1001;
+    }
+
+    .hamburger-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(77, 184, 255, 0.6);
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      margin: 2px 0;
+      background: white;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-btn.active span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-btn.active span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .hamburger-nav {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 300px;
+      height: 100vh;
+      background: rgba(5, 20, 35, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      transition: right 0.4s ease;
+      padding: 80px 20px 20px;
+      overflow-y: auto;
+      box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .hamburger-nav.active {
+      right: 0;
+    }
+
+    .hamburger-tabs {
+      list-style: none;
+      width: 100%;
+    }
+
+    .hamburger-tab {
+      width: 100%;
+      margin-bottom: 5px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .hamburger-tab a {
+      display: flex;
+      align-items: center;
+      padding: 18px 20px;
+      text-decoration: none;
+      color: white;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a i {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a span {
+      margin-left: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .hamburger-tab:hover {
+      transform: translateX(-5px);
+    }
+
+    /* Different colors for each tab */
+    .tab1 { background: var(--nav-aqua); }
+    .tab2 { background: var(--nav-seafoam); }
+    .tab3 { background: var(--nav-coral); }
+    .tab4 { background: var(--nav-sunset); }
+    .tab5 { background: #9b5de5; }
+    .tab6 { background: #00bbf9; }
+    .tab7 { background: #00f5d4; }
+    .tab8 { background: #f15bb5; }
+    .tab9 { background: #fee440; }
+    .tab10 { background: var(--nav-pollution); } /* New tab color */
+
+    /* Active tab indicator */
+    .hamburger-tab.active {
+      box-shadow: inset 5px 0 0 white;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      color: var(--white);
+      background-image: url('ju.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* Bubble animation */
+    .bubble {
+      position: fixed;
+      top: -10%;
+      z-index: 9999;
+      color: rgba(255, 255, 255, 0.7);
+      user-select: none;
+      pointer-events: none;
+      animation-name: bubbles-fall, bubbles-sway;
+      animation-duration: 15s, 5s;
+      animation-timing-function: linear, ease-in-out;
+      animation-iteration-count: infinite, infinite;
+      font-size: clamp(0.8em, 2vw, 1.2em);
+    }
+
+    @keyframes bubbles-fall {
+      0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.7; }
+      100% { transform: translateY(110vh) translateX(15vw) rotate(360deg); opacity: 0; }
+    }
+
+    @keyframes bubbles-sway {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(20px); }
+    }
+
+    .container {
+      max-width: min(960px, 90%);
+      margin: 0 auto;
+      padding: clamp(20px, 3vw, 30px);
+      background-color: rgba(96, 125, 139, 0.8); /* Arctic blue transparency */
+      border-radius: 8px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      text-transform: uppercase;
+      font-size: clamp(0.7rem, 2vw, 0.9rem);
+      color: var(--ice-blue);
+      font-weight: bold;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 6vw, 2.5rem);
+      margin: 0;
+      color: var(--white);
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .species-name {
+      font-style: italic;
+      color: var(--light-blue);
+      margin: 5px 0 25px;
+      font-size: clamp(1rem, 3vw, 1.2rem);
+    }
+
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: clamp(15px, 3vw, 20px);
+      margin-bottom: clamp(20px, 3vw, 30px);
+      min-height: min(350px, 40vw);
+    }
+
+    .image-background {
+      flex: 2;
+      min-width: 300px;
+      background-image: url('ju.jpg');
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .image-caption {
+      background-color: rgba(69, 90, 100, 0.9); /* Darker Arctic blue */
+      color: white;
+      padding: clamp(15px, 3vw, 25px);
+      flex: 1;
+      min-width: min(250px, 100%);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .image-caption h4 {
+      margin: 0 0 clamp(10px, 2vw, 15px);
+      font-size: clamp(0.9rem, 3vw, 1.1rem);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--ice-blue);
+    }
+
+    .image-caption p {
+      margin: clamp(8px, 2vw, 12px) 0;
+      font-size: clamp(0.9rem, 2vw, 1rem);
+    }
+
+    .content p {
+      margin-bottom: clamp(15px, 3vw, 25px);
+      line-height: 1.7;
+      font-size: clamp(0.95rem, 2vw, 1.05rem);
+    }
+
+    .beluga-fact {
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: clamp(10px, 2vw, 15px);
+      border-left: 4px solid var(--ice-blue);
+      margin: clamp(15px, 3vw, 20px) 0;
+      font-style: italic;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .beluga-fact:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
+    }
+
+    .vocalization {
+      background-color: rgba(179, 229, 252, 0.15);
+      padding: clamp(10px, 2vw, 15px);
+      border-radius: 8px;
+      margin: clamp(15px, 3vw, 20px) 0;
+    }
+
+    .conservation-status {
+      background-color: var(--warning-orange);
+      padding: clamp(10px, 2vw, 15px);
+      border: 1px solid rgba(255, 138, 101, 0.4);
+      border-radius: 8px;
+      margin: clamp(15px, 3vw, 20px) 0;
+    }
+
+    .resources {
+      margin-top: clamp(25px, 5vw, 40px);
+      padding-top: clamp(15px, 3vw, 20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .resources a {
+      color: var(--ice-blue);
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: clamp(10px, 2vw, 15px);
+      transition: color 0.3s;
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .resources a:hover {
+      color: #81d4fa;
+      text-decoration: underline;
+    }
+
+    ul {
+      margin: clamp(10px, 2vw, 15px) 0;
+      padding-left: clamp(15px, 3vw, 20px);
+    }
+
+    li {
+      margin-bottom: clamp(5px, 1vw, 8px);
+      font-size: clamp(0.95rem, 2vw, 1rem);
+    }
+
+    /* Interactive elements */
+    .interactive-section {
+      margin: 30px 0;
+      padding: 20px;
+      background: rgba(69, 90, 100, 0.4);
+      border-radius: 8px;
+      border: 1px solid rgba(179, 229, 252, 0.3);
+    }
+
+    .interactive-title {
+      color: var(--ice-blue);
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .interactive-title i {
+      margin-right: 10px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: var(--nav-aqua);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      margin: 5px;
+    }
+
+    .btn:hover {
+      background: #3aa0e0;
+      transform: translateY(-2px);
+    }
+
+    .quiz-container {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+
+    .quiz-question {
+      margin-bottom: 15px;
+    }
+
+    .quiz-option {
+      display: block;
+      padding: 10px;
+      margin: 8px 0;
+      background: rgba(179, 229, 252, 0.1);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quiz-option:hover {
+      background: rgba(179, 229, 252, 0.2);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .image-container {
+        flex-direction: column;
+      }
+
+      .image-background {
+        width: 100%;
+        min-height: 200px;
+        flex: none;
+      }
+
+      .image-caption {
+        width: 100%;
+        flex: none;
+      }
+      
+      body {
+        background-attachment: scroll;
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 15px;
+      }
+      
+      .hamburger-nav {
+        width: 80%;
+        max-width: 300px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .image-background {
+        min-height: 150px;
+      }
+      
+      .resources a {
+        display: block;
+        margin-right: 0;
+        margin-bottom: 8px;
+      }
+      
+      .hamburger-btn {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .hamburger-btn span {
+        width: 22px;
+        height: 2.5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVIGATION -->
+  <!-- HAMBURGER MENU -->
+  <div class="hamburger-menu">
+    <div class="hamburger-btn" id="hamburgerBtn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <!-- HAMBURGER NAVIGATION -->
+  <nav class="hamburger-nav" id="hamburgerNav">
+    <ul class="hamburger-tabs">
+      <li class="hamburger-tab tab1">
+        <a href="daliy.html">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab2">
+        <a href="animals.html">
+          <i class="fas fa-fish"></i>
+          <span>Animals</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab3">
+        <a href="chat.html">
+          <i class="fas fa-hands-helping"></i>
+          <span>Conservation</span>
+        </a>
+      </li>
+      <!-- NEW POLLUTION TAB -->
+      <li class="hamburger-tab tab10">
+        <a href="pollution.html">
+          <i class="fas fa-industry"></i>
+          <span>Man Made Pollution</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab4">
+        <a href="gemes.html">
+          <i class="fas fa-gamepad"></i>
+          <span>Games</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab5">
+        <a href="about.html">
+          <i class="fas fa-info-circle"></i>
+          <span>About</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab6">
+        <a href="contact.html">
+          <i class="fas fa-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab7">
+        <a href="news.html">
+          <i class="fas fa-newspaper"></i>
+          <span>News</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab8">
+        <a href="visit.html">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Visit</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab9">
+        <a href="DONATE.HTML">
+          <i class="fas fa-donate"></i>
+          <span>Donate</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Bubbles will be added here by JavaScript -->
+  
+  <div class="container">
+    <div class="section-title">Arctic Marine Mammals</div>
+    <h1>Beluga Whale</h1>
+    <div class="species-name">Delphinapterus leucas</div>
+
+    <div class="image-container">
+      <div class="image-background"></div>
+      <div class="image-caption">
+        <h4>Distribution</h4>
+        <p>Arctic and sub-Arctic waters</p>
+        <h4>Habitat</h4>
+        <p>Coastal areas, river estuaries, and sea ice edges</p>
+        <h4>Size</h4>
+        <p>3-5.5m (10-18ft), 700-1,600kg (1,500-3,500lbs)</p>
+        <h4>Taxonomy</h4>
+        <p>Family: Monodontidae (with narwhals), Order: Cetacea</p>
+      </div>
+    </div>
+
+    <div class="content">
+      <p>
+        The beluga whale, often called the "canary of the sea" for its rich vocalizations, is a small Arctic whale known for its pure white color and distinctive rounded forehead (called a melon). Unlike other whales, belugas can turn their heads side to side thanks to unfused neck vertebrae. These highly social whales live in pods that can number in the hundreds and are known for their curiosity toward humans.
+      </p>
+      
+      <div class="beluga-fact" onclick="revealMoreFacts()">
+        <i class="fas fa-lightbulb"></i> Belugas are among the most vocal of all whales, producing clicks, whistles, and chirps that can be heard above water. Each individual develops its own unique "signature whistle" similar to how humans have names! Click for more facts.
+      </div>
+      
+      <div id="moreFacts" class="hidden">
+        <p>Beluga whales are born gray or brown and gradually lighten with age, reaching their characteristic pure white color between 5-10 years old. This adaptation helps them camouflage in their Arctic environment among ice floes.</p>
+      </div>
+      
+      <div class="vocalization">
+        <h4>Vocalization Superstars</h4>
+        <p>Belugas have one of the most sophisticated sonar systems in nature, using echolocation to navigate under ice and find breathing holes. Their melon (forehead) can change shape to focus different sounds, allowing them to communicate and hunt effectively in murky Arctic waters.</p>
+      </div>
+
+      <div class="interactive-section">
+        <h3 class="interactive-title"><i class="fas fa-chart-line"></i> Beluga Population Status</h3>
+        <p>Select a population to learn about their conservation status:</p>
+        <button class="btn" onclick="showPopulation('cook')">Cook Inlet</button>
+        <button class="btn" onclick="showPopulation('stlawrence')">St. Lawrence</button>
+        <button class="btn" onclick="showPopulation('alaska')">Alaska</button>
+        
+        <div id="populationInfo" class="quiz-container hidden">
+          <p id="populationText"></p>
+        </div>
+      </div>
+
+      <p>
+        Belugas are well adapted to Arctic life with a thick layer of blubber for insulation. They undergo an annual migration, spending winters near the ice edge and moving to shallow estuaries in summer where they molt their skin by rubbing against gravel. These summer gatherings can include thousands of individuals and are crucial for social bonding.
+      </p>
+
+      <div class="conservation-status">
+        <h4>Conservation Status: Least Concern (IUCN Red List)</h4>
+        <p>Some subpopulations are endangered (Cook Inlet belugas: Critically Endangered)</p>
+      </div>
+      
+      <p>
+        Major threats to beluga whales include:
+        <ul>
+          <li>Climate change altering Arctic ecosystems</li>
+          <li>Pollution (especially in St. Lawrence River population)</li>
+          <li>Increased shipping and industrial activity</li>
+          <li>Hunting by indigenous communities</li>
+          <li>Noise pollution disrupting communication</li>
+        </ul>
+      </p>
+
+      <div class="interactive-section">
+        <h3 class="interactive-title"><i class="fas fa-brain"></i> Beluga Knowledge Quiz</h3>
+        <p>Test your knowledge about these amazing whales:</p>
+        <button class="btn" onclick="startQuiz()">Start Quiz</button>
+        
+        <div id="quizContainer" class="quiz-container hidden">
+          <div id="question1" class="quiz-question">
+            <p>1. Why are beluga whales called "canaries of the sea"?</p>
+            <div class="quiz-option" onclick="checkAnswer(1, 'vocalizations', this)">For their extensive and varied vocalizations</div>
+            <div class="quiz-option" onclick="checkAnswer(1, 'color', this)">Because they're yellow like canaries</div>
+            <div class="quiz-option" onclick="checkAnswer(1, 'size', this)">Because of their small size compared to other whales</div>
+          </div>
+          
+          <div id="question2" class="quiz-question hidden">
+            <p>2. What unique physical ability do belugas have that most whales don't?</p>
+            <div class="quiz-option" onclick="checkAnswer(2, 'turn heads', this)">They can turn their heads side to side</div>
+            <div class="quiz-option" onclick="checkAnswer(2, 'breathe air', this)">They can breathe air through their mouths</div>
+            <div class="quiz-option" onclick="checkAnswer(2, 'walk on land', this)">They can briefly walk on land</div>
+          </div>
+          
+          <div id="quizResult" class="hidden">
+            <h4><i class="fas fa-award"></i> <span id="resultText"></span></h4>
+            <button class="btn" onclick="resetQuiz()">Try Again</button>
+          </div>
+        </div>
+      </div>
+      
+      <p>
+        Conservation efforts include monitoring populations, protecting critical habitats, and regulating hunting. Belugas are culturally important to many Arctic indigenous peoples and are sometimes kept in aquariums where their intelligence and trainability make them popular attractions. Research on beluga communication and social structure continues to reveal fascinating insights into these "sea canaries."
+      </p>
+    </div>
+
+    <div class="resources">
+      <strong>Additional Resources:</strong><br>
+      <a href="https://www.iucnredlist.org/species/6335/50357046" target="_blank">IUCN Red List</a>
+      <a href="https://www.worldwildlife.org/species/beluga" target="_blank">WWF Belugas</a>
+      <a href="https://oceana.org/marine-life/beluga-whale/" target="_blank">Oceana Beluga Guide</a>
+    </div>
+  </div>
+
+  <script>
+    // NAVIGATION FUNCTIONALITY
+    function setupNavigation() {
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const hamburgerNav = document.getElementById('hamburgerNav');
+      
+      hamburgerBtn.addEventListener('click', function() {
+        this.classList.toggle('active');
+        hamburgerNav.classList.toggle('active');
+        
+        // Prevent body scrolling when nav is open
+        if (hamburgerNav.classList.contains('active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Close nav when clicking outside on mobile
+      document.addEventListener('click', function(e) {
+        if (hamburgerNav.classList.contains('active') && 
+            !hamburgerNav.contains(e.target) && 
+            !hamburgerBtn.contains(e.target)) {
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Add active class to clicked tab
+      document.querySelectorAll('.hamburger-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Close nav after selection
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      });
+    }
+
+    // Create bubbles
+    function createBubbles() {
+      const bubbleCount = 30; // Reduced for mobile performance
+      const body = document.querySelector('body');
+      const bubbleSymbols = ['○', '◌', '◦', '⦿', '◯'];
+      
+      for (let i = 0; i < bubbleCount; i++) {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.innerHTML = bubbleSymbols[Math.floor(Math.random() * bubbleSymbols.length)];
+        
+        // Randomize properties
+        const size = Math.random() * 0.8 + 0.4; // Between 0.4 and 1.2em
+        const left = Math.random() * 100;
+        const opacity = Math.random() * 0.5 + 0.3; // Between 0.3 and 0.8
+        const animationDuration = Math.random() * 20 + 10; // Between 10 and 30s
+        const animationDelay = Math.random() * 10; // Start at different times
+        
+        bubble.style.fontSize = `${size}em`;
+        bubble.style.left = `${left}vw`;
+        bubble.style.opacity = opacity;
+        bubble.style.animationDuration = `${animationDuration}s`;
+        bubble.style.animationDelay = `${animationDelay}s`;
+        
+        body.appendChild(bubble);
+      }
+    }
+
+    // Interactive elements functionality
+    function revealMoreFacts() {
+      const moreFacts = document.getElementById('moreFacts');
+      moreFacts.classList.toggle('hidden');
+    }
+    
+    function showPopulation(region) {
+      const populationInfo = document.getElementById('populationInfo');
+      const populationText = document.getElementById('populationText');
+      
+      populationInfo.classList.remove('hidden');
+      
+      switch(region) {
+        case 'cook':
+          populationText.innerHTML = "<strong>Cook Inlet, Alaska:</strong> This isolated population is critically endangered with only about 279 individuals remaining. They face threats from development, pollution, and noise in their limited habitat near Anchorage.";
+          break;
+        case 'stlawrence':
+          populationText.innerHTML = "<strong>St. Lawrence Estuary, Canada:</strong> This southernmost population is endangered with approximately 900 individuals. They suffer from high levels of toxic contamination and frequent ship strikes.";
+          break;
+        case 'alaska':
+          populationText.innerHTML = "<strong>Alaska (other populations):</strong> Most Alaskan beluga populations are healthy and number in the thousands. The Beaufort Sea population is the largest with an estimated 40,000 individuals.";
+          break;
+      }
+    }
+    
+    let currentQuestion = 0;
+    let score = 0;
+    
+    function startQuiz() {
+      document.getElementById('quizContainer').classList.remove('hidden');
+      document.getElementById('question1').classList.remove('hidden');
+    }
+    
+    function checkAnswer(questionNum, answer, element) {
+      // Visual feedback
+      const options = element.parentElement.querySelectorAll('.quiz-option');
+      options.forEach(opt => {
+        opt.style.pointerEvents = 'none'; // Prevent further clicks
+      });
+      
+      // Correct answers
+      const correctAnswers = {
+        1: 'vocalizations',
+        2: 'turn heads'
+      };
+      
+      if (answer === correctAnswers[questionNum]) {
+        element.style.background = 'rgba(0, 200, 83, 0.3)';
+        element.style.border = '1px solid #00c853';
+        score++;
+      } else {
+        element.style.background = 'rgba(255, 87, 34, 0.3)';
+        element.style.border = '1px solid #ff5722';
+        
+        // Highlight correct answer
+        options.forEach(opt => {
+          if (opt.textContent.includes(correctAnswers[questionNum] === 'vocalizations' ? 'vocalizations' : 'turn their heads')) {
+            opt.style.background = 'rgba(0, 200, 83, 0.3)';
+            opt.style.border = '1px solid #00c853';
+          }
+        });
+      }
+      
+      // Move to next question or show results
+      setTimeout(() => {
+        document.getElementById(`question${questionNum}`).classList.add('hidden');
+        
+        if (questionNum < 2) {
+          document.getElementById(`question${questionNum + 1}`).classList.remove('hidden');
+        } else {
+          showQuizResults();
+        }
+      }, 1500);
+    }
+    
+    function showQuizResults() {
+      const quizResult = document.getElementById('quizResult');
+      const resultText = document.getElementById('resultText');
+      
+      quizResult.classList.remove('hidden');
+      
+      if (score === 2) {
+        resultText.textContent = `Perfect! You got ${score}/2 correct. You're a beluga expert!`;
+      } else if (score === 1) {
+        resultText.textContent = `Good job! You got ${score}/2 correct. You know quite a bit about belugas!`;
+      } else {
+        resultText.textContent = `You got ${score}/2 correct. Learn more about these amazing whales!`;
+      }
+    }
+    
+    function resetQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      
+      // Reset all questions and options
+      document.querySelectorAll('.quiz-question').forEach(q => {
+        q.classList.add('hidden');
+      });
+      
+      document.querySelectorAll('.quiz-option').forEach(opt => {
+        opt.style.background = 'rgba(179, 229, 252, 0.1)';
+        opt.style.border = 'none';
+        opt.style.pointerEvents = 'auto';
+      });
+      
+      document.getElementById('quizResult').classList.add('hidden');
+      document.getElementById('quizContainer').classList.add('hidden');
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      setupNavigation();
+      createBubbles();
+    });
+  </script>
+</body>
+</html>

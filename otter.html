@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Southern Sea Otter - Keystone Species of the Kelp Forest</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo.jpg">
+  <link rel="apple-touch-icon" href="logo.jpg">
+  <meta name="msapplication-TileImage" content="logo.png">
+  <meta name="theme-color" content="#0a2a43">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --wave-blue: #006994;
+      --coral: #ff7f50;
+      --aqua: #4db8ff;
+      --seafoam: #00ffaa;
+      --sunset: #ff8e53;
+    }
+
+    /* NAVIGATION STYLES */
+    .hamburger-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .hamburger-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--aqua);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 1001;
+    }
+
+    .hamburger-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(77, 184, 255, 0.6);
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      margin: 2px 0;
+      background: white;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-btn.active span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-btn.active span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .hamburger-nav {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 300px;
+      height: 100vh;
+      background: rgba(5, 20, 35, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      transition: right 0.4s ease;
+      padding: 80px 20px 20px;
+      overflow-y: auto;
+      box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .hamburger-nav.active {
+      right: 0;
+    }
+
+    .hamburger-tabs {
+      list-style: none;
+      width: 100%;
+    }
+
+    .hamburger-tab {
+      width: 100%;
+      margin-bottom: 5px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .hamburger-tab a {
+      display: flex;
+      align-items: center;
+      padding: 18px 20px;
+      text-decoration: none;
+      color: white;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a i {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a span {
+      margin-left: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .hamburger-tab:hover {
+      transform: translateX(-5px);
+    }
+
+    /* Different colors for each tab */
+    .tab1 { background: var(--aqua); }
+    .tab2 { background: var(--seafoam); }
+    .tab3 { background: var(--coral); }
+    .tab4 { background: var(--sunset); }
+    .tab5 { background: #9b5de5; }
+    .tab6 { background: #00bbf9; }
+    .tab7 { background: #00f5d4; }
+    .tab8 { background: #f15bb5; }
+    .tab9 { background: #f5900b; }
+    .tab10 { background: #6a994e; } /* New color for pollution tab */
+
+    /* Active tab indicator */
+    .hamburger-tab.active {
+      box-shadow: inset 5px 0 0 white;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      color: #ffffff;
+      background-image: url('kkp.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* Water ripple effect */
+    .ripple {
+      position: fixed;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      transform: scale(0);
+      animation: ripple 8s infinite ease-out;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    @keyframes ripple {
+      0% { transform: scale(0); opacity: 0.6; }
+      100% { transform: scale(10); opacity: 0; }
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 30px;
+      background-color: rgba(26, 83, 92, 0.85); /* Sea green-blue */
+      border-radius: 8px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      color: #a5d6a7; /* Soft sea green */
+      font-weight: bold;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 0;
+      color: #ffffff;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .species-name {
+      font-style: italic;
+      color: #e0f7fa;
+      margin: 5px 0 25px;
+      font-size: 1.2rem;
+    }
+
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 30px;
+      min-height: 350px;
+    }
+
+    .image-background {
+      flex: 2;
+      background-image: url('kkp.jpg');
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .image-caption {
+      background-color: rgba(0, 77, 64, 0.9); /* Dark teal */
+      color: white;
+      padding: 25px;
+      flex: 1;
+      border-radius: 8px;
+      min-width: 250px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .image-caption h4 {
+      margin: 0 0 15px;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #a5d6a7;
+    }
+
+    .image-caption p {
+      margin: 12px 0;
+      font-size: 1rem;
+    }
+
+    .content p {
+      margin-bottom: 25px;
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+
+    .otter-fact {
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 15px;
+      border-left: 4px solid #a5d6a7;
+      margin: 20px 0;
+      font-style: italic;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .conservation-status {
+      background-color: rgba(255, 179, 0, 0.3);
+      padding: 20px;
+      border: 1px solid rgba(255, 179, 0, 0.6);
+      border-radius: 8px;
+      margin: 25px 0;
+    }
+
+    .kelp-icon {
+      display: inline-block;
+      animation: sway 4s infinite ease-in-out;
+    }
+
+    @keyframes sway {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    .resources {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .resources a {
+      color: #a5d6a7;
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: 15px;
+      transition: color 0.3s;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .resources a:hover {
+      color: #4db6ac;
+      text-decoration: underline;
+    }
+
+    ul {
+      margin: 15px 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+      .image-container {
+        flex-direction: column;
+      }
+
+      .image-background {
+        width: 100%;
+        min-height: 200px;
+        flex: none;
+      }
+
+      .image-caption {
+        width: 100%;
+        min-width: auto;
+        padding: 15px;
+      }
+      
+      body {
+        background-attachment: scroll;
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      .species-name {
+        font-size: 1rem;
+      }
+      
+      .resources a {
+        display: block;
+        margin: 10px 0;
+      }
+      
+      .content p, .image-caption p {
+        font-size: 0.95rem;
+      }
+      
+      .otter-fact, .conservation-status {
+        padding: 12px;
+      }
+      
+      .hamburger-nav {
+        width: 80%;
+        max-width: 300px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .container {
+        padding: 12px;
+      }
+      
+      .image-background {
+        min-height: 150px;
+      }
+      
+      .image-caption h4 {
+        font-size: 1rem;
+      }
+      
+      .content p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
+      
+      .hamburger-btn {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .hamburger-btn span {
+        width: 22px;
+        height: 2.5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVIGATION -->
+  <!-- HAMBURGER MENU -->
+  <div class="hamburger-menu">
+    <div class="hamburger-btn" id="hamburgerBtn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <!-- HAMBURGER NAVIGATION -->
+  <nav class="hamburger-nav" id="hamburgerNav">
+    <ul class="hamburger-tabs">
+      <li class="hamburger-tab tab1">
+        <a href="daily.html">  <!-- Fixed typo from daliy.html to daily.html -->
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+    
+      <li class="hamburger-tab tab3">
+        <a href="chat.html">
+          <i class="fas fa-hands-helping"></i>
+          <span>Conservation</span>
+        </a>
+      </li>
+      <!-- NEW TAB: Man Made Pollution -->
+      <li class="hamburger-tab tab10">
+        <a href="pollution.html">
+          <i class="fas fa-industry"></i>
+          <span>Man Made Pollution</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab4">
+        <a href="gemes.html">
+          <i class="fas fa-camera"></i>
+          <span>games</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab5">
+        <a href="about.html">
+          <i class="fas fa-info-circle"></i>
+          <span>About</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab6">
+        <a href="contact.html">
+          <i class="fas fa-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab7">
+        <a href="news.html">
+          <i class="fas fa-newspaper"></i>
+          <span>News</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab8">
+        <a href="visit.html">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>visit</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab9">
+        <a href="DONATE.HTML">
+          <i class="fas fa-user"></i>
+          <span>Donate</span>
+        </a>
+      </li>
+       <li class="hamburger-tab tab9">
+        <a href="animals.html">
+          <i class="fas fa-user"></i>
+          <span>animals</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Water ripples will be added here by JavaScript -->
+  
+  <div class="container">
+    <div class="section-title">Marine Mammal Conservation</div>
+    <h1>Southern Sea Otter</h1>
+    <div class="species-name">Enhydra lutris nereis</div>
+
+    <div class="image-container">
+      <div class="image-background"></div>
+      <div class="image-caption">
+        <h4>Distribution</h4>
+        <p>Central California coastline</p>
+        <h4>Habitat</h4>
+        <p>Kelp forests and rocky shores</p>
+        <h4>Size</h4>
+        <p>1.2-1.5m (4-5ft) length, 20-30kg (45-65lbs)</p>
+        <h4>Taxonomy</h4>
+        <p>Family: Mustelidae (weasels), Subfamily: Lutrinae</p>
+        <h4>Population</h4>
+        <p>~3,000 individuals (2023 estimate)</p>
+      </div>
+    </div>
+
+    <div class="content">
+      <p>
+        The southern sea otter is a charismatic marine mammal and a <strong>keystone species</strong> of California's coastal ecosystems. Unlike other marine mammals, sea otters lack blubber and instead rely on their incredibly dense fur (up to 1 million hairs per square inch!) to stay warm in chilly Pacific waters.
+      </p>
+      
+      <div class="otter-fact">
+        Sea otters are one of the few mammals besides primates that use tools. They often use rocks to crack open shellfish while floating on their backs!
+      </div>
+      
+      <div class="conservation-status">
+        <h4>Conservation Status: Threatened (U.S. ESA)</h4>
+        <p>While populations have rebounded from near extinction, they remain at about 30% of historical levels.</p>
+      </div>
+      
+      <p>
+        Sea otters play a crucial role in maintaining healthy <span class="kelp-icon">kelp forests</span> by controlling sea urchin populations. Without otters, urchins can overgraze kelp, creating "urchin barrens" that support far less marine life.
+      </p>
+
+      <p>
+        Major threats to southern sea otters include:
+        <ul>
+          <li><strong>Oil spills</strong> (their fur loses insulation when oiled)</li>
+          <li><strong>Shark bites</strong> (increasing in frequency)</li>
+          <li><strong>Infectious diseases</strong> from coastal pollution</li>
+          <li><strong>Food limitation</strong> in parts of their range</li>
+          <li><strong>Historical overhunting</strong> for their luxurious fur</li>
+        </ul>
+      </p>
+      
+      <div class="otter-fact">
+        A sea otter's daily food intake is about 25% of its body weight - equivalent to a 150lb human eating 37lbs of food each day!
+      </div>
+      
+      <p>
+        Conservation successes include:
+        <ul>
+          <li>International protection from hunting (1911 Fur Seal Treaty)</li>
+          <li>Successful reintroduction programs</li>
+          <li>Oil spill response programs</li>
+          <li>Habitat protection measures</li>
+          <li>Public education campaigns</li>
+        </ul>
+      </p>
+      
+      <p>
+        The southern sea otter's recovery demonstrates how protecting a single keystone species can benefit entire ecosystems. Their continued protection helps maintain biodiversity in California's coastal waters.
+      </p>
+    </div>
+
+    <div class="resources">
+      <strong>Get Involved in Conservation:</strong><br>
+      <a href="https://www.montereybayaquarium.org/conservation/sea-otter-research" target="_blank">Monterey Bay Aquarium</a>
+      <a href="https://www.fws.org/species/southern-sea-otter-enhydra-lutris-nereis" target="_blank">U.S. Fish & Wildlife Service</a>
+      <a href="https://www.iucnredlist.org/species/7750/21939518" target="_blank">IUCN Red List</a>
+      <a href="https://www.seaottersavvy.org/" target="_blank">Sea Otter Savvy</a>
+      <a href="https://www.aquariumofthebay.org/conservation/sea-otters/" target="_blank">Aquarium of the Bay</a>
+    </div>
+  </div>
+
+  <script>
+    // NAVIGATION FUNCTIONALITY
+    function setupNavigation() {
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const hamburgerNav = document.getElementById('hamburgerNav');
+      
+      hamburgerBtn.addEventListener('click', function() {
+        this.classList.toggle('active');
+        hamburgerNav.classList.toggle('active');
+        
+        // Prevent body scrolling when nav is open
+        if (hamburgerNav.classList.contains('active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Close nav when clicking outside on mobile
+      document.addEventListener('click', function(e) {
+        if (hamburgerNav.classList.contains('active') && 
+            !hamburgerNav.contains(e.target) && 
+            !hamburgerBtn.contains(e.target)) {
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Add active class to clicked tab
+      document.querySelectorAll('.hamburger-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Close nav after selection
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      });
+    }
+
+    // Create water ripples
+    document.addEventListener('DOMContentLoaded', function() {
+      setupNavigation();
+      
+      const body = document.querySelector('body');
+      
+      // Create ripples
+      setInterval(() => {
+        const ripple = document.createElement('div');
+        ripple.className = 'ripple';
+        
+        const size = Math.random() * 200 + 100;
+        const left = Math.random() * 100;
+        const top = Math.random() * 100;
+        
+        ripple.style.width = `${size}px`;
+        ripple.style.height = `${size}px`;
+        ripple.style.left = `${left}%`;
+        ripple.style.top = `${top}%`;
+        
+        body.appendChild(ripple);
+        
+        // Remove ripple after animation completes
+        setTimeout(() => {
+          ripple.remove();
+        }, 8000);
+      }, 2000);
+    });
+  </script>
+</body>
+</html>

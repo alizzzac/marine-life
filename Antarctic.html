@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Antarctic Krill - Southern Ocean Keystone Species</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo.jpg">
+  <link rel="apple-touch-icon" href="logo.jpg">
+  <meta name="msapplication-TileImage" content="logo.png">
+  <meta name="theme-color" content="#0a2a43">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --ocean-blue: #455a81;
+      --ice-blue: #81d4fa;
+      --light-blue: #e1f5fe;
+      --warning-orange: rgba(255, 167, 38, 0.4);
+      --white: #ffffff;
+      --dark-ocean: #29436b;
+      
+      /* Navigation colors */
+      --aqua: #4db8ff;
+      --seafoam: #00ffaa;
+      --coral: #ff7f50;
+      --sunset: #ff8e53;
+    }
+
+    /* NAVIGATION STYLES */
+    .hamburger-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .hamburger-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--ice-blue);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 1001;
+    }
+
+    .hamburger-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(129, 212, 250, 0.6);
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      margin: 2px 0;
+      background: white;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-btn.active span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-btn.active span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .hamburger-nav {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 300px;
+      height: 100vh;
+      background: rgba(5, 20, 35, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      transition: right 0.4s ease;
+      padding: 80px 20px 20px;
+      overflow-y: auto;
+      box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .hamburger-nav.active {
+      right: 0;
+    }
+
+    .hamburger-tabs {
+      list-style: none;
+      width: 100%;
+    }
+
+    .hamburger-tab {
+      width: 100%;
+      margin-bottom: 5px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .hamburger-tab a {
+      display: flex;
+      align-items: center;
+      padding: 18px 20px;
+      text-decoration: none;
+      color: white;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a i {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a span {
+      margin-left: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .hamburger-tab:hover {
+      transform: translateX(-5px);
+    }
+
+    /* Different colors for each tab */
+    .tab1 { background: var(--aqua); }
+    .tab2 { background: var(--seafoam); }
+    .tab3 { background: var(--coral); }
+    .tab4 { background: var(--sunset); }
+    .tab5 { background: #9b5de5; }
+    .tab6 { background: #00bbf9; }
+    .tab7 { background: #00f5d4; }
+    .tab8 { background: #f15bb5; }
+    .tab9 { background: #f5900b; }
+    .tab10 { background: #ff4757; } /* Added for Man Made Pollution */
+
+    /* Active tab indicator */
+    .hamburger-tab.active {
+      box-shadow: inset 5px 0 0 white;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      color: var(--white);
+      background-image: url('pp.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      padding: clamp(10px, 2vw, 20px);
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* Snowflake animation - optimized for mobile */
+    .snowflake {
+      position: fixed;
+      top: -10%;
+      z-index: 999;
+      color: white;
+      user-select: none;
+      pointer-events: none;
+      animation-name: snowflakes-fall, snowflakes-shake;
+      animation-duration: 10s, 3s;
+      animation-timing-function: linear, ease-in-out;
+      animation-iteration-count: infinite, infinite;
+      font-size: clamp(0.8em, 2vw, 1.2em);
+    }
+
+    @keyframes snowflakes-fall {
+      0% { transform: translateY(0) translateX(0) rotate(0deg); }
+      100% { transform: translateY(110vh) translateX(15vw) rotate(360deg); }
+    }
+
+    @keyframes snowflakes-shake {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(10px); }
+    }
+
+    .container {
+      max-width: min(960px, 90%);
+      margin: 70px auto 30px;
+      padding: clamp(20px, 3vw, 30px);
+      background-color: rgba(69, 90, 129, 0.85);
+      border-radius: 8px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      text-transform: uppercase;
+      font-size: clamp(0.7rem, 2vw, 0.9rem);
+      color: var(--ice-blue);
+      font-weight: bold;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 6vw, 2.5rem);
+      margin: 0;
+      color: var(--white);
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .species-name {
+      font-style: italic;
+      color: var(--light-blue);
+      margin: 5px 0 clamp(15px, 3vw, 25px);
+      font-size: clamp(1rem, 3vw, 1.2rem);
+    }
+
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: clamp(15px, 3vw, 20px);
+      margin-bottom: clamp(20px, 3vw, 30px);
+      min-height: min(350px, 40vw);
+    }
+
+    .image-background {
+      flex: 2;
+      min-width: 300px;
+      background-image: url('pp.jpg');
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .image-caption {
+      background-color: rgba(41, 67, 107, 0.9);
+      color: white;
+      padding: clamp(15px, 3vw, 25px);
+      flex: 1;
+      min-width: min(250px, 100%);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .image-caption h4 {
+      margin: 0 0 clamp(10px, 2vw, 15px);
+      font-size: clamp(0.9rem, 3vw, 1.1rem);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--ice-blue);
+    }
+
+    .image-caption p {
+      margin: clamp(8px, 2vw, 12px) 0;
+      font-size: clamp(0.9rem, 2vw, 1rem);
+    }
+
+    .content p {
+      margin-bottom: clamp(15px, 3vw, 25px);
+      line-height: 1.7;
+      font-size: clamp(0.95rem, 2vw, 1.05rem);
+    }
+
+    .krill-fact {
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: clamp(10px, 2vw, 15px);
+      border-left: 4px solid var(--ice-blue);
+      margin: clamp(15px, 3vw, 20px) 0;
+      font-style: italic;
+    }
+
+    .conservation-status {
+      background-color: var(--warning-orange);
+      padding: clamp(10px, 2vw, 15px);
+      border: 1px solid rgba(255, 167, 38, 0.4);
+      border-radius: 8px;
+      margin: clamp(15px, 3vw, 20px) 0;
+    }
+
+    .resources {
+      margin-top: clamp(25px, 5vw, 40px);
+      padding-top: clamp(15px, 3vw, 20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .resources a {
+      color: var(--ice-blue);
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: clamp(10px, 2vw, 15px);
+      transition: color 0.3s;
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .resources a:hover {
+      color: #4fc3f7;
+      text-decoration: underline;
+    }
+
+    ul {
+      margin: clamp(10px, 2vw, 15px) 0;
+      padding-left: clamp(15px, 3vw, 20px);
+    }
+
+    li {
+      margin-bottom: clamp(5px, 1vw, 8px);
+      font-size: clamp(0.95rem, 2vw, 1rem);
+    }
+
+    .bioluminescence {
+      display: inline-block;
+      animation: glow 2s infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 5px #fff, 0 0 10px var(--ice-blue); }
+      to { text-shadow: 0 0 10px #fff, 0 0 20px #4fc3f7, 0 0 30px #0288d1; }
+    }
+
+    @media (max-width: 768px) {
+      .image-container {
+        flex-direction: column;
+      }
+
+      .image-background {
+        width: 100%;
+        min-height: 200px;
+        flex: none;
+      }
+
+      .image-caption {
+        width: 100%;
+        flex: none;
+      }
+      
+      body {
+        background-attachment: scroll;
+      }
+      
+      .hamburger-nav {
+        width: 80%;
+        max-width: 300px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .image-background {
+        min-height: 150px;
+      }
+      
+      .resources a {
+        display: block;
+        margin-right: 0;
+        margin-bottom: 8px;
+      }
+      
+      .snowflake {
+        font-size: 0.7em; /* Smaller snowflakes on tiny screens */
+      }
+      
+      .hamburger-btn {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .hamburger-btn span {
+        width: 22px;
+        height: 2.5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVIGATION -->
+  <!-- HAMBURGER MENU -->
+  <div class="hamburger-menu">
+    <div class="hamburger-btn" id="hamburgerBtn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <!-- HAMBURGER NAVIGATION -->
+  <nav class="hamburger-nav" id="hamburgerNav">
+    <ul class="hamburger-tabs">
+      <li class="hamburger-tab tab1">
+        <a href="daliy.html">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab2">
+        <a href="pollution.html">
+          <i class="fas fa-industry"></i>
+          <span>Man Made Pollution</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab3">
+        <a href="chat.html">
+          <i class="fas fa-hands-helping"></i>
+          <span>Conservation</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab4">
+        <a href="gemes.html">
+          <i class="fas fa-camera"></i>
+          <span>games</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab5">
+        <a href="about.html">
+          <i class="fas fa-info-circle"></i>
+          <span>About</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab6">
+        <a href="contact.html">
+          <i class="fas fa-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab7">
+        <a href="news.html">
+          <i class="fas fa-newspaper"></i>
+          <span>News</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab8">
+        <a href="visit.html">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>visit</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab9">
+        <a href="DONATE.HTML">
+          <i class="fas fa-user"></i>
+          <span>Donate</span>
+        </a>
+      </li>
+       <li class="hamburger-tab tab10">
+        <a href="animals.html">
+          <i class="fas fa-user"></i>
+          <span>animals</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Snowflakes will be added here by JavaScript -->
+  
+  <div class="container">
+    <div class="section-title">Southern Ocean Wildlife</div>
+    <h1>Antarctic Krill</h1>
+    <div class="species-name">Euphausia superba</div>
+
+    <div class="image-container">
+      <div class="image-background"></div>
+      <div class="image-caption">
+        <h4>Distribution</h4>
+        <p>Circumpolar in Southern Ocean</p>
+        <h4>Habitat</h4>
+        <p>Open ocean (pelagic), sea ice edge</p>
+        <h4>Size</h4>
+        <p>6 cm (2.4 in) average length, 2 grams weight</p>
+        <h4>Taxonomy</h4>
+        <p>Order: Euphausiacea, Family: Euphausiidae</p>
+        <h4>Unique Feature</h4>
+        <p><span class="bioluminescence">Bioluminescent</span> photophores</p>
+      </div>
+    </div>
+
+    <div class="content">
+      <p>
+        Antarctic krill are the keystone species of the Southern Ocean ecosystem, forming the critical link between phytoplankton and higher predators. These small crustaceans exist in <strong>astonishing numbers</strong>, with a total biomass estimated at 379 million tons - one of the most abundant animal species on Earth. Their massive swarms can stretch for kilometers and are visible from space.
+      </p>
+      
+      <div class="krill-fact">
+        A single cubic meter of ocean water can contain up to 30,000 individual krill! Their swarms are so dense they can turn the water pinkish-red.
+      </div>
+      
+      <p>
+        Krill have evolved remarkable adaptations for survival in frigid Antarctic waters:
+        <ul>
+          <li><strong>Antifreeze proteins</strong> that prevent ice crystal formation</li>
+          <li>Daily <strong>vertical migrations</strong> (up to 1,000m depth)</li>
+          <li>Ability to survive <strong>months without food</strong> in winter</li>
+          <li>Specialized filtering appendages for <strong>efficient phytoplankton feeding</strong></li>
+          <li><span class="bioluminescence">Bioluminescent organs</span> for communication</li>
+        </ul>
+      </p>
+
+      <div class="conservation-status">
+        <h4>Conservation Status: Not Evaluated (IUCN)</h4>
+        <p>While abundant, krill face growing threats from climate change and commercial fishing</p>
+      </div>
+      
+      <p>
+        Krill are the foundation of the Antarctic food web, supporting:
+        <ul>
+          <li>Whales (a blue whale eats up to 4 tons daily!)</li>
+          <li>Seals (especially crabeater seals)</li>
+          <li>Penguins and other seabirds</li>
+          <li>Squid and fish species</li>
+        </ul>
+      </p>
+      
+      <p>
+        Major threats to krill populations include:
+        <ul>
+          <li>Climate change reducing sea ice habitat</li>
+          <li>Ocean acidification affecting reproduction</li>
+          <li>Commercial harvesting for aquaculture feed and omega-3 supplements</li>
+          <li>Changes in phytoplankton communities</li>
+        </ul>
+      </p>
+      
+      <p>
+        The Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR) manages krill fisheries with precautionary catch limits. However, scientists emphasize the need for marine protected areas and continued monitoring as the Antarctic environment changes rapidly.
+      </p>
+    </div>
+
+    <div class="resources">
+      <strong>Additional Resources:</strong><br>
+      <a href="https://www.ccamlr.org/" target="_blank">CCAMLR</a>
+      <a href="https://www.bas.ac.uk/project/krill/" target="_blank">British Antarctic Survey</a>
+      <a href="https://www.antarctica.gov.au/about-antarctica/animals/krill/" target="_blank">Australian Antarctic Program</a>
+      <a href="https://oceana.org/marine-life/antarctic-krill/" target="_blank">Oceana</a>
+    </div>
+  </div>
+
+  <script>
+    // NAVIGATION FUNCTIONALITY
+    function setupNavigation() {
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const hamburgerNav = document.getElementById('hamburgerNav');
+      
+      hamburgerBtn.addEventListener('click', function() {
+        this.classList.toggle('active');
+        hamburgerNav.classList.toggle('active');
+        
+        // Prevent body scrolling when nav is open
+        if (hamburgerNav.classList.contains('active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Close nav when clicking outside on mobile
+      document.addEventListener('click', function(e) {
+        if (hamburgerNav.classList.contains('active') && 
+            !hamburgerNav.contains(e.target) && 
+            !hamburgerBtn.contains(e.target)) {
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Add active class to clicked tab
+      document.querySelectorAll('.hamburger-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Close nav after selection
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      });
+    }
+
+    // Create snowflakes - optimized for performance
+    document.addEventListener('DOMContentLoaded', function() {
+      setupNavigation();
+      
+      const snowflakesCount = window.innerWidth < 768 ? 30 : 50; // Fewer on mobile
+      const body = document.querySelector('body');
+      const snowflakeChars = ['❄', '❅', '❆'];
+      
+      for (let i = 0; i < snowflakesCount; i++) {
+        const snowflake = document.createElement('div');
+        snowflake.className = 'snowflake';
+        snowflake.innerHTML = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+        
+        // Randomize properties
+        const size = Math.random() * 0.8 + 0.4;
+        const left = Math.random() * 100;
+        const opacity = Math.random() * 0.7 + 0.3;
+        const animationDuration = Math.random() * 15 + 5;
+        const animationDelay = Math.random() * 5;
+        
+        snowflake.style.fontSize = `${size}em`;
+        snowflake.style.left = `${left}vw`;
+        snowflake.style.opacity = opacity;
+        snowflake.style.animationDuration = `${animationDuration}s`;
+        snowflake.style.animationDelay = `${animationDelay}s`;
+        
+        body.appendChild(snowflake);
+      }
+    });
+  </script>
+</body>
+</html>

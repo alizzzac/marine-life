@@ -1,0 +1,838 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Life Gallery - Patterned Display</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0c2d6b 0%, #1a4b8c 25%, #2a75b3 50%, #4aa1d0 75%, #6bc8e4 100%);
+            position: relative;
+            overflow-x: hidden;
+            color: white;
+            padding-bottom: 40px;
+        }
+
+        /* Ocean Background Animation */
+        .ocean-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+            background: linear-gradient(to bottom, #1a4b8c, #2a75b3, #4aa1d0);
+        }
+
+        .wave {
+            position: absolute;
+            width: 200%;
+            height: 100px;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(0,255,255,0.2) 100%);
+            border-radius: 50%;
+            animation: wave-float 6s ease-in-out infinite;
+        }
+
+        .wave:nth-child(1) {
+            top: 20%;
+            animation-delay: 0s;
+        }
+
+        .wave:nth-child(2) {
+            top: 40%;
+            animation-delay: 2s;
+        }
+
+        .wave:nth-child(3) {
+            top: 60%;
+            animation-delay: 4s;
+        }
+
+        @keyframes wave-float {
+            0%, 100% { transform: translateX(-50%) translateY(0px) rotate(0deg); }
+            50% { transform: translateX(-60%) translateY(-20px) rotate(180deg); }
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            background: linear-gradient(to right, #ff6b35, #3b82f6, #06d6a0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .fish-icon {
+            font-size: 2.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .pattern-info {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            border: 1px solid rgba(255,255,255,0.25);
+            text-align: center;
+        }
+
+        .pattern-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .pattern-info p {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .pattern-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            margin: 0 5px;
+            background: rgba(255,255,255,0.25);
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .badge-fish {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+        }
+
+        .badge-card {
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+        }
+
+        /* Cards Container */
+        .cards-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Section Headers */
+        .section-header {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .section-header h2 {
+            font-size: 2.2rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background: linear-gradient(to right, #ff6b35, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 3D Card Styles */
+        .card-wrapper {
+            perspective: 1000px;
+            height: 400px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .card-wrapper:hover {
+            transform: translateY(-10px);
+            z-index: 20;
+        }
+
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.7s ease;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        .card-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%);
+        }
+
+        .card-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.8rem;
+            color: white;
+            z-index: 2;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .card-subtitle {
+            font-style: italic;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .card-details {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.2rem;
+            margin-bottom: 1.2rem;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .card-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+
+        .card-detail-item h4 {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: #e0f7ff;
+        }
+
+        .card-detail-item p {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.95);
+        }
+
+        .flip-hint {
+            text-align: center;
+            font-size: 0.9rem;
+            color: white;
+            background: rgba(0,0,0,0.3);
+            padding: 0.7rem 1.2rem;
+            border-radius: 25px;
+            backdrop-filter: blur(5px);
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* Back side specific styles */
+        .card-back .card-content {
+            background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 50%, #06b6d4 100%);
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .back-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .fact-section {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .fact-section h4 {
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .fact-section p {
+            color: rgba(255,255,255,0.95);
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .bullet-point {
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* Hover Effects */
+        .card-wrapper:hover .card {
+            transform: scale(1.05) rotateX(5deg);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .card-wrapper:hover .card.flipped {
+            transform: scale(1.05) rotateX(5deg) rotateY(180deg);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2.5rem;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 2rem;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .pattern-info h2 {
+                font-size: 1.6rem;
+            }
+            
+            .pattern-info p {
+                font-size: 1rem;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+                padding: 0 1.5rem 2rem;
+                gap: 2rem;
+            }
+            
+            .card-wrapper {
+                height: 380px;
+            }
+            
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Animation for card entrance */
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-wrapper {
+            animation: cardFadeIn 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="ocean-bg">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
+    <div class="header">
+        <h1>
+            <span class="fish-icon">🐠</span>
+            Ocean Life Gallery
+            <span class="fish-icon">🌊</span>
+        </h1>
+        <p>
+            Discover the fascinating world beneath the waves with our interactive 3D cards.
+        </p>
+        
+        <div class="pattern-info">
+            <h2><span class="pattern-badge badge-fish">FISH PIC</span> + <span class="pattern-badge badge-card">3D CARD</span> Pattern</h2>
+            <p>Cards arranged in groups of 4 FISH PIC and 4 3D CARD as requested</p>
+            <p>Total of 25 marine species displayed in this pattern</p>
+        </div>
+    </div>
+
+    <div class="cards-container" id="cardsContainer">
+        <!-- Cards will be generated by JavaScript -->
+    </div>
+    
+    <div class="footer">
+        Interactive Ocean Life Gallery | 25 Marine Species | 3D Flip Cards
+    </div>
+
+    <script>
+        // Fish data
+        const fishData = [
+            {
+                id: 1,
+                name: "Clownfish",
+                scientificName: "Amphiprioninae",
+                habitat: "Coral reefs in warm waters",
+                size: "4-5 inches",
+                diet: "Algae, zooplankton, worms",
+                funFact: "Clownfish live in symbiosis with sea anemones, protected by their mucus coating.",
+                gradient: "linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)"
+            },
+            {
+                id: 2,
+                name: "Blue Tang",
+                scientificName: "Paracanthurus hepatus",
+                habitat: "Indo-Pacific coral reefs",
+                size: "12 inches",
+                diet: "Algae and plankton",
+                funFact: "Blue tangs can change color from blue to purple when stressed or sleeping.",
+                gradient: "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)"
+            },
+            {
+                id: 3,
+                name: "Angelfish",
+                scientificName: "Pomacanthidae",
+                habitat: "Tropical marine waters",
+                size: "6-24 inches",
+                diet: "Sponges, algae, small invertebrates",
+                funFact: "Angelfish have been known to live over 20 years in captivity.",
+                gradient: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)"
+            },
+            {
+                id: 4,
+                name: "Seahorse",
+                scientificName: "Hippocampus",
+                habitat: "Shallow tropical waters",
+                size: "0.6-14 inches",
+                diet: "Small crustaceans and plankton",
+                funFact: "Male seahorses are the only creatures where the male gives birth to offspring.",
+                gradient: "linear-gradient(135deg, #06d6a0 0%, #118ab2 100%)"
+            },
+            {
+                id: 5,
+                name: "Pufferfish",
+                scientificName: "Tetraodontidae",
+                habitat: "Tropical and subtropical waters",
+                size: "1-24 inches",
+                diet: "Algae, invertebrates, fish",
+                funFact: "Pufferfish can inflate to several times their normal size when threatened.",
+                gradient: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)"
+            },
+            {
+                id: 6,
+                name: "Manta Ray",
+                scientificName: "Mobula birostris",
+                habitat: "Open ocean, tropical waters",
+                size: "15-23 feet wingspan",
+                diet: "Zooplankton, small fish",
+                funFact: "Manta rays have the largest brain-to-body ratio of any fish and can recognize themselves in mirrors.",
+                gradient: "linear-gradient(135deg, #1f2937 0%, #374151 100%)"
+            },
+            {
+                id: 7,
+                name: "Lionfish",
+                scientificName: "Pterois",
+                habitat: "Indo-Pacific coral reefs",
+                size: "12-15 inches",
+                diet: "Small fish and invertebrates",
+                funFact: "Lionfish have venomous spines and are considered one of the most beautiful yet dangerous fish.",
+                gradient: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)"
+            },
+            {
+                id: 8,
+                name: "Parrotfish",
+                scientificName: "Scaridae",
+                habitat: "Tropical coral reefs",
+                size: "1-4 feet",
+                diet: "Algae and coral polyps",
+                funFact: "Parrotfish play a crucial role in creating tropical beaches by excreting sand.",
+                gradient: "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+            },
+            {
+                id: 9,
+                name: "Butterflyfish",
+                scientificName: "Chaetodontidae",
+                habitat: "Tropical marine waters",
+                size: "3-8 inches",
+                diet: "Coral polyps, algae, worms",
+                funFact: "Butterflyfish often swim in monogamous pairs and have excellent eyesight.",
+                gradient: "linear-gradient(135deg, #fde047 0%, #facc15 100%)"
+            },
+            {
+                id: 10,
+                name: "Octopus",
+                scientificName: "Octopoda",
+                habitat: "Ocean floors worldwide",
+                size: "1 inch to 30 feet",
+                diet: "Crabs, shrimp, fish",
+                funFact: "Octopuses have three hearts, blue blood, and can change both color and texture.",
+                gradient: "linear-gradient(135deg, #7c2d92 0%, #5b21b6 100%)"
+            },
+            {
+                id: 11,
+                name: "Moray Eel",
+                scientificName: "Muraenidae",
+                habitat: "Tropical and temperate seas",
+                size: "5 inches to 13 feet",
+                diet: "Fish, squid, crustaceans",
+                funFact: "Moray eels have a second set of jaws called pharyngeal jaws to help swallow prey.",
+                gradient: "linear-gradient(135deg, #065f46 0%, #047857 100%)"
+            },
+            {
+                id: 12,
+                name: "Jellyfish",
+                scientificName: "Cnidaria",
+                habitat: "Oceans worldwide",
+                size: "0.04 inches to 6 feet",
+                diet: "Fish, shrimp, crabs, plants",
+                funFact: "Jellyfish are 95% water and have been around for over 500 million years.",
+                gradient: "linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)"
+            },
+            {
+                id: 13,
+                name: "Great White Shark",
+                scientificName: "Carcharodon carcharias",
+                habitat: "Coastal waters worldwide",
+                size: "15-20 feet",
+                diet: "Fish, seals, sea lions",
+                funFact: "Great whites can detect a drop of blood in 25 gallons of water.",
+                gradient: "linear-gradient(135deg, #6b7280 0%, #4b5563 100%)"
+            },
+            {
+                id: 14,
+                name: "Sea Turtle",
+                scientificName: "Chelonioidea",
+                habitat: "Oceans worldwide",
+                size: "2-6 feet",
+                diet: "Seagrass, algae, jellyfish",
+                funFact: "Sea turtles can live over 100 years and return to the same beach where they were born to nest.",
+                gradient: "linear-gradient(135deg, #92400e 0%, #78350f 100%)"
+            },
+            {
+                id: 15,
+                name: "Starfish",
+                scientificName: "Asteroidea",
+                habitat: "Ocean floors worldwide",
+                size: "0.4-3 feet",
+                diet: "Mollusks, worms, decomposing matter",
+                funFact: "Starfish can regenerate lost arms and some species can regrow their entire body from a single arm.",
+                gradient: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)"
+            },
+            {
+                id: 16,
+                name: "Dolphin",
+                scientificName: "Delphinidae",
+                habitat: "Oceans and seas worldwide",
+                size: "4-30 feet",
+                diet: "Fish, squid, crustaceans",
+                funFact: "Dolphins have names for each other and can recognize themselves in mirrors.",
+                gradient: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)"
+            },
+            {
+                id: 17,
+                name: "Whale Shark",
+                scientificName: "Rhincodon typus",
+                habitat: "Warm ocean waters",
+                size: "18-32 feet",
+                diet: "Plankton, small fish, fish eggs",
+                funFact: "Whale sharks are the largest fish in the ocean but are gentle filter feeders.",
+                gradient: "linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)"
+            },
+            {
+                id: 18,
+                name: "Coral",
+                scientificName: "Anthozoa",
+                habitat: "Tropical shallow waters",
+                size: "Microscopic to several feet",
+                diet: "Plankton, small fish (via symbiotic algae)",
+                funFact: "Coral reefs support 25% of all marine species despite covering less than 1% of the ocean.",
+                gradient: "linear-gradient(135deg, #f472b6 0%, #ec4899 100%)"
+            },
+            {
+                id: 19,
+                name: "Hammerhead Shark",
+                scientificName: "Sphyrnidae",
+                habitat: "Warm waters worldwide",
+                size: "3-20 feet",
+                diet: "Fish, squid, octopus, crustaceans",
+                funFact: "Hammerhead sharks' unique head shape gives them 360-degree vision and enhanced electroreception.",
+                gradient: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+            },
+            {
+                id: 20,
+                name: "Electric Ray",
+                scientificName: "Torpediniformes",
+                habitat: "Temperate and tropical seas",
+                size: "1-6 feet",
+                diet: "Small fish, worms",
+                funFact: "Electric rays can generate up to 220 volts of electricity to stun prey and defend themselves.",
+                gradient: "linear-gradient(135deg, #facc15 0%, #eab308 100%)"
+            },
+            {
+                id: 21,
+                name: "Nautilus",
+                scientificName: "Nautiloidea",
+                habitat: "Deep tropical waters",
+                size: "6-10 inches",
+                diet: "Crabs, fish, shrimp",
+                funFact: "Nautiluses are living fossils that have remained virtually unchanged for 500 million years.",
+                gradient: "linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%)"
+            },
+            {
+                id: 22,
+                name: "Mantis Shrimp",
+                scientificName: "Stomatopoda",
+                habitat: "Tropical and subtropical waters",
+                size: "1-15 inches",
+                diet: "Fish, crabs, worms",
+                funFact: "Mantis shrimp have the most complex eyes in the animal kingdom with 16 types of color receptors.",
+                gradient: "linear-gradient(135deg, #06d6a0 0%, #059669 100%)"
+            },
+            {
+                id: 23,
+                name: "Sea Anemone",
+                scientificName: "Actiniaria",
+                habitat: "Ocean floors worldwide",
+                size: "0.5-6 feet",
+                diet: "Fish, mussels, zooplankton",
+                funFact: "Sea anemones are animals, not plants, and some species can live for over 100 years.",
+                gradient: "linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)"
+            },
+            {
+                id: 24,
+                name: "Stingray",
+                scientificName: "Dasyatidae",
+                habitat: "Coastal tropical waters",
+                size: "1-14 feet",
+                diet: "Mollusks, worms, fish",
+                funFact: "Stingrays bury themselves in sand and can sense electrical fields from other animals.",
+                gradient: "linear-gradient(135deg, #92400e 0%, #78350f 100%)"
+            },
+            {
+                id: 25,
+                name: "Grouper",
+                scientificName: "Epinephelinae",
+                habitat: "Tropical and subtropical waters",
+                size: "1-8 feet",
+                diet: "Fish, octopus, crustaceans",
+                funFact: "Some grouper species can change from female to male as they age and grow larger.",
+                gradient: "linear-gradient(135deg, #0f766e 0%, #0d9488 100%)"
+            }
+        ];
+
+        // Generate cards in FISH PIC (4) + 3D CARD (4) pattern
+        function generateCards() {
+            const container = document.getElementById('cardsContainer');
+            const groups = Math.ceil(fishData.length / 8);
+            
+            for (let group = 0; group < groups; group++) {
+                const startIndex = group * 8;
+                const endIndex = Math.min(startIndex + 8, fishData.length);
+                
+                // Create FISH PIC group header
+                if (startIndex < fishData.length) {
+                    const fishHeader = document.createElement('div');
+                    fishHeader.className = 'section-header';
+                    fishHeader.innerHTML = `<h2><span class="pattern-badge badge-fish">FISH PIC</span> Group ${group + 1}</h2>`;
+                    container.appendChild(fishHeader);
+                }
+                
+                // Create 4 FISH PIC cards
+                for (let i = startIndex; i < startIndex + 4 && i < endIndex; i++) {
+                    const fish = fishData[i];
+                    container.appendChild(createCard(fish, i));
+                }
+                
+                // Create 3D CARD group header
+                if (startIndex + 4 < fishData.length) {
+                    const cardHeader = document.createElement('div');
+                    cardHeader.className = 'section-header';
+                    cardHeader.innerHTML = `<h2><span class="pattern-badge badge-card">3D CARD</span> Group ${group + 1}</h2>`;
+                    container.appendChild(cardHeader);
+                }
+                
+                // Create 4 3D CARD cards
+                for (let i = startIndex + 4; i < endIndex; i++) {
+                    const fish = fishData[i];
+                    container.appendChild(createCard(fish, i));
+                }
+            }
+        }
+
+        // Helper function to create card element
+        function createCard(fish, index) {
+            const cardWrapper = document.createElement('div');
+            cardWrapper.className = 'card-wrapper';
+            cardWrapper.style.animationDelay = `${index * 50}ms`;
+            
+            cardWrapper.innerHTML = `
+                <div class="card" onclick="flipCard(this)">
+                    <!-- Front of card -->
+                    <div class="card-face">
+                        <div class="card-content" style="background: ${fish.gradient};">
+                            <div class="card-overlay"></div>
+                            <div class="card-info">
+                                <h3 class="card-title">${fish.name}</h3>
+                                <p class="card-subtitle">${fish.scientificName}</p>
+                                
+                                <div class="card-details">
+                                    <div class="card-detail-grid">
+                                        <div class="card-detail-item">
+                                            <h4>Habitat</h4>
+                                            <p>${fish.habitat}</p>
+                                        </div>
+                                        <div class="card-detail-item">
+                                            <h4>Size</h4>
+                                            <p>${fish.size}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flip-hint">
+                                    Click to flip for more info
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Back of card -->
+                    <div class="card-face card-back">
+                        <div class="card-content">
+                            <h3 class="back-title">${fish.name}</h3>
+                            
+                            <div class="fact-section">
+                                <h4>
+                                    <span class="bullet-point"></span>
+                                    Diet
+                                </h4>
+                                <p>${fish.diet}</p>
+                            </div>
+                            
+                            <div class="fact-section">
+                                <h4>
+                                    <span class="bullet-point"></span>
+                                    Fun Fact
+                                </h4>
+                                <p>${fish.funFact}</p>
+                            </div>
+                            
+                            <div class="flip-hint">
+                                Click to flip back
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return cardWrapper;
+        }
+
+        // Flip card function
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            generateCards();
+        });
+    </script>
+</body>
+</html>

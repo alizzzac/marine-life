@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dugong - Marine Mammal Species</title>
+  <!-- Favicon using your logo.png -->
+    <link rel="icon" type="image/png" href="logo.jpg">
+    <link rel="apple-touch-icon" href="logo.jpg">
+    <meta name="msapplication-TileImage" content="logo.png">
+    <meta name="theme-color" content="#0a2a43">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --wave-blue: #006994;
+      --coral: #ff7f50;
+      --aqua: #4db8ff;
+      --seafoam: #00ffaa;
+      --sunset: #ff8e53;
+      --seagrass: #00a896;
+      --dugong-brown: #8d6e63;
+      --pollution-gray: #666666;
+    }
+
+    /* NAVIGATION STYLES */
+    .hamburger-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .hamburger-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--seagrass);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 1001;
+    }
+
+    .hamburger-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(0, 168, 150, 0.6);
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      margin: 2px 0;
+      background: white;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-btn.active span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-btn.active span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .hamburger-nav {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 300px;
+      height: 100vh;
+      background: rgba(5, 20, 35, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      transition: right 0.4s ease;
+      padding: 80px 20px 20px;
+      overflow-y: auto;
+      box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .hamburger-nav.active {
+      right: 0;
+    }
+
+    .hamburger-tabs {
+      list-style: none;
+      width: 100%;
+    }
+
+    .hamburger-tab {
+      width: 100%;
+      margin-bottom: 5px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .hamburger-tab a {
+      display: flex;
+      align-items: center;
+      padding: 18px 20px;
+      text-decoration: none;
+      color: white;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a i {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a span {
+      margin-left: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .hamburger-tab:hover {
+      transform: translateX(-5px);
+    }
+
+    /* Different colors for each tab */
+    .tab1 { background: var(--seagrass); }
+    .tab2 { background: var(--seafoam); }
+    .tab3 { background: var(--coral); }
+    .tab4 { background: var(--sunset); }
+    .tab5 { background: #9b5de5; }
+    .tab6 { background: #00bbf9; }
+    .tab7 { background: #00f5d4; }
+    .tab8 { background: #f15bb5; }
+    .tab9 { background: #40e9f5; }
+    .tab10 { background: var(--pollution-gray); } /* New pollution tab */
+
+    /* Active tab indicator */
+    .hamburger-tab.active {
+      box-shadow: inset 5px 0 0 white;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      color: #ffffff;
+      background-image: url('kop.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* Bubble animation */
+    .bubble {
+      position: fixed;
+      top: -10%;
+      z-index: 9999;
+      color: rgba(255, 255, 255, 0.7);
+      user-select: none;
+      pointer-events: none;
+      animation-name: bubbles-fall, bubbles-sway;
+      animation-duration: 15s, 5s;
+      animation-timing-function: linear, ease-in-out;
+      animation-iteration-count: infinite, infinite;
+      font-size: 1.2em;
+    }
+
+    @keyframes bubbles-fall {
+      0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.7; }
+      100% { transform: translateY(110vh) translateX(15vw) rotate(360deg); opacity: 0; }
+    }
+
+    @keyframes bubbles-sway {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(20px); }
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 30px;
+      background-color: rgba(0, 105, 92, 0.75); /* Seagrass green transparency */
+      border-radius: 8px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      color: #a7ffeb; /* Light seagrass accent */
+      font-weight: bold;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 0;
+      color: #ffffff;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .species-name {
+      font-style: italic;
+      color: #b2dfdb;
+      margin: 5px 0 25px;
+      font-size: 1.2rem;
+    }
+
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 30px;
+      min-height: 350px;
+    }
+
+    .image-background {
+      flex: 2;
+      background-image: url('kop.jpg');
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .image-caption {
+      background-color: rgba(0, 77, 64, 0.85); /* Darker seagrass green */
+      color: white;
+      padding: 25px;
+      flex: 1;
+      border-radius: 8px;
+      min-width: 250px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .image-caption h4 {
+      margin: 0 0 15px;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #a7ffeb;
+    }
+
+    .image-caption p {
+      margin: 12px 0;
+      font-size: 1rem;
+    }
+
+    .content p {
+      margin-bottom: 25px;
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+
+    .dugong-fact {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-left: 4px solid #a7ffeb;
+      margin: 20px 0;
+      font-style: italic;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .dugong-fact:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+    }
+
+    .conservation-status {
+      background-color: rgba(255, 138, 101, 0.15); /* Warning color */
+      padding: 15px;
+      border: 1px solid rgba(255, 138, 101, 0.3);
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    .resources {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .resources a {
+      color: #a7ffeb;
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: 15px;
+      transition: color 0.3s;
+    }
+
+    .resources a:hover {
+      color: #64ffda;
+      text-decoration: underline;
+    }
+
+    ul {
+      margin: 15px 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    /* Interactive elements */
+    .interactive-section {
+      margin: 30px 0;
+      padding: 20px;
+      background: rgba(0, 77, 64, 0.5);
+      border-radius: 8px;
+      border: 1px solid rgba(167, 255, 235, 0.3);
+    }
+
+    .interactive-title {
+      color: #a7ffeb;
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .interactive-title i {
+      margin-right: 10px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: var(--seagrass);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      margin: 5px;
+    }
+
+    .btn:hover {
+      background: #008e7a;
+      transform: translateY(-2px);
+    }
+
+    .quiz-container {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+
+    .quiz-question {
+      margin-bottom: 15px;
+    }
+
+    .quiz-option {
+      display: block;
+      padding: 10px;
+      margin: 8px 0;
+      background: rgba(167, 255, 235, 0.1);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quiz-option:hover {
+      background: rgba(167, 255, 235, 0.2);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .image-container {
+        flex-direction: column;
+      }
+
+      .image-background {
+        width: 100%;
+        min-height: 250px;
+      }
+
+      .image-caption {
+        width: 100%;
+      }
+      
+      body {
+        background-attachment: scroll;
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .hamburger-nav {
+        width: 80%;
+        max-width: 300px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .hamburger-btn {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .hamburger-btn span {
+        width: 22px;
+        height: 2.5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVIGATION -->
+  <!-- HAMBURGER MENU -->
+  <div class="hamburger-menu">
+    <div class="hamburger-btn" id="hamburgerBtn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <!-- HAMBURGER NAVIGATION -->
+  <nav class="hamburger-nav" id="hamburgerNav">
+    <ul class="hamburger-tabs">
+      <li class="hamburger-tab tab1">
+        <a href="daliy.html">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+    
+      <li class="hamburger-tab tab3">
+        <a href="chat.html">
+          <i class="fas fa-hands-helping"></i>
+          <span>Conservation</span>
+        </a>
+      </li>
+      
+      <!-- NEW POLLUTION TAB -->
+      <li class="hamburger-tab tab10">
+        <a href="pollution.html">
+          <i class="fas fa-industry"></i>
+          <span>Man Made Pollution</span>
+        </a>
+      </li>
+      
+      <li class="hamburger-tab tab4">
+        <a href="gemes.html">
+          <i class="fas fa-gamepad"></i>
+          <span>Games</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab5">
+        <a href="about.html">
+          <i class="fas fa-info-circle"></i>
+          <span>About</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab6">
+        <a href="contact.html">
+          <i class="fas fa-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab7">
+        <a href="news.html">
+          <i class="fas fa-newspaper"></i>
+          <span>News</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab8">
+        <a href="visit.html">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Visit</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab9">
+        <a href="DONATE.HTML">
+          <i class="fas fa-donate"></i>
+          <span>Donate</span>
+        </a>
+      </li>
+       <li class="hamburger-tab tab2">
+        <a href="animals.html">
+          <i class="fas fa-fish"></i>
+          <span>Animals</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Bubbles will be added here by JavaScript -->
+  
+  <div class="container">
+    <div class="section-title">Marine Mammals</div>
+    <h1>Dugong</h1>
+    <div class="species-name">Dugong dugon</div>
+
+    <div class="image-container">
+      <div class="image-background"></div>
+      <div class="image-caption">
+        <h4>Distribution</h4>
+        <p>Coastal waters of Indo-Pacific region</p>
+        <h4>Habitat</h4>
+        <p>Shallow, protected bays and mangrove channels</p>
+        <h4>Size</h4>
+        <p>Up to 3m (10ft) and 400kg (900lbs)</p>
+        <h4>Taxonomy</h4>
+        <p>Order: Sirenia, Family: Dugongidae</p>
+      </div>
+    </div>
+
+    <div class="content">
+      <p>
+        The dugong, sometimes called the "sea cow," is a gentle marine mammal that grazes on seagrass meadows in warm coastal waters. As the only strictly marine herbivorous mammal, dugongs play a vital role in maintaining healthy seagrass ecosystems. Their slow, graceful movements and rounded bodies give them a distinctive appearance unlike any other marine creature.
+      </p>
+      
+      <div class="dugong-fact" onclick="revealMoreFacts()">
+        <i class="fas fa-lightbulb"></i> Dugongs can live for 70 years or more, and mothers nurse their calves for up to 18 months - one of the longest nursing periods of any marine mammal! Click for more facts.
+      </div>
+      
+      <div id="moreFacts" class="hidden">
+        <p>Dugongs are thought to have inspired ancient tales of mermaids with their human-like eyes and tendency to sit upright in the water while nursing their young. They can hold their breath for up to six minutes before surfacing to breathe.</p>
+      </div>
+      
+      <p>
+        Dugongs are closely related to manatees but differ in several ways, including their dolphin-like tail flukes and specialized snouts for uprooting seagrass. An adult dugong can eat up to 40kg of seagrass daily, carefully cropping the plants to encourage healthy regrowth. This grazing behavior helps maintain the biodiversity of seagrass meadows.
+      </p>
+
+      <div class="interactive-section">
+        <h3 class="interactive-title"><i class="fas fa-chart-line"></i> Dugong Population Status</h3>
+        <p>Select a region to see dugong population trends:</p>
+        <button class="btn" onclick="showPopulation('australia')">Australia</button>
+        <button class="btn" onclick="showPopulation('uae')">Arabian Gulf</button>
+        <button class="btn" onclick="showPopulation('east-africa')">East Africa</button>
+        
+        <div id="populationInfo" class="quiz-container hidden">
+          <p id="populationText"></p>
+        </div>
+      </div>
+
+      <div class="conservation-status">
+        <h4>Conservation Status: Vulnerable (IUCN Red List)</h4>
+        <p>Many populations have declined by more than 30% over the last 60 years.</p>
+      </div>
+      
+      <p>
+        Major threats to dugongs include:
+        <ul>
+          <li>Habitat loss from coastal development</li>
+          <li>Seagrass destruction from pollution and dredging</li>
+          <li>Entanglement in fishing nets</li>
+          <li>Boat strikes</li>
+          <li>Historical hunting for meat and oil</li>
+        </ul>
+      </p>
+
+      <div class="interactive-section">
+        <h3 class="interactive-title"><i class="fas fa-brain"></i> Dugong Knowledge Quiz</h3>
+        <p>Test your knowledge about these gentle marine mammals:</p>
+        <button class="btn" onclick="startQuiz()">Start Quiz</button>
+        
+        <div id="quizContainer" class="quiz-container hidden">
+          <div id="question1" class="quiz-question">
+            <p>1. What is the primary food source for dugongs?</p>
+            <div class="quiz-option" onclick="checkAnswer(1, 'seagrass', this)">Seagrass</div>
+            <div class="quiz-option" onclick="checkAnswer(1, 'plankton', this)">Plankton</div>
+            <div class="quiz-option" onclick="checkAnswer(1, 'small fish', this)">Small fish</div>
+          </div>
+          
+          <div id="question2" class="quiz-question hidden">
+            <p>2. How long can dugongs hold their breath underwater?</p>
+            <div class="quiz-option" onclick="checkAnswer(2, '6 minutes', this)">Up to 6 minutes</div>
+            <div class="quiz-option" onclick="checkAnswer(2, '15 minutes', this)">Up to 15 minutes</div>
+            <div class="quiz-option" onclick="checkAnswer(2, '30 minutes', this)">Up to 30 minutes</div>
+          </div>
+          
+          <div id="quizResult" class="hidden">
+            <h4><i class="fas fa-award"></i> <span id="resultText"></span></h4>
+            <button class="btn" onclick="resetQuiz()">Try Again</button>
+          </div>
+        </div>
+      </div>
+      
+      <p>
+        Conservation efforts focus on protecting seagrass habitats, establishing marine protected areas, and working with local communities. In some cultures, dugongs hold significant cultural importance and feature in traditional stories and art. Ecotourism programs are helping raise awareness while providing alternative livelihoods to hunting.
+      </p>
+    </div>
+
+    <div class="resources">
+      <strong>Additional Resources:</strong><br>
+      <a href="https://www.iucnredlist.org/species/6909/160756767" target="_blank">IUCN Red List</a>
+      <a href="https://www.cms.int/dugong" target="_blank">Dugong MoU (CMS)</a>
+      <a href="https://www.dugongconservation.org" target="_blank">Dugong Conservation</a>
+    </div>
+  </div>
+
+  <script>
+    // NAVIGATION FUNCTIONALITY
+    function setupNavigation() {
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const hamburgerNav = document.getElementById('hamburgerNav');
+      
+      hamburgerBtn.addEventListener('click', function() {
+        this.classList.toggle('active');
+        hamburgerNav.classList.toggle('active');
+        
+        // Prevent body scrolling when nav is open
+        if (hamburgerNav.classList.contains('active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Close nav when clicking outside on mobile
+      document.addEventListener('click', function(e) {
+        if (hamburgerNav.classList.contains('active') && 
+            !hamburgerNav.contains(e.target) && 
+            !hamburgerBtn.contains(e.target)) {
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Add active class to clicked tab
+      document.querySelectorAll('.hamburger-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Close nav after selection
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      });
+    }
+
+    // Create bubbles
+    function createBubbles() {
+      const bubbleCount = 40;
+      const body = document.querySelector('body');
+      const bubbleSymbols = ['○', '◌', '◦', '⦿', '◯'];
+      
+      for (let i = 0; i < bubbleCount; i++) {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.innerHTML = bubbleSymbols[Math.floor(Math.random() * bubbleSymbols.length)];
+        
+        // Randomize properties
+        const size = Math.random() * 0.8 + 0.4; // Between 0.4 and 1.2em
+        const left = Math.random() * 100;
+        const opacity = Math.random() * 0.5 + 0.3; // Between 0.3 and 0.8
+        const animationDuration = Math.random() * 20 + 10; // Between 10 and 30s
+        const animationDelay = Math.random() * 10; // Start at different times
+        
+        bubble.style.fontSize = `${size}em`;
+        bubble.style.left = `${left}vw`;
+        bubble.style.opacity = opacity;
+        bubble.style.animationDuration = `${animationDuration}s`;
+        bubble.style.animationDelay = `${animationDelay}s`;
+        
+        body.appendChild(bubble);
+      }
+    }
+
+    // Interactive elements functionality
+    function revealMoreFacts() {
+      const moreFacts = document.getElementById('moreFacts');
+      moreFacts.classList.toggle('hidden');
+    }
+    
+    function showPopulation(region) {
+      const populationInfo = document.getElementById('populationInfo');
+      const populationText = document.getElementById('populationText');
+      
+      populationInfo.classList.remove('hidden');
+      
+      switch(region) {
+        case 'australia':
+          populationText.innerHTML = "<strong>Australia:</strong> Home to the largest dugong population with an estimated 85,000 individuals. Populations are generally stable in remote areas but declining near urban centers.";
+          break;
+        case 'uae':
+          populationText.innerHTML = "<strong>Arabian Gulf:</strong> Approximately 7,000 dugongs remain, making this the second largest population. They face threats from coastal development and fishing activities.";
+          break;
+        case 'east-africa':
+          populationText.innerHTML = "<strong>East Africa:</strong> Populations are small and fragmented, with likely fewer than 1,000 individuals total. Threatened by habitat loss and accidental capture in fishing gear.";
+          break;
+      }
+    }
+    
+    let currentQuestion = 0;
+    let score = 0;
+    
+    function startQuiz() {
+      document.getElementById('quizContainer').classList.remove('hidden');
+      document.getElementById('question1').classList.remove('hidden');
+    }
+    
+    function checkAnswer(questionNum, answer, element) {
+      // Visual feedback
+      const options = element.parentElement.querySelectorAll('.quiz-option');
+      options.forEach(opt => {
+        opt.style.pointerEvents = 'none'; // Prevent further clicks
+      });
+      
+      // Correct answers
+      const correctAnswers = {
+        1: 'seagrass',
+        2: '6 minutes'
+      };
+      
+      if (answer === correctAnswers[questionNum]) {
+        element.style.background = 'rgba(0, 200, 83, 0.3)';
+        element.style.border = '1px solid #00c853';
+        score++;
+      } else {
+        element.style.background = 'rgba(255, 87, 34, 0.3)';
+        element.style.border = '1px solid #ff5722';
+        
+        // Highlight correct answer
+        options.forEach(opt => {
+          if (opt.textContent.toLowerCase() === correctAnswers[questionNum]) {
+            opt.style.background = 'rgba(0, 200, 83, 0.3)';
+            opt.style.border = '1px solid #00c853';
+          }
+        });
+      }
+      
+      // Move to next question or show results
+      setTimeout(() => {
+        document.getElementById(`question${questionNum}`).classList.add('hidden');
+        
+        if (questionNum < 2) {
+          document.getElementById(`question${questionNum + 1}`).classList.remove('hidden');
+        } else {
+          showQuizResults();
+        }
+      }, 1500);
+    }
+    
+    function showQuizResults() {
+      const quizResult = document.getElementById('quizResult');
+      const resultText = document.getElementById('resultText');
+      
+      quizResult.classList.remove('hidden');
+      
+      if (score === 2) {
+        resultText.textContent = `Perfect! You got ${score}/2 correct. You're a dugong expert!`;
+      } else if (score === 1) {
+        resultText.textContent = `Good job! You got ${score}/2 correct. You know quite a bit about dugongs!`;
+      } else {
+        resultText.textContent = `You got ${score}/2 correct. Learn more about these amazing creatures!`;
+      }
+    }
+    
+    function resetQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      
+      // Reset all questions and options
+      document.querySelectorAll('.quiz-question').forEach(q => {
+        q.classList.add('hidden');
+      });
+      
+      document.querySelectorAll('.quiz-option').forEach(opt => {
+        opt.style.background = 'rgba(167, 255, 235, 0.1)';
+        opt.style.border = 'none';
+        opt.style.pointerEvents = 'auto';
+      });
+      
+      document.getElementById('quizResult').classList.add('hidden');
+      document.getElementById('quizContainer').classList.add('hidden');
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      setupNavigation();
+      createBubbles();
+    });
+  </script>
+</body>
+</html>

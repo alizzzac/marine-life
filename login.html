@@ -1,0 +1,2364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Underwater Whale Adventure | Perfect Password Toggle</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            height: 100vh;
+            background: linear-gradient(to bottom, #005a8c, #0077b6, #0096c7);
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            cursor: none;
+        }
+/* Points system styles */
+.points-display {
+    background: rgba(0, 0, 0, 0.3);
+    color: #f1c40f;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    margin: 15px 0;
+    text-align: center;
+    border: 1px solid rgba(241, 196, 15, 0.3);
+}
+
+.points-display i {
+    margin-right: 8px;
+}
+
+.btn-points {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(to right, #f39c12, #f1c40f);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.btn-points:hover {
+    background: linear-gradient(to right, #f1c40f, #f39c12);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-points:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+#pointsContainer {
+    transition: all 0.5s ease;
+}
+        /* Canvas container */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        /* Sand */
+        .sand {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 120px;
+            background: #f7e2a7;
+            z-index: 1;
+            clip-path: polygon(
+                0% 80%,
+                10% 75%,
+                20% 80%,
+                30% 73%,
+                40% 78%,
+                50% 70%,
+                60% 76%,
+                70% 72%,
+                80% 78%,
+                90% 74%,
+                100% 80%,
+                100% 100%,
+                0% 100%
+            );
+            animation: waveSand 6s ease-in-out infinite alternate;
+        }
+        
+        @keyframes waveSand {
+            0% {
+                clip-path: polygon(
+                    0% 80%, 10% 75%, 20% 80%, 30% 73%, 40% 78%,
+                    50% 70%, 60% 76%, 70% 72%, 80% 78%, 90% 74%, 100% 80%,
+                    100% 100%, 0% 100%
+                );
+            }
+            50% {
+                clip-path: polygon(
+                    0% 79%, 10% 74%, 20% 78%, 30% 72%, 40% 77%,
+                    50% 69%, 60% 75%, 70% 71%, 80% 76%, 90% 73%, 100% 79%,
+                    100% 100%, 0% 100%
+                );
+            }
+            100% {
+                clip-path: polygon(
+                    0% 78%, 10% 73%, 20% 77%, 30% 71%, 40% 76%,
+                    50% 68%, 60% 74%, 70% 70%, 80% 75%, 90% 72%, 100% 78%,
+                    100% 100%, 0% 100%
+                );
+            }
+        }
+
+        /* Sand details */
+        .shell, .starfish {
+            position: absolute;
+            bottom: 8px;
+            width: 16px;
+            height: 16px;
+            z-index: 2;
+        }
+        .shell {
+            background: #ffb6c1;
+            border-radius: 50% 50% 0 0;
+            transform: rotate(-20deg);
+        }
+        .starfish {
+            background: #ff6347;
+            clip-path: polygon(50% 0%, 60% 35%, 100% 35%, 65% 55%, 75% 90%, 50% 70%, 25% 90%, 35% 55%, 0% 35%, 40% 35%);
+        }
+        .shell1 { left: 20%; }
+        .shell2 { left: 65%; width:12px; height:12px; }
+        .starfish1 { left: 40%; width:18px; height:18px; }
+        .starfish2 { left: 85%; width:14px; height:14px; }
+
+        /* Sand bubbles */
+        .sand-bubble {
+            position: absolute;
+            bottom: 10px;
+            width: 6px;
+            height: 6px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            animation: sand-bubble-up 5s linear infinite;
+            z-index: 0;
+        }
+        .sand-bubble1 { left: 25%; animation-delay: 0s; }
+        .sand-bubble2 { left: 45%; animation-delay: 1s; }
+        .sand-bubble3 { left: 70%; animation-delay: 2s; }
+        .sand-bubble4 { left: 80%; animation-delay: 1.5s; }
+        @keyframes sand-bubble-up {
+            0% { bottom: 10px; opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { bottom: 100%; opacity: 0; }
+        }
+
+        /* Rocks & corals */
+        .rocks {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            z-index: 2;
+        }
+        .rock {
+            width: 40px;
+            height: 20px;
+            background: #444;
+            border-radius: 50% / 40%;
+            display: inline-block;
+            margin-right: -10px;
+        }
+        .coral {
+            width: 6px;
+            height: 40px;
+            background: #e75480;
+            display: inline-block;
+            margin: 0 2px;
+            border-radius: 50% 50% 0 0;
+            animation: sway 3s ease-in-out infinite alternate;
+        }
+        .coral:nth-child(3) { background: #3cb371; height: 35px; animation-duration: 4s; }
+        .coral:nth-child(4) { background: #ff8c00; height: 45px; animation-duration: 5s; }
+        @keyframes sway {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(8deg); }
+        }
+
+        /* Crabs */
+        .crab {
+            position: absolute;
+            bottom: 15px;
+            width: 40px;
+            height: 25px;
+            background: #ff6347;
+            border-radius: 20px;
+            z-index: 3;
+            animation: walkCrab 8s linear infinite;
+        }
+        .crab::before, .crab::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            width: 10px;
+            height: 10px;
+            background: #ff6347;
+            border-radius: 50%;
+        }
+        .crab::before { left: -8px; }
+        .crab::after { right: -8px; }
+        .crab-eye {
+            position: absolute;
+            top: -10px;
+            width: 4px;
+            height: 10px;
+            background: black;
+            border-radius: 2px;
+            z-index: 4;
+        }
+        .crab-eye.left { left: 8px; }
+        .crab-eye.right { right: 8px; }
+        .crab1 { right: 40px; animation-delay: 0s; }
+        .crab2 { right: 60px; width: 30px; height: 20px; animation-delay: 4s; }
+        .crab3 { right: 80px; width: 35px; height: 22px; animation-delay: 6s; }
+        @keyframes walkCrab {
+            0% { right: 40px; transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+            100% { right: 90%; transform: translateY(0); }
+        }
+
+        /* Fish */
+        .fish {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 2;
+        }
+        .fish::before {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 2px;
+            width: 6px;
+            height: 6px;
+            clip-path: polygon(0 50%, 100% 0, 100% 100%);
+        }
+        .fish.left-to-right {
+            animation: swimRight 15s ease-in-out infinite;
+        }
+        .fish.right-to-left {
+            transform: scaleX(-1);
+            animation: swimLeft 15s ease-in-out infinite;
+        }
+        @keyframes swimRight {
+            0% { left: -40px; }
+            50% { transform: translateY(-3px); }
+            100% { left: 110%; }
+        }
+        @keyframes swimLeft {
+            0% { right: -40px; }
+            50% { transform: translateY(3px); }
+            100% { right: 110%; }
+        }
+        /* Fish colors */
+        .fish.blue { background: #007acc; width: 20px; height: 10px; top: 100px; animation-duration: 12s; }
+        .fish.blue::before { background: #007acc; }
+        .fish.orange { background: #f39c12; width: 25px; height: 12px; top: 180px; animation-duration: 10s; animation-delay: 2s; }
+        .fish.orange::before { background: #f39c12; }
+        .fish.purple { background: #9b59b6; width: 25px; height: 12px; top: 250px; animation-duration: 14s; animation-delay: 3s; }
+        .fish.purple::before { background: #9b59b6; }
+        .fish.red { background: #e74c3c; width: 20px; height: 10px; top: 80px; animation-duration: 11s; animation-delay: 1s; }
+        .fish.red::before { background: #e74c3c; }
+        .fish.yellow { background: #f1c40f; width: 15px; height: 8px; top: 220px; animation-duration: 8s; animation-delay: 1.5s; }
+        .fish.yellow::before { background: #f1c40f; }
+        .fish.yellow2 { background: #f1c40f; width: 12px; height: 7px; top: 160px; animation-duration: 9s; animation-delay: 2s; }
+        .fish.yellow2::before { background: #f1c40f; }
+        .fish.green { background: #2ecc71; width: 18px; height: 9px; top: 140px; animation-duration: 10s; animation-delay: 1s; }
+        .fish.green::before { background: #2ecc71; }
+        .fish.pink { background: #e91e63; width: 22px; height: 11px; top: 200px; animation-duration: 13s; animation-delay: 2.5s; }
+        .fish.pink::before { background: #e91e63; }
+
+        /* Big Fish */
+        .big-fish {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 2;
+        }
+        .big-fish::before {
+            content: '';
+            position: absolute;
+            right: -12px;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            clip-path: polygon(0 50%, 100% 0, 100% 100%);
+            background: inherit;
+        }
+        .big-fish.left-to-right {
+            animation: swimRightBig 20s ease-in-out infinite;
+        }
+        .big-fish.right-to-left {
+            transform: scaleX(-1);
+            animation: swimLeftBig 22s ease-in-out infinite;
+        }
+        @keyframes swimRightBig {
+            0% { left: -80px; }
+            50% { transform: translateY(-6px); }
+            100% { left: 110%; }
+        }
+        @keyframes swimLeftBig {
+            0% { right: -80px; }
+            50% { transform: translateY(6px); }
+            100% { right: 110%; }
+        }
+
+        /* Underwater plants */
+        .seaweed {
+            position: absolute;
+            bottom: 0;
+            width: 8px;
+            height: 60px;
+            background: linear-gradient(to top, #2e8b57, #3cb371);
+            border-radius: 4px;
+            z-index: 2;
+            animation: seaweed-sway 4s ease-in-out infinite alternate;
+        }
+        .seaweed::before, .seaweed::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 15px;
+            background: inherit;
+            border-radius: 50% 50% 0 0;
+        }
+        .seaweed::before { top: -15px; left: -2px; transform: rotate(20deg); }
+        .seaweed::after { top: -30px; left: 2px; transform: rotate(-20deg); }
+        @keyframes seaweed-sway {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(5deg); }
+        }
+
+        /* Sunlight rays */
+        .sunray {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.2), rgba(255,255,255,0));
+            transform-origin: top;
+            z-index: 1;
+        }
+        @keyframes ray-move {
+            0% { opacity: 0; }
+            50% { opacity: 0.3; }
+            100% { opacity: 0; }
+        }
+
+        /* Water surface */
+        .water-surface {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            z-index: 1;
+            animation: surface-ripple 3s ease-in-out infinite;
+        }
+        @keyframes surface-ripple {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+        
+        /* Watermark and controls */
+        .watermark {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 12px;
+            border-radius: 10px;
+            max-width: 250px;
+        }
+        
+        /* Login Form Styles */
+        .login-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            width: 340px;
+            max-width: 90%;
+            transition: all 0.5s ease;
+            overflow: hidden;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-header h2 {
+            color: white;
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .form-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            border-radius: 2px;
+        }
+        
+        .form-header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-top: 12px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-group label i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+            color: #4facfe;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            padding-right: 40px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #007acc;
+            font-size: 1.1rem;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .password-toggle:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .password-toggle.active {
+            color: #00a8ff;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .password-strength {
+            height: 4px;
+            margin-top: 8px;
+            border-radius: 2px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .strength-meter {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+        
+        .strength-0 { width: 20%; background: #ff4757; }
+        .strength-1 { width: 40%; background: #ff6b81; }
+        .strength-2 { width: 60%; background: #ffa502; }
+        .strength-3 { width: 80%; background: #2ed573; }
+        .strength-4 { width: 100%; background: #1e90ff; }
+        
+        .password-hints {
+            margin-top: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            display: none;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 5px;
+        }
+        
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        .remember-me input {
+            margin-right: 8px;
+            accent-color: #007acc;
+        }
+        
+        .forgot-password {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+            color: #4facfe;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, #007acc, #00a8ff);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: all 0.6s ease;
+        }
+        
+        .btn-login:hover {
+            background: linear-gradient(to right, #00a8ff, #007acc);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .btn-login:hover::before {
+            left: 100%;
+        }
+        
+        .btn-login:active {
+            transform: translateY(1px);
+        }
+        
+        .form-switch {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        .form-switch a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            margin-left: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-switch a:hover {
+            text-decoration: underline;
+            color: #4facfe;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        
+        /* Bubble burst animation */
+        .bubble-burst {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99;
+            animation: bubble-rise 4s ease-out forwards;
+        }
+        
+        @keyframes bubble-rise {
+            0% {
+                transform: translateY(0) scale(0.2);
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1.2);
+                opacity: 0;
+            }
+        }
+        
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            z-index: 200;
+            text-align: center;
+            display: none;
+        }
+        
+        .ocean-title {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 2.2rem;
+            text-align: center;
+            text-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            font-weight: bold;
+            letter-spacing: 2px;
+            animation: titleFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes titleFloat {
+            0% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-5px); }
+            100% { transform: translateX(-50%) translateY(0); }
+        }
+        
+        /* Logout button */
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            z-index: 101;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            display: none;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* User welcome message */
+        .welcome-message {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            animation: titleFloat 3s ease-in-out infinite;
+            display: none;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 20px;
+            border-radius: 20px;
+        }
+        
+        /* Decorative bubbles in form */
+        .form-bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            z-index: -1;
+        }
+        
+        .bubble-1 {
+            width: 30px;
+            height: 30px;
+            top: 20px;
+            left: 20px;
+            animation: float 8s infinite ease-in-out;
+        }
+        
+        .bubble-2 {
+            width: 25px;
+            height: 25px;
+            bottom: 30px;
+            right: 30px;
+            animation: float 10s infinite ease-in-out reverse;
+        }
+        
+        .bubble-3 {
+            width: 20px;
+            height: 20px;
+            top: 40%;
+            left: 15px;
+            animation: float 12s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(5px, -5px); }
+            50% { transform: translate(10px, 5px); }
+            75% { transform: translate(-5px, 10px); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        /* Password reveal animation */
+        @keyframes reveal {
+            0% { opacity: 0; transform: translateY(5px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .reveal-text {
+            animation: reveal 0.3s ease;
+        }
+      
+.points-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255, 215, 0, 0.9);
+    color: #000;
+    padding: 10px 15px;
+    border-radius: 5px;
+    animation: slideIn 0.5s ease;
+    z-index: 1000;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+    </style>
+</head>
+<body>
+   
+    
+    <div class="welcome-message" id="welcomeMessage">Welcome back, Diver!</div>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+    
+    <!-- Underwater background elements -->
+    <div class="water-surface"></div>
+
+    <!-- Sunlight rays -->
+    <div class="sunray" style="left: 20%; animation: ray-move 8s infinite ease-in-out;"></div>
+    <div class="sunray" style="left: 40%; animation: ray-move 10s infinite ease-in-out 2s;"></div>
+    <div class="sunray" style="left: 60%; animation: ray-move 9s infinite ease-in-out 1s;"></div>
+    <div class="sunray" style="left: 80%; animation: ray-move 7s infinite ease-in-out 3s;"></div>
+
+    <!-- Sand -->
+    <div class="sand">
+        <div class="shell shell1"></div>
+        <div class="shell shell2"></div>
+        <div class="starfish starfish1"></div>
+        <div class="starfish starfish2"></div>
+        <div class="sand-bubble sand-bubble1"></div>
+        <div class="sand-bubble sand-bubble2"></div>
+        <div class="sand-bubble sand-bubble3"></div>
+        <div class="sand-bubble sand-bubble4"></div>
+    </div>
+
+    <!-- Rocks and corals -->
+    <div class="rocks">
+        <div class="rock"></div>
+        <div class="coral"></div>
+        <div class="coral"></div>
+        <div class="coral"></div>
+        <div class="coral"></div>
+    </div>
+
+    <!-- Seaweed -->
+    <div class="seaweed" style="left: 10%; height: 50px;"></div>
+    <div class="seaweed" style="left: 25%; height: 70px; animation-duration: 5s;"></div>
+    <div class="seaweed" style="left: 90%; height: 55px; animation-duration: 6s;"></div>
+    <div class="seaweed" style="left: 75%; height: 65px; animation-duration: 4.5s;"></div>
+
+    <!-- Crabs -->
+    <div class="crab crab1">
+        <div class="crab-eye left"></div>
+        <div class="crab-eye right"></div>
+    </div>
+    <div class="crab crab2">
+        <div class="crab-eye left"></div>
+        <div class="crab-eye right"></div>
+    </div>
+    <div class="crab crab3">
+        <div class="crab-eye left"></div>
+        <div class="crab-eye right"></div>
+    </div>
+
+    <!-- Fish -->
+    <div class="fish blue left-to-right"></div>
+    <div class="fish orange right-to-left"></div>
+    <div class="fish purple left-to-right"></div>
+    <div class="fish red right-to-left"></div>
+    <div class="fish yellow left-to-right"></div>
+    <div class="fish yellow2 right-to-left"></div>
+    <div class="fish green left-to-right"></div>
+    <div class="fish pink right-to-left"></div>
+
+    <!-- Big Fish -->
+    <div class="big-fish left-to-right" style="background: #1abc9c; width: 40px; height: 20px; top: 120px; animation-duration: 25s; animation-delay: 0s;"></div>
+    <div class="big-fish right-to-left" style="background: #d35400; width: 45px; height: 22px; top: 280px; animation-duration: 30s; animation-delay: 5s;"></div>
+
+    <!-- Whale Canvas Container -->
+    <div id="canvas-container"></div>
+    
+    <div class="watermark">Move your cursor to guide the whale</div>
+    <div class="controls">Click to toggle eye expression<br>Press 'S' to save animation</div>
+    
+    <!-- Login Form -->
+    <div class="login-container" id="loginContainer">
+        <!-- Decorative bubbles -->
+        <div class="form-bubble bubble-1"></div>
+        <div class="form-bubble bubble-2"></div>
+        <div class="form-bubble bubble-3"></div>
+        
+        <div class="form-header">
+            <h2><i class="fas fa-water"></i> Ocean Login</h2>
+            <p>Dive into your underwater adventure</p>
+        </div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username"><i class="fas fa-user"></i> Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                <div class="error-message" id="usernameError">Username must be at least 4 characters</div>
+            </div>
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    <span class="password-toggle" id="passwordToggle" title="Show password">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                <div class="password-strength">
+                    <div class="strength-meter" id="strengthMeter"></div>
+                </div>
+                <div class="password-hints" id="passwordHints">
+                    <p>Password should contain:</p>
+                    <ul>
+                        <li id="lengthHint">At least 8 characters</li>
+                        <li id="numberHint">At least one number</li>
+                        <li id="letterHint">At least one letter</li>
+                        <li id="specialHint">At least one special character</li>
+                    </ul>
+                </div>
+                <div class="error-message" id="passwordError">Password must be at least 6 characters</div>
+            </div>
+            <div class="form-footer">
+                <div class="remember-me">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Remember me</label>
+                </div>
+                <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+            <button type="submit" class="btn-login">Dive In <i class="fas fa-sign-in-alt"></i></button>
+        </form>
+        <div class="form-switch">
+            Don't have an account? <a href="#" id="signupLink">Sign Up</a>
+        </div>
+    </div>
+    
+    <div class="success-message" id="successMessage">Welcome to the underwater world!</div>
+
+    <script>
+        // Enhanced login functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for existing login
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            if (loggedInUser) {
+                document.getElementById('loginContainer').classList.add('hidden');
+                document.getElementById('logoutBtn').style.display = 'block';
+                document.getElementById('welcomeMessage').textContent = `Welcome back, ${loggedInUser}!`;
+                document.getElementById('welcomeMessage').style.display = 'block';
+            }
+            
+            // Password visibility toggle
+            const passwordToggle = document.getElementById('passwordToggle');
+            const passwordInput = document.getElementById('password');
+            const strengthMeter = document.getElementById('strengthMeter');
+            const passwordHints = document.getElementById('passwordHints');
+            
+            // Initialize password strength meter
+            passwordInput.addEventListener('input', updatePasswordStrength);
+            
+            passwordToggle.addEventListener('click', function() {
+                const isPassword = passwordInput.type === 'password';
+                
+                // Toggle password visibility
+                passwordInput.type = isPassword ? 'text' : 'password';
+                
+                // Update icon
+                passwordToggle.innerHTML = isPassword ? 
+                    '<i class="fas fa-eye-slash"></i>' : 
+                    '<i class="fas fa-eye"></i>';
+                
+                // Toggle active state
+                passwordToggle.classList.toggle('active', isPassword);
+                
+                // Add animation class to input
+                passwordInput.classList.add('reveal-text');
+                setTimeout(() => {
+                    passwordInput.classList.remove('reveal-text');
+                }, 300);
+            });
+            
+            // Form validation
+            const usernameInput = document.getElementById('username');
+            const usernameError = document.getElementById('usernameError');
+            const passwordError = document.getElementById('passwordError');
+            
+            usernameInput.addEventListener('input', function() {
+                if (usernameInput.value.length < 4) {
+                    usernameError.style.display = 'block';
+                } else {
+                    usernameError.style.display = 'none';
+                }
+            });
+            
+            passwordInput.addEventListener('input', function() {
+                if (passwordInput.value.length < 6) {
+                    passwordError.style.display = 'block';
+                } else {
+                    passwordError.style.display = 'none';
+                }
+            });
+            
+            // Handle login form submission
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', handleLogin);
+            
+            // Setup logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            logoutBtn.addEventListener('click', handleLogout);
+            
+            // Setup signup link
+            const signupLink = document.getElementById('signupLink');
+            signupLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('loginContainer').classList.add('hidden');
+                setTimeout(() => {
+                    alert('Signup functionality would go here!');
+                    document.getElementById('loginContainer').classList.remove('hidden');
+                }, 300);
+            });
+            
+            // Forgot password
+            document.querySelector('.forgot-password').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Password reset instructions sent to your email!');
+            });
+            
+            // Password strength meter
+            function updatePasswordStrength() {
+                const password = passwordInput.value;
+                let strength = 0;
+                
+                // Show hints when password has content
+                if (password.length > 0) {
+                    passwordHints.style.display = 'block';
+                } else {
+                    passwordHints.style.display = 'none';
+                }
+                
+                // Update hints
+                document.getElementById('lengthHint').style.color = password.length >= 8 ? '#2ed573' : '#ff6b81';
+                document.getElementById('numberHint').style.color = /\d/.test(password) ? '#2ed573' : '#ff6b81';
+                document.getElementById('letterHint').style.color = /[a-zA-Z]/.test(password) ? '#2ed573' : '#ff6b81';
+                document.getElementById('specialHint').style.color = /[^A-Za-z0-9]/.test(password) ? '#2ed573' : '#ff6b81';
+                
+                // Length strength
+                if (password.length >= 8) strength += 1;
+                if (password.length >= 12) strength += 1;
+                
+                // Character diversity
+                if (/[A-Z]/.test(password)) strength += 1;
+                if (/[0-9]/.test(password)) strength += 1;
+                if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+                
+                // Update strength meter
+                strengthMeter.className = 'strength-meter';
+                if (strength > 0) {
+                    strengthMeter.classList.add(`strength-${Math.min(strength, 4)}`);
+                }
+            }
+        });
+
+        // Handle login
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // Validation
+            let isValid = true;
+            
+            if (username.length < 4) {
+                document.getElementById('usernameError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (password.length < 6) {
+                document.getElementById('passwordError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            // Store username in localStorage if "Remember me" is checked
+            if (rememberMe) {
+                localStorage.setItem('loggedInUser', username);
+            }
+            
+            // Hide the form
+            const loginContainer = document.getElementById('loginContainer');
+            loginContainer.classList.add('hidden');
+            
+            // Show logout button
+            document.getElementById('logoutBtn').style.display = 'block';
+            
+            // Show welcome message
+            document.getElementById('welcomeMessage').textContent = `Welcome, ${username}!`;
+            document.getElementById('welcomeMessage').style.display = 'block';
+            
+            // Create bubble burst effect
+            createBubbleBurst(loginContainer);
+            
+            // Show success message
+            const successMessage = document.getElementById('successMessage');
+            successMessage.style.display = 'block';
+            successMessage.textContent = `Welcome ${username}! You've successfully logged in. Enjoy the underwater world!`;
+            
+            // Hide success message after delay
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        // Handle logout
+        function handleLogout() {
+            // Remove user from localStorage
+            localStorage.removeItem('loggedInUser');
+            
+            // Hide logout button and welcome message
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('welcomeMessage').style.display = 'none';
+            
+            // Show login form
+            document.getElementById('loginContainer').classList.remove('hidden');
+            
+            // Reset form
+            document.getElementById('loginForm').reset();
+            document.getElementById('password').type = 'password';
+            document.getElementById('passwordToggle').innerHTML = '<i class="fas fa-eye"></i>';
+            document.getElementById('passwordToggle').classList.remove('active');
+            document.getElementById('usernameError').style.display = 'none';
+            document.getElementById('passwordError').style.display = 'none';
+            document.getElementById('strengthMeter').className = 'strength-meter';
+            document.getElementById('passwordHints').style.display = 'none';
+        }
+
+        // Create bubble burst animation
+        function createBubbleBurst(container) {
+            const rect = container.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            // Create 50 bubbles for a more impressive effect
+            for (let i = 0; i < 50; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble-burst';
+                
+                // Random position around the form center
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 50;
+                const x = centerX + Math.cos(angle) * distance;
+                const y = centerY + Math.sin(angle) * distance;
+                
+                // Random size
+                const size = 5 + Math.random() * 20;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                
+                // Random animation duration
+                const duration = 2 + Math.random() * 3;
+                bubble.style.animationDuration = duration + 's';
+                
+                // Random animation delay
+                const delay = Math.random() * 1.5;
+                bubble.style.animationDelay = delay + 's';
+                
+                // Position the bubble
+                bubble.style.left = x + 'px';
+                bubble.style.top = y + 'px';
+                
+                // Add shine effect
+                bubble.style.boxShadow = 'inset 0 0 5px rgba(255, 255, 255, 0.8), 0 0 10px rgba(255, 255, 255, 0.6)';
+                
+                // Add slight horizontal movement
+                const horizontalMovement = (Math.random() - 0.5) * 100;
+                bubble.style.setProperty('--horizontal-movement', horizontalMovement + 'px');
+                
+                // Add custom animation for each bubble
+                const keyframes = `
+                    @keyframes bubble-rise-${i} {
+                        0% {
+                            transform: translate(0, 0) scale(0.2);
+                            opacity: 0.8;
+                        }
+                        50% {
+                            transform: translate(var(--horizontal-movement), -50vh) scale(0.8);
+                            opacity: 0.6;
+                        }
+                        100% {
+                            transform: translate(calc(var(--horizontal-movement) * 2), -100vh) scale(1.2);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                
+                const style = document.createElement('style');
+                style.innerHTML = keyframes;
+                document.head.appendChild(style);
+                
+                bubble.style.animationName = `bubble-rise-${i}`;
+                
+                document.body.appendChild(bubble);
+                
+                // Remove bubble after animation
+                setTimeout(() => {
+                    bubble.remove();
+                    style.remove();
+                }, (duration + delay) * 1000);
+            }
+        }
+
+        // Whale animation with perfect eye position
+        let numLayers;
+        let layers = [];
+        let size;
+        let speed;
+        let bx, by;
+        let x2, y2, r2, dy2, dx2, tailr2, l2;
+        let eye;
+        let particles = [];
+        let trail = [];
+        let expressiveEyes = true;
+        let eyeExpression = 'default';
+
+        function setup() {
+            const canvas = createCanvas(windowWidth, windowHeight);
+            canvas.parent('canvas-container');
+            frameRate(60);
+            
+            numLayers = 35;
+            size = 50;
+            speed = 1.5;
+            
+            initLayers();
+            
+            mouseX = width / 2;
+            mouseY = height / 2;
+            
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: random(width),
+                    y: random(height),
+                    size: random(1, 4),
+                    speed: random(0.2, 1),
+                    alpha: random(100, 200)
+                });
+            }
+        }
+        
+        function initLayers() {
+            r2 = dy2 = dx2 = tailr2 = l2 = 0;
+            layers = [];
+            
+            for (let i = numLayers - 1; i >= 0; i--) {
+                layers[i] = new Layer(i);
+            }
+            
+            mouseX = width / 2;
+            mouseY = height / 2;
+        }
+
+        function draw() {
+            clear();
+            
+            drawParticles();
+            
+            eye = 0;
+            x2 = mouseX;
+            y2 = mouseY;
+            
+            if (frameCount % 2 === 0) {
+                trail.push({x: mouseX, y: mouseY});
+                if (trail.length > 20) trail.shift();
+            }
+            
+            drawMotionTrail();
+            
+            for (let i = layers.length - 1; i >= 0; i--) {
+                layers[i].updateLayer();
+            }
+            
+            for (let i = 0; i < layers.length; i++) {
+                layers[i].drawLayer();
+            }
+            
+            if (expressiveEyes && frameCount % 180 === 0) {
+                eyeExpression = random(['default', 'surprised', 'happy', 'curious', 'sleepy']);
+            }
+        }
+        
+        function drawParticles() {
+            noStroke();
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                fill(255, 255, 255, p.alpha);
+                ellipse(p.x, p.y, p.size, p.size);
+                
+                p.x += sin(frameCount * 0.05 + i) * 0.3;
+                p.y -= p.speed;
+                
+                if (p.y < -10) {
+                    p.y = height + 10;
+                    p.x = random(width);
+                }
+            }
+        }
+        
+        function drawMotionTrail() {
+            noStroke();
+            for (let i = 0; i < trail.length; i++) {
+                let alpha = map(i, 0, trail.length, 0, 100);
+                let size = map(i, 0, trail.length, 2, 15);
+                fill(150, 200, 255, alpha);
+                ellipse(trail[i].x, trail[i].y, size, size);
+            }
+        }
+
+        class Layer {
+            constructor(i) {
+                this.L = 1 - i / numLayers;
+                this.R = (30 * pow(this.L, 3) - 58.5 * sq(this.L) + 28 * this.L + 0.92) * size / 2;
+                this.dY = (10 * pow(this.L, 3) - 10 * sq(this.L)) * size;
+                this.gray = 200 - 80 * this.L;
+                this.first = (i === numLayers - 1) ? 1 : 0;
+                
+                this.X = width / 2;
+                this.Y = height / 2;
+                
+                this.tailR = 0;
+                this.dX = 0;
+                
+                if (this.L > 0.775) {
+                    this.dX = (22 * sq(this.L) - 30 * this.L + 10) * size;
+                    if (i !== 0) {
+                        this.tailR = (-86.7 * sq(this.L) + 153.2 * this.L - 66) * size / 2;
+                    }
+                }
+                
+                this.R2 = r2;
+                this.dY2 = dy2;
+                this.dX2 = dx2;
+                this.tailR2 = tailr2;
+                this.L2 = l2;
+                
+                r2 = this.R;
+                dy2 = this.dY;
+                dx2 = this.dX;
+                tailr2 = this.tailR;
+                l2 = this.L;
+            }
+
+            updateLayer() {
+                this.BX = bx;
+                this.BY = by;
+                
+                bx = this.X;
+                by = this.Y;
+                
+                if (this.first === 1) {
+                    this.X = (speed / numLayers * x2 + this.X) / (speed / numLayers + 1);
+                    this.Y = (speed / numLayers * y2 + this.Y) / (speed / numLayers + 1);
+                } else {
+                    this.X = this.BX;
+                    this.Y = this.BY;
+                }
+                
+                this.X2 = x2;
+                this.Y2 = y2;
+                x2 = this.X;
+                y2 = this.Y;
+            }
+
+            drawLayer() {
+                fill(this.gray);
+                noStroke();
+                
+                if (this.L <= 0.775) {
+                    ellipse(this.X, this.Y - this.dY, this.R * 2, this.R * 2);
+                    
+                    if (this.L > 0.3 && this.L <= 0.4) {
+                        let finSize = size * (this.L - 0.3) * 1.4;
+                        
+                        for (let side = -1; side <= 1; side += 2) {
+                            push();
+                            translate(this.X + side * this.R * 0.6, this.Y + this.R * 0.4);
+                            rotate(side * PI/4);
+                            fill(this.gray);
+                            ellipse(0, 0, finSize * 40, finSize * 15);
+                            fill(this.gray - 30);
+                            ellipse(0, 0, finSize * 25, finSize * 8);
+                            pop();
+                        }
+                    }
+                    
+                    fill(this.gray + 30);
+                    stroke(this.gray + 30);
+                    strokeWeight(2);
+                    beginShape();
+                    if (!this.first) {
+                        vertex(
+                            this.X2 + cos(PI/6) * this.R2, 
+                            this.Y2 - this.dY2 + sin(PI/6) * this.R2
+                        );
+                    }
+                    for (let i = PI/6; i <= 5*PI/6; i += PI/15) {
+                        vertex(
+                            this.X + cos(i) * this.R,
+                            this.Y - this.dY + sin(i) * this.R
+                        );
+                    }
+                    if (!this.first) {
+                        vertex(
+                            this.X2 + cos(5*PI/6) * this.R2,
+                            this.Y2 - this.dY2 + sin(5*PI/6) * this.R2
+                        );
+                    }
+                    endShape(CLOSE);
+                    noStroke();
+                    
+                    if (this.L > 0.4 && this.L < 0.5) {
+                        fill(this.gray - 50);
+                        noStroke();
+                        beginShape();
+                        let offset = abs(this.L - 0.45) / 0.05;
+                        let startAngle = (17 + offset) * PI/12;
+                        let endAngle = (19 - offset) * PI/12;
+                        for (let a = startAngle; a <= endAngle; a += PI/50) {
+                            vertex(
+                                this.X + cos(a) * this.R,
+                                this.Y - this.dY + sin(a) * this.R
+                            );
+                        }
+                        endShape(CLOSE);
+                    }
+                    
+                    if (this.L < 0.2) {
+                        stroke(100);
+                        strokeWeight(3);
+                        if (!this.first) {
+                            line(
+                                this.X2 - cos(PI/6) * this.R2, this.Y2 - this.dY2 + sin(PI/6) * this.R2,
+                                this.X - cos(PI/6) * this.R, this.Y - this.dY + sin(PI/6) * this.R
+                            );
+                            line(
+                                this.X2 + cos(PI/6) * this.R2, this.Y2 - this.dY2 + sin(PI/6) * this.R2,
+                                this.X + cos(PI/6) * this.R, this.Y - this.dY + sin(PI/6) * this.R
+                            );
+                        }
+                        if (eye === 0) {
+                            noStroke();
+                            let eyeX, eyeY;
+                            
+                            // PERFECTED EYE POSITION - Adjusted multipliers
+                            eyeX = this.X - this.R * 0.7;   // Slightly closer to center
+                            eyeY = (this.Y - this.dY) - this.R * 0.1; // Better vertical alignment
+                            
+                            // Draw eyes
+                            fill(180, 180, 200);
+                            ellipse(eyeX, eyeY, size/1.2, size/1.2);
+                            ellipse(this.X + this.R * 0.7, eyeY, size/1.2, size/1.2);
+                            
+                            // Draw iris
+                            fill(30, 30, 50);
+                            ellipse(eyeX, eyeY, size/1.8, size/1.8);
+                            ellipse(this.X + this.R * 0.7, eyeY, size/1.8, size/1.8);
+                            
+                            // Draw pupils with expressions
+                            fill(0);
+                            let pupilSize = size/4;
+                            let pupilOffsetX = 0;
+                            let pupilOffsetY = 0;
+                            
+                            if (expressiveEyes) {
+                                switch(eyeExpression) {
+                                    case 'surprised':
+                                        pupilSize = size/6;
+                                        pupilOffsetY = -size/10;
+                                        break;
+                                    case 'happy':
+                                        pupilOffsetX = size/15;
+                                        pupilOffsetY = size/15;
+                                        pupilSize = size/5;
+                                        break;
+                                    case 'curious':
+                                        pupilOffsetX = -size/15;
+                                        pupilOffsetY = -size/15;
+                                        pupilSize = size/5;
+                                        break;
+                                    case 'sleepy':
+                                        pupilSize = size/4.5;
+                                        pupilOffsetX = -size/20;
+                                        pupilOffsetY = size/20;
+                                        break;
+                                    default:
+                                        pupilSize = size/4;
+                                }
+                            }
+                            
+                            ellipse(eyeX + pupilOffsetX, eyeY + pupilOffsetY, pupilSize, pupilSize);
+                            ellipse(this.X + this.R * 0.7 + pupilOffsetX, eyeY + pupilOffsetY, pupilSize, pupilSize);
+                            
+                            // Draw eye reflections
+                            fill(220, 220, 255);
+                            ellipse(eyeX - size/12, eyeY - size/12, size/5, size/5);
+                            ellipse(this.X + this.R * 0.7 + size/10, eyeY - size/12, size/5, size/5);
+                            
+                            fill(255, 255, 255, 220);
+                            ellipse(eyeX - size/15, eyeY - size/10, size/9, size/9);
+                            ellipse(this.X + this.R * 0.7 + size/9, eyeY - size/10, size/9, size/9);
+                            
+                            // Draw eyelid expressions
+                            if (expressiveEyes) {
+                                if (eyeExpression === 'happy') {
+                                    noFill();
+                                    stroke(180, 180, 200);
+                                    strokeWeight(2);
+                                    arc(eyeX, eyeY + size/10, size/1.2, size/2, 0, PI);
+                                    arc(this.X + this.R * 0.7, eyeY + size/10, size/1.2, size/2, 0, PI);
+                                    noStroke();
+                                } else if (eyeExpression === 'sleepy') {
+                                    fill(180, 180, 200);
+                                    arc(eyeX, eyeY - size/20, size/1.1, size/3, PI, TWO_PI);
+                                    arc(this.X + this.R * 0.7, eyeY - size/20, size/1.1, size/3, PI, TWO_PI);
+                                }
+                            }
+                            
+                            eye = 1;
+                        }
+                    }
+                } else {
+                    noStroke();
+                    fill(this.gray);
+                    for (let side = -1; side <= 1; side += 2) {
+                        beginShape();
+                        vertex(this.X + side * this.dX, this.Y - this.dY + this.R);
+                        vertex(this.X2 + side * this.dX2, this.Y2 - this.dY2 + this.R2);
+                        vertex(this.X2 + side * this.dX2, this.Y2 - this.dY2 - this.R2);
+                        vertex(this.X + side * this.dX, this.Y - this.dY - this.R);
+                        endShape(CLOSE);
+                        
+                        beginShape();
+                        vertex(this.X + side * this.dX, this.Y - this.dY + this.R);
+                        vertex(this.X + side * this.dX - side * this.tailR, this.Y - this.dY);
+                        vertex(this.X + side * this.dX, this.Y - this.dY - this.R);
+                        vertex(this.X + side * this.dX + side * this.tailR, this.Y - this.dY);
+                        endShape(CLOSE);
+                        
+                        beginShape();
+                        vertex(this.X + side * this.dX - side * this.tailR, this.Y - this.dY);
+                        vertex(this.X2 + side * this.dX2 - side * this.tailR2, this.Y2 - this.dY2);
+                        vertex(this.X2 + side * this.dX2 + side * this.tailR2, this.Y2 - this.dY2);
+                        vertex(this.X + side * this.dX + side * this.tailR, this.Y - this.dY);
+                        endShape(CLOSE);
+                    }
+                }
+            }
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+            mouseX = width / 2;
+            mouseY = height / 2;
+            initLayers();
+        }
+        
+        function mouseClicked() {
+            expressiveEyes = !expressiveEyes;
+            if (expressiveEyes) {
+                eyeExpression = random(['default', 'surprised', 'happy', 'curious', 'sleepy']);
+            }
+        }
+        
+        function keyPressed() {
+            if (key === 's' || key === 'S') {
+                saveCanvas('whale_animation', 'png');
+            }
+        }
+        // Enhanced login functionality without points from whale clicks
+document.addEventListener('DOMContentLoaded', function() {
+    // Game points system variables
+    let userPoints = 0;
+    const POINTS_FOR_DISCOUNT = 100;
+    const DISCOUNT_PERCENTAGE = 10;
+    let currentDiscount = 0;
+    
+    // Check for existing login
+    const loggedInUser = localStorage.getItem('loggedInUser');
+    if (loggedInUser) {
+        document.getElementById('loginContainer').classList.add('hidden');
+        document.getElementById('logoutBtn').style.display = 'block';
+        document.getElementById('welcomeMessage').textContent = `Welcome back, ${loggedInUser}!`;
+        document.getElementById('welcomeMessage').style.display = 'block';
+        
+        // Initialize points from storage
+        userPoints = parseInt(localStorage.getItem(`${loggedInUser}_points`)) || 0;
+        currentDiscount = parseInt(localStorage.getItem(`${loggedInUser}_discount`)) || 0;
+        updatePointsDisplay();
+        document.getElementById('pointsContainer').classList.remove('hidden');
+    }
+    
+    // Password visibility toggle
+    const passwordToggle = document.getElementById('passwordToggle');
+    const passwordInput = document.getElementById('password');
+    const strengthMeter = document.getElementById('strengthMeter');
+    const passwordHints = document.getElementById('passwordHints');
+    
+    // Initialize password strength meter
+    passwordInput.addEventListener('input', updatePasswordStrength);
+    
+    passwordToggle.addEventListener('click', function() {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        passwordToggle.innerHTML = isPassword ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+        passwordToggle.classList.toggle('active', isPassword);
+        passwordInput.classList.add('reveal-text');
+        setTimeout(() => {
+            passwordInput.classList.remove('reveal-text');
+        }, 300);
+    });
+    
+    // Form validation
+    const usernameInput = document.getElementById('username');
+    const usernameError = document.getElementById('usernameError');
+    const passwordError = document.getElementById('passwordError');
+    
+    usernameInput.addEventListener('input', function() {
+        if (usernameInput.value.length < 4) {
+            usernameError.style.display = 'block';
+        } else {
+            usernameError.style.display = 'none';
+        }
+    });
+    
+    passwordInput.addEventListener('input', function() {
+        if (passwordInput.value.length < 6) {
+            passwordError.style.display = 'block';
+        } else {
+            passwordError.style.display = 'none';
+        }
+    });
+    
+    // Handle login form submission
+    const loginForm = document.getElementById('loginForm');
+    loginForm.addEventListener('submit', handleLogin);
+    
+    // Setup logout button
+    const logoutBtn = document.getElementById('logoutBtn');
+    logoutBtn.addEventListener('click', handleLogout);
+    
+    // Setup signup link
+    const signupLink = document.getElementById('signupLink');
+    signupLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('loginContainer').classList.add('hidden');
+        setTimeout(() => {
+            alert('Signup functionality would go here!');
+            document.getElementById('loginContainer').classList.remove('hidden');
+        }, 300);
+    });
+    
+    // Forgot password
+    document.querySelector('.forgot-password').addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('Password reset instructions sent to your email!');
+    });
+    
+    // Points system event listeners
+    document.getElementById('usePointsBtn').addEventListener('click', usePointsForDiscount);
+    
+    // Whale animation variables
+    let numLayers;
+    let layers = [];
+    let size;
+    let speed;
+    let bx, by;
+    let x2, y2, r2, dy2, dx2, tailr2, l2;
+    let eye;
+    let particles = [];
+    let trail = [];
+    let expressiveEyes = true;
+    let eyeExpression = 'default';
+    
+    // Initialize p5.js sketch
+    new p5(function(sketch) {
+        sketch.setup = setup;
+        sketch.draw = draw;
+        sketch.windowResized = windowResized;
+        sketch.mouseClicked = mouseClicked;
+        sketch.keyPressed = keyPressed;
+        
+        function setup() {
+            const canvas = sketch.createCanvas(sketch.windowWidth, sketch.windowHeight);
+            canvas.parent('canvas-container');
+            sketch.frameRate(60);
+            
+            numLayers = 35;
+            size = 50;
+            speed = 1.5;
+            
+            initLayers();
+            
+            sketch.mouseX = sketch.width / 2;
+            sketch.mouseY = sketch.height / 2;
+            
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: sketch.random(sketch.width),
+                    y: sketch.random(sketch.height),
+                    size: sketch.random(1, 4),
+                    speed: sketch.random(0.2, 1),
+                    alpha: sketch.random(100, 200)
+                });
+            }
+        }
+        
+        function initLayers() {
+            r2 = dy2 = dx2 = tailr2 = l2 = 0;
+            layers = [];
+            
+            for (let i = numLayers - 1; i >= 0; i--) {
+                layers[i] = new Layer(i);
+            }
+            
+            sketch.mouseX = sketch.width / 2;
+            sketch.mouseY = sketch.height / 2;
+        }
+        
+        function draw() {
+            sketch.clear();
+            
+            drawParticles();
+            
+            eye = 0;
+            x2 = sketch.mouseX;
+            y2 = sketch.mouseY;
+            
+            if (sketch.frameCount % 2 === 0) {
+                trail.push({x: sketch.mouseX, y: sketch.mouseY});
+                if (trail.length > 20) trail.shift();
+            }
+            
+            drawMotionTrail();
+            
+            for (let i = layers.length - 1; i >= 0; i--) {
+                layers[i].updateLayer();
+            }
+            
+            for (let i = 0; i < layers.length; i++) {
+                layers[i].drawLayer();
+            }
+            
+            if (expressiveEyes && sketch.frameCount % 180 === 0) {
+                eyeExpression = ['default', 'surprised', 'happy', 'curious', 'sleepy'][Math.floor(sketch.random(5))];
+            }
+        }
+        
+        function drawParticles() {
+            sketch.noStroke();
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                sketch.fill(255, 255, 255, p.alpha);
+                sketch.ellipse(p.x, p.y, p.size, p.size);
+                
+                p.x += sketch.sin(sketch.frameCount * 0.05 + i) * 0.3;
+                p.y -= p.speed;
+                
+                if (p.y < -10) {
+                    p.y = sketch.height + 10;
+                    p.x = sketch.random(sketch.width);
+                }
+            }
+        }
+        
+        function drawMotionTrail() {
+            sketch.noStroke();
+            for (let i = 0; i < trail.length; i++) {
+                let alpha = sketch.map(i, 0, trail.length, 0, 100);
+                let size = sketch.map(i, 0, trail.length, 2, 15);
+                sketch.fill(150, 200, 255, alpha);
+                sketch.ellipse(trail[i].x, trail[i].y, size, size);
+            }
+        }
+        
+        class Layer {
+            constructor(i) {
+                this.L = 1 - i / numLayers;
+                this.R = (30 * sketch.pow(this.L, 3) - 58.5 * sketch.sq(this.L) + 28 * this.L + 0.92) * size / 2;
+                this.dY = (10 * sketch.pow(this.L, 3) - 10 * sketch.sq(this.L)) * size;
+                this.gray = 200 - 80 * this.L;
+                this.first = (i === numLayers - 1) ? 1 : 0;
+                
+                this.X = sketch.width / 2;
+                this.Y = sketch.height / 2;
+                
+                this.tailR = 0;
+                this.dX = 0;
+                
+                if (this.L > 0.775) {
+                    this.dX = (22 * sketch.sq(this.L) - 30 * this.L + 10) * size;
+                    if (i !== 0) {
+                        this.tailR = (-86.7 * sketch.sq(this.L) + 153.2 * this.L - 66) * size / 2;
+                    }
+                }
+                
+                this.R2 = r2;
+                this.dY2 = dy2;
+                this.dX2 = dx2;
+                this.tailR2 = tailr2;
+                this.L2 = l2;
+                
+                r2 = this.R;
+                dy2 = this.dY;
+                dx2 = this.dX;
+                tailr2 = this.tailR;
+                l2 = this.L;
+            }
+            
+            updateLayer() {
+                this.BX = bx;
+                this.BY = by;
+                
+                bx = this.X;
+                by = this.Y;
+                
+                if (this.first === 1) {
+                    this.X = (speed / numLayers * x2 + this.X) / (speed / numLayers + 1);
+                    this.Y = (speed / numLayers * y2 + this.Y) / (speed / numLayers + 1);
+                } else {
+                    this.X = this.BX;
+                    this.Y = this.BY;
+                }
+                
+                this.X2 = x2;
+                this.Y2 = y2;
+                x2 = this.X;
+                y2 = this.Y;
+            }
+            
+            drawLayer() {
+                sketch.fill(this.gray);
+                sketch.noStroke();
+                
+                if (this.L <= 0.775) {
+                    sketch.ellipse(this.X, this.Y - this.dY, this.R * 2, this.R * 2);
+                    
+                    if (this.L > 0.3 && this.L <= 0.4) {
+                        let finSize = size * (this.L - 0.3) * 1.4;
+                        
+                        for (let side = -1; side <= 1; side += 2) {
+                            sketch.push();
+                            sketch.translate(this.X + side * this.R * 0.6, this.Y + this.R * 0.4);
+                            sketch.rotate(side * sketch.PI/4);
+                            sketch.fill(this.gray);
+                            sketch.ellipse(0, 0, finSize * 40, finSize * 15);
+                            sketch.fill(this.gray - 30);
+                            sketch.ellipse(0, 0, finSize * 25, finSize * 8);
+                            sketch.pop();
+                        }
+                    }
+                    
+                    sketch.fill(this.gray + 30);
+                    sketch.stroke(this.gray + 30);
+                    sketch.strokeWeight(2);
+                    sketch.beginShape();
+                    if (!this.first) {
+                        sketch.vertex(
+                            this.X2 + sketch.cos(sketch.PI/6) * this.R2, 
+                            this.Y2 - this.dY2 + sketch.sin(sketch.PI/6) * this.R2
+                        );
+                    }
+                    for (let i = sketch.PI/6; i <= 5*sketch.PI/6; i += sketch.PI/15) {
+                        sketch.vertex(
+                            this.X + sketch.cos(i) * this.R,
+                            this.Y - this.dY + sketch.sin(i) * this.R
+                        );
+                    }
+                    if (!this.first) {
+                        sketch.vertex(
+                            this.X2 + sketch.cos(5*sketch.PI/6) * this.R2,
+                            this.Y2 - this.dY2 + sketch.sin(5*sketch.PI/6) * this.R2
+                        );
+                    }
+                    sketch.endShape(sketch.CLOSE);
+                    sketch.noStroke();
+                    
+                    if (this.L > 0.4 && this.L < 0.5) {
+                        sketch.fill(this.gray - 50);
+                        sketch.noStroke();
+                        sketch.beginShape();
+                        let offset = sketch.abs(this.L - 0.45) / 0.05;
+                        let startAngle = (17 + offset) * sketch.PI/12;
+                        let endAngle = (19 - offset) * sketch.PI/12;
+                        for (let a = startAngle; a <= endAngle; a += sketch.PI/50) {
+                            sketch.vertex(
+                                this.X + sketch.cos(a) * this.R,
+                                this.Y - this.dY + sketch.sin(a) * this.R
+                            );
+                        }
+                        sketch.endShape(sketch.CLOSE);
+                    }
+                    
+                    if (this.L < 0.2) {
+                        sketch.stroke(100);
+                        sketch.strokeWeight(3);
+                        if (!this.first) {
+                            sketch.line(
+                                this.X2 - sketch.cos(sketch.PI/6) * this.R2, this.Y2 - this.dY2 + sketch.sin(sketch.PI/6) * this.R2,
+                                this.X - sketch.cos(sketch.PI/6) * this.R, this.Y - this.dY + sketch.sin(sketch.PI/6) * this.R
+                            );
+                            sketch.line(
+                                this.X2 + sketch.cos(sketch.PI/6) * this.R2, this.Y2 - this.dY2 + sketch.sin(sketch.PI/6) * this.R2,
+                                this.X + sketch.cos(sketch.PI/6) * this.R, this.Y - this.dY + sketch.sin(sketch.PI/6) * this.R
+                            );
+                        }
+                        if (eye === 0) {
+                            sketch.noStroke();
+                            let eyeX, eyeY;
+                            
+                            eyeX = this.X - this.R * 0.7;
+                            eyeY = (this.Y - this.dY) - this.R * 0.1;
+                            
+                            sketch.fill(180, 180, 200);
+                            sketch.ellipse(eyeX, eyeY, size/1.2, size/1.2);
+                            sketch.ellipse(this.X + this.R * 0.7, eyeY, size/1.2, size/1.2);
+                            
+                            sketch.fill(30, 30, 50);
+                            sketch.ellipse(eyeX, eyeY, size/1.8, size/1.8);
+                            sketch.ellipse(this.X + this.R * 0.7, eyeY, size/1.8, size/1.8);
+                            
+                            sketch.fill(0);
+                            let pupilSize = size/4;
+                            let pupilOffsetX = 0;
+                            let pupilOffsetY = 0;
+                            
+                            if (expressiveEyes) {
+                                switch(eyeExpression) {
+                                    case 'surprised':
+                                        pupilSize = size/6;
+                                        pupilOffsetY = -size/10;
+                                        break;
+                                    case 'happy':
+                                        pupilOffsetX = size/15;
+                                        pupilOffsetY = size/15;
+                                        pupilSize = size/5;
+                                        break;
+                                    case 'curious':
+                                        pupilOffsetX = -size/15;
+                                        pupilOffsetY = -size/15;
+                                        pupilSize = size/5;
+                                        break;
+                                    case 'sleepy':
+                                        pupilSize = size/4.5;
+                                        pupilOffsetX = -size/20;
+                                        pupilOffsetY = size/20;
+                                        break;
+                                    default:
+                                        pupilSize = size/4;
+                                }
+                            }
+                            
+                            sketch.ellipse(eyeX + pupilOffsetX, eyeY + pupilOffsetY, pupilSize, pupilSize);
+                            sketch.ellipse(this.X + this.R * 0.7 + pupilOffsetX, eyeY + pupilOffsetY, pupilSize, pupilSize);
+                            
+                            sketch.fill(220, 220, 255);
+                            sketch.ellipse(eyeX - size/12, eyeY - size/12, size/5, size/5);
+                            sketch.ellipse(this.X + this.R * 0.7 + size/10, eyeY - size/12, size/5, size/5);
+                            
+                            sketch.fill(255, 255, 255, 220);
+                            sketch.ellipse(eyeX - size/15, eyeY - size/10, size/9, size/9);
+                            sketch.ellipse(this.X + this.R * 0.7 + size/9, eyeY - size/10, size/9, size/9);
+                            
+                            if (expressiveEyes) {
+                                if (eyeExpression === 'happy') {
+                                    sketch.noFill();
+                                    sketch.stroke(180, 180, 200);
+                                    sketch.strokeWeight(2);
+                                    sketch.arc(eyeX, eyeY + size/10, size/1.2, size/2, 0, sketch.PI);
+                                    sketch.arc(this.X + this.R * 0.7, eyeY + size/10, size/1.2, size/2, 0, sketch.PI);
+                                    sketch.noStroke();
+                                } else if (eyeExpression === 'sleepy') {
+                                    sketch.fill(180, 180, 200);
+                                    sketch.arc(eyeX, eyeY - size/20, size/1.1, size/3, sketch.PI, sketch.TWO_PI);
+                                    sketch.arc(this.X + this.R * 0.7, eyeY - size/20, size/1.1, size/3, sketch.PI, sketch.TWO_PI);
+                                }
+                            }
+                            
+                            eye = 1;
+                        }
+                    }
+                } else {
+                    sketch.noStroke();
+                    sketch.fill(this.gray);
+                    for (let side = -1; side <= 1; side += 2) {
+                        sketch.beginShape();
+                        sketch.vertex(this.X + side * this.dX, this.Y - this.dY + this.R);
+                        sketch.vertex(this.X2 + side * this.dX2, this.Y2 - this.dY2 + this.R2);
+                        sketch.vertex(this.X2 + side * this.dX2, this.Y2 - this.dY2 - this.R2);
+                        sketch.vertex(this.X + side * this.dX, this.Y - this.dY - this.R);
+                        sketch.endShape(sketch.CLOSE);
+                        
+                        sketch.beginShape();
+                        sketch.vertex(this.X + side * this.dX, this.Y - this.dY + this.R);
+                        sketch.vertex(this.X + side * this.dX - side * this.tailR, this.Y - this.dY);
+                        sketch.vertex(this.X + side * this.dX, this.Y - this.dY - this.R);
+                        sketch.vertex(this.X + side * this.dX + side * this.tailR, this.Y - this.dY);
+                        sketch.endShape(sketch.CLOSE);
+                        
+                        sketch.beginShape();
+                        sketch.vertex(this.X + side * this.dX - side * this.tailR, this.Y - this.dY);
+                        sketch.vertex(this.X2 + side * this.dX2 - side * this.tailR2, this.Y2 - this.dY2);
+                        sketch.vertex(this.X2 + side * this.dX2 + side * this.tailR2, this.Y2 - this.dY2);
+                        sketch.vertex(this.X + side * this.dX + side * this.tailR, this.Y - this.dY);
+                        sketch.endShape(sketch.CLOSE);
+                    }
+                }
+            }
+        }
+        
+        function windowResized() {
+            sketch.resizeCanvas(sketch.windowWidth, sketch.windowHeight);
+            sketch.mouseX = sketch.width / 2;
+            sketch.mouseY = sketch.height / 2;
+            initLayers();
+        }
+        
+        function mouseClicked() {
+            expressiveEyes = !expressiveEyes;
+            if (expressiveEyes) {
+                eyeExpression = ['default', 'surprised', 'happy', 'curious', 'sleepy'][Math.floor(sketch.random(5))];
+            }
+            // Points awarding functionality removed from here
+        }
+        
+        function keyPressed() {
+            if (sketch.key === 's' || sketch.key === 'S') {
+                sketch.saveCanvas('whale_animation', 'png');
+            }
+        }
+    });
+    
+    // Password strength meter
+    function updatePasswordStrength() {
+        const password = passwordInput.value;
+        let strength = 0;
+        
+        if (password.length > 0) {
+            passwordHints.style.display = 'block';
+        } else {
+            passwordHints.style.display = 'none';
+        }
+        
+        document.getElementById('lengthHint').style.color = password.length >= 8 ? '#2ed573' : '#ff6b81';
+        document.getElementById('numberHint').style.color = /\d/.test(password) ? '#2ed573' : '#ff6b81';
+        document.getElementById('letterHint').style.color = /[a-zA-Z]/.test(password) ? '#2ed573' : '#ff6b81';
+        document.getElementById('specialHint').style.color = /[^A-Za-z0-9]/.test(password) ? '#2ed573' : '#ff6b81';
+        
+        if (password.length >= 8) strength += 1;
+        if (password.length >= 12) strength += 1;
+        
+        if (/[A-Z]/.test(password)) strength += 1;
+        if (/[0-9]/.test(password)) strength += 1;
+        if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+        
+        strengthMeter.className = 'strength-meter';
+        if (strength > 0) {
+            strengthMeter.classList.add(`strength-${Math.min(strength, 4)}`);
+        }
+    }
+    
+    // Handle login
+    function handleLogin(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+        
+        let isValid = true;
+        
+        if (username.length < 4) {
+            document.getElementById('usernameError').style.display = 'block';
+            isValid = false;
+        }
+        
+        if (password.length < 6) {
+            document.getElementById('passwordError').style.display = 'block';
+            isValid = false;
+        }
+        
+        if (!isValid) return;
+        
+        if (rememberMe) {
+            localStorage.setItem('loggedInUser', username);
+        }
+        
+        // Initialize user points
+        userPoints = parseInt(localStorage.getItem(`${username}_points`)) || 0;
+        currentDiscount = parseInt(localStorage.getItem(`${username}_discount`)) || 0;
+        
+        const loginContainer = document.getElementById('loginContainer');
+        loginContainer.classList.add('hidden');
+        
+        document.getElementById('logoutBtn').style.display = 'block';
+        document.getElementById('welcomeMessage').textContent = `Welcome, ${username}!`;
+        document.getElementById('welcomeMessage').style.display = 'block';
+        
+        // Show points container
+        document.getElementById('pointsContainer').classList.remove('hidden');
+        updatePointsDisplay();
+        
+        createBubbleBurst(loginContainer);
+        
+        const successMessage = document.getElementById('successMessage');
+        successMessage.style.display = 'block';
+        successMessage.textContent = `Welcome ${username}! You've successfully logged in. Enjoy the underwater world!`;
+        
+        setTimeout(() => {
+            successMessage.style.display = 'none';
+        }, 3000);
+    }
+    
+    // Handle logout
+    function handleLogout() {
+        localStorage.removeItem('loggedInUser');
+        
+        document.getElementById('logoutBtn').style.display = 'none';
+        document.getElementById('welcomeMessage').style.display = 'none';
+        document.getElementById('pointsContainer').classList.add('hidden');
+        
+        document.getElementById('loginContainer').classList.remove('hidden');
+        document.getElementById('loginForm').reset();
+        document.getElementById('password').type = 'password';
+        document.getElementById('passwordToggle').innerHTML = '<i class="fas fa-eye"></i>';
+        document.getElementById('passwordToggle').classList.remove('active');
+        document.getElementById('usernameError').style.display = 'none';
+        document.getElementById('passwordError').style.display = 'none';
+        document.getElementById('strengthMeter').className = 'strength-meter';
+        document.getElementById('passwordHints').style.display = 'none';
+    }
+    
+    // Update points display
+    function updatePointsDisplay() {
+        const pointsElement = document.getElementById('totalPoints');
+        pointsElement.textContent = userPoints;
+        
+        const usePointsBtn = document.getElementById('usePointsBtn');
+        if (userPoints >= POINTS_FOR_DISCOUNT) {
+            usePointsBtn.disabled = false;
+            usePointsBtn.textContent = `Use ${POINTS_FOR_DISCOUNT} Points for ${DISCOUNT_PERCENTAGE}% Discount`;
+        } else {
+            usePointsBtn.disabled = true;
+            usePointsBtn.textContent = `Need ${POINTS_FOR_DISCOUNT - userPoints} more points for discount`;
+        }
+    }
+    
+    // Award points function
+    function awardPoints(username, points) {
+        if (!username) return;
+        
+        const currentPoints = parseInt(localStorage.getItem(`${username}_points`)) || 0;
+        const newPoints = currentPoints + points;
+        
+        localStorage.setItem(`${username}_points`, newPoints.toString());
+        
+        const loggedInUser = localStorage.getItem('loggedInUser');
+        if (loggedInUser === username) {
+            userPoints = newPoints;
+            updatePointsDisplay();
+            
+            // Show points earned notification
+            const notification = document.createElement('div');
+            notification.className = 'points-notification';
+            notification.innerHTML = `+${points} Points! <i class="fas fa-coins"></i>`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    }
+    
+    // Use points for discount
+    function usePointsForDiscount() {
+        const username = localStorage.getItem('loggedInUser');
+        if (!username || userPoints < POINTS_FOR_DISCOUNT) return;
+        
+        userPoints -= POINTS_FOR_DISCOUNT;
+        localStorage.setItem(`${username}_points`, userPoints.toString());
+        currentDiscount = DISCOUNT_PERCENTAGE;
+        localStorage.setItem(`${username}_discount`, currentDiscount.toString());
+        updatePointsDisplay();
+        
+        alert(`Congratulations! You've received a ${DISCOUNT_PERCENTAGE}% discount on your next purchase.`);
+    }
+    
+    // Create bubble burst animation
+    function createBubbleBurst(container) {
+        const rect = container.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        for (let i = 0; i < 50; i++) {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble-burst';
+            
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 50;
+            const x = centerX + Math.cos(angle) * distance;
+            const y = centerY + Math.sin(angle) * distance;
+            
+            const size = 5 + Math.random() * 20;
+            bubble.style.width = size + 'px';
+            bubble.style.height = size + 'px';
+            
+            const duration = 2 + Math.random() * 3;
+            bubble.style.animationDuration = duration + 's';
+            
+            const delay = Math.random() * 1.5;
+            bubble.style.animationDelay = delay + 's';
+            
+            bubble.style.left = x + 'px';
+            bubble.style.top = y + 'px';
+            
+            bubble.style.boxShadow = 'inset 0 0 5px rgba(255, 255, 255, 0.8), 0 0 10px rgba(255, 255, 255, 0.6)';
+            
+            const horizontalMovement = (Math.random() - 0.5) * 100;
+            bubble.style.setProperty('--horizontal-movement', horizontalMovement + 'px');
+            
+            const keyframes = `
+                @keyframes bubble-rise-${i} {
+                    0% {
+                        transform: translate(0, 0) scale(0.2);
+                        opacity: 0.8;
+                    }
+                    50% {
+                        transform: translate(var(--horizontal-movement), -50vh) scale(0.8);
+                        opacity: 0.6;
+                    }
+                    100% {
+                        transform: translate(calc(var(--horizontal-movement) * 2), -100vh) scale(1.2);
+                        opacity: 0;
+                    }
+                }
+            `;
+            
+            const style = document.createElement('style');
+            style.innerHTML = keyframes;
+            document.head.appendChild(style);
+            
+            bubble.style.animationName = `bubble-rise-${i}`;
+            
+            document.body.appendChild(bubble);
+            
+            setTimeout(() => {
+                bubble.remove();
+                style.remove();
+            }, (duration + delay) * 1000);
+        }
+    }
+    
+    // Example function to simulate game completion
+    function simulateGameCompletion() {
+        const username = localStorage.getItem('loggedInUser');
+        if (username) {
+            const pointsEarned = Math.floor(Math.random() * 20) + 10; // Random points between 10-30
+            awardPoints(username, pointsEarned);
+        }
+    }
+    
+    // For demo purposes, simulate game completion every 30 seconds
+    setInterval(simulateGameCompletion, 30000);
+});
+    
+    // Modify the handleLogin function to store user data
+function handleLogin(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const rememberMe = document.getElementById('rememberMe').checked;
+    
+    // Store user data in localStorage
+    localStorage.setItem('loggedInUser', username);
+    
+    // Initialize user points if they don't exist
+    if (!localStorage.getItem(`${username}_points`)) {
+        localStorage.setItem(`${username}_points`, '0');
+    }
+    
+    // Show success message and redirect after delay
+    const successMessage = document.getElementById('successMessage');
+    successMessage.style.display = 'block';
+    successMessage.textContent = `Welcome ${username}! Redirecting to Ocean Guardians...`;
+    
+    setTimeout(() => {
+        // Redirect to Ocean Guardians site
+        window.location.href = "DONATE.HTML"; // Change to your actual page URL
+    }, 2000);
+}
+
+// Add this function to award points from games
+function awardPoints(points) {
+    const username = localStorage.getItem('loggedInUser');
+    if (!username) return;
+    
+    const currentPoints = parseInt(localStorage.getItem(`${username}_points`)) || 0;
+    const newPoints = currentPoints + points;
+    localStorage.setItem(`${username}_points`, newPoints.toString());
+    
+    // Show points earned notification
+    const notification = document.createElement('div');
+    notification.className = 'points-notification';
+    notification.innerHTML = `+${points} Points! <i class="fas fa-coins"></i>`;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+</script>
+
+</body>
+</html>

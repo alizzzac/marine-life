@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Staghorn Coral - Coral Reef Species</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo.jpg">
+  <link rel="apple-touch-icon" href="logo.jpg">
+  <meta name="msapplication-TileImage" content="logo.png">
+  <meta name="theme-color" content="#0a2a43">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --coral-teal: #006064;
+      --coral-highlight: #84ffff;
+      --pale-teal: #b2ebf2;
+      --coral-stress: rgba(255, 138, 101, 0.15);
+      --white: #ffffff;
+      --dark-coral: #004d40;
+      --wave-blue: #006994;
+      --coral: #ff7f50;
+      --aqua: #4db8ff;
+      --seafoam: #00ffaa;
+      --sunset: #ff8e53;
+    }
+
+    /* NAVIGATION STYLES */
+    .hamburger-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .hamburger-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--aqua);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 1001;
+    }
+
+    .hamburger-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(77, 184, 255, 0.6);
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      margin: 2px 0;
+      background: white;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-btn.active span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-btn.active span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .hamburger-nav {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 300px;
+      height: 100vh;
+      background: rgba(5, 20, 35, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      transition: right 0.4s ease;
+      padding: 80px 20px 20px;
+      overflow-y: auto;
+      box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .hamburger-nav.active {
+      right: 0;
+    }
+
+    .hamburger-tabs {
+      list-style: none;
+      width: 100%;
+    }
+
+    .hamburger-tab {
+      width: 100%;
+      margin-bottom: 5px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .hamburger-tab a {
+      display: flex;
+      align-items: center;
+      padding: 18px 20px;
+      text-decoration: none;
+      color: white;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a i {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-tab a span {
+      margin-left: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .hamburger-tab:hover {
+      transform: translateX(-5px);
+    }
+
+    /* Different colors for each tab */
+    .tab1 { background: var(--aqua); }
+    .tab2 { background: var(--seafoam); }
+    .tab3 { background: var(--coral); }
+    .tab4 { background: var(--sunset); }
+    .tab5 { background: #9b5de5; }
+    .tab6 { background: #00bbf9; }
+    .tab7 { background: #00f5d4; }
+    .tab8 { background: #f15bb5; }
+    .tab9 { background: #f2a815; }
+    .tab10 { background: #ff6b6b; } /* New color for pollution tab */
+
+    /* Active tab indicator */
+    .hamburger-tab.active {
+      box-shadow: inset 5px 0 0 white;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      color: var(--white);
+      background-image: url('mml.webp');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      padding: clamp(10px, 2vw, 20px);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: min(960px, 90%);
+      margin: 0 auto;
+      padding: clamp(20px, 3vw, 30px);
+      background-color: rgba(0, 96, 100, 0.75);
+      border-radius: 8px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .section-title {
+      text-transform: uppercase;
+      font-size: clamp(0.7rem, 2vw, 0.9rem);
+      color: var(--coral-highlight);
+      font-weight: bold;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 6vw, 2.5rem);
+      margin: 0;
+      color: var(--white);
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .species-name {
+      font-style: italic;
+      color: var(--pale-teal);
+      margin: 5px 0 clamp(15px, 3vw, 25px);
+      font-size: clamp(1rem, 3vw, 1.2rem);
+    }
+
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: clamp(15px, 3vw, 20px);
+      margin-bottom: clamp(20px, 3vw, 30px);
+      min-height: min(350px, 40vw);
+    }
+
+    .image-background {
+      flex: 2;
+      min-width: 300px;
+      background-image: url('mml.webp');
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .image-caption {
+      background-color: rgba(0, 77, 64, 0.85);
+      color: white;
+      padding: clamp(15px, 3vw, 25px);
+      flex: 1;
+      border-radius: 8px;
+      min-width: min(250px, 100%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .image-caption h4 {
+      margin: 0 0 clamp(10px, 2vw, 15px);
+      font-size: clamp(0.9rem, 3vw, 1.1rem);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--coral-highlight);
+    }
+
+    .image-caption p {
+      margin: clamp(8px, 2vw, 12px) 0;
+      font-size: clamp(0.9rem, 2vw, 1rem);
+    }
+
+    .content p {
+      margin-bottom: clamp(15px, 3vw, 25px);
+      line-height: 1.7;
+      font-size: clamp(0.95rem, 2vw, 1.05rem);
+    }
+
+    .coral-fact {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: clamp(10px, 2vw, 15px);
+      border-left: 4px solid var(--coral-highlight);
+      margin: clamp(15px, 3vw, 20px) 0;
+      font-style: italic;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .conservation-status {
+      background-color: var(--coral-stress);
+      padding: clamp(10px, 2vw, 15px);
+      border: 1px solid rgba(255, 138, 101, 0.3);
+      border-radius: 8px;
+      margin: clamp(15px, 3vw, 20px) 0;
+    }
+
+    .resources {
+      margin-top: clamp(25px, 5vw, 40px);
+      padding-top: clamp(15px, 3vw, 20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .resources a {
+      color: var(--coral-highlight);
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: clamp(10px, 2vw, 15px);
+      transition: color 0.3s;
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .resources a:hover {
+      color: #18ffff;
+      text-decoration: underline;
+    }
+
+    ul {
+      margin: clamp(10px, 2vw, 15px) 0;
+      padding-left: clamp(15px, 3vw, 20px);
+    }
+
+    li {
+      margin-bottom: clamp(5px, 1vw, 8px);
+      font-size: clamp(0.95rem, 2vw, 1rem);
+    }
+
+    /* Coral polyp animation for desktop */
+    .polyp {
+      position: fixed;
+      z-index: -1;
+      user-select: none;
+      pointer-events: none;
+      animation: polyp-float 15s infinite linear;
+      opacity: 0.6;
+      display: none; /* Hidden by default */
+    }
+
+    @keyframes polyp-float {
+      0% { 
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 0.3;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% { 
+        transform: translateY(-100vh) translateX(15vw) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .image-container {
+        flex-direction: column;
+      }
+
+      .image-background {
+        width: 100%;
+        min-height: 200px;
+        flex: none;
+      }
+
+      .image-caption {
+        width: 100%;
+        flex: none;
+      }
+      
+      body {
+        background-attachment: scroll;
+      }
+      
+      .hamburger-nav {
+        width: 80%;
+        max-width: 300px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .polyp {
+        display: block;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .image-background {
+        min-height: 150px;
+      }
+      
+      .resources a {
+        display: block;
+        margin-right: 0;
+        margin-bottom: 8px;
+      }
+      
+      .hamburger-btn {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .hamburger-btn span {
+        width: 22px;
+        height: 2.5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVIGATION -->
+  <!-- HAMBURGER MENU -->
+  <div class="hamburger-menu">
+    <div class="hamburger-btn" id="hamburgerBtn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <!-- HAMBURGER NAVIGATION -->
+  <nav class="hamburger-nav" id="hamburgerNav">
+    <ul class="hamburger-tabs">
+      <li class="hamburger-tab tab1">
+        <a href="daliy.html">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab2">
+        <a href="pollution.html">
+          <i class="fas fa-industry"></i>
+          <span>Man Made Pollution</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab3">
+        <a href="chat.html">
+          <i class="fas fa-hands-helping"></i>
+          <span>Conservation</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab4">
+        <a href="gemes.html">
+          <i class="fas fa-camera"></i>
+          <span>games</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab5">
+        <a href="about.html">
+          <i class="fas fa-info-circle"></i>
+          <span>About</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab6">
+        <a href="contact.html">
+          <i class="fas fa-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab7">
+        <a href="news.html">
+          <i class="fas fa-newspaper"></i>
+          <span>News</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab8">
+        <a href="visit.html">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>visit</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab9">
+        <a href="DONATE.HTML">
+          <i class="fas fa-user"></i>
+          <span>Donate</span>
+        </a>
+      </li>
+      <li class="hamburger-tab tab10">
+        <a href="animals.html">
+          <i class="fas fa-paw"></i>
+          <span>animals</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Coral polyps will be added here by JavaScript -->
+  
+  <div class="container">
+    <div class="section-title">Coral Reef Ecosystems</div>
+    <h1>Staghorn Coral</h1>
+    <div class="species-name">Acropora cervicornis</div>
+
+    <div class="image-container">
+      <div class="image-background"></div>
+      <div class="image-caption">
+        <h4>Distribution</h4>
+        <p>Western Atlantic, Caribbean, Bahamas, Florida</p>
+        <h4>Environment</h4>
+        <p>Shallow reef environments (1-30m depth)</p>
+        <h4>Growth Rate</h4>
+        <p>5-10 cm per year (one of fastest growing corals)</p>
+        <h4>Taxonomy</h4>
+        <p>Family: Acroporidae, Order: Scleractinia (stony corals)</p>
+      </div>
+    </div>
+
+    <div class="content">
+      <p>
+        Staghorn coral (Acropora cervicornis) is a branching, stony coral with cylindrical branches that resemble deer antlers. These corals are among the most important reef-building species in the Caribbean, providing essential habitat for numerous marine organisms. Their complex structure offers shelter for fish, crustaceans, and other reef creatures.
+      </p>
+      
+      <div class="coral-fact">
+        A single staghorn coral colony can grow over 2 meters (6.5 feet) in diameter and live for hundreds of years, with some colonies estimated to be over 500 years old!
+      </div>
+      
+      <p>
+        Staghorn corals reproduce both sexually through mass spawning events (typically after full moons in late summer) and asexually through fragmentation. This ability to regrow from broken pieces makes them particularly resilient to physical disturbances like storms when water conditions are healthy.
+      </p>
+
+      <div class="conservation-status">
+        <h4>Conservation Status: Critically Endangered (IUCN Red List)</h4>
+        <p>Staghorn coral populations have declined by 80-98% across their range since 1980 due to disease, climate change, and other stressors.</p>
+      </div>
+      
+      <p>
+        Primary threats include:
+        <ul>
+          <li>White band disease</li>
+          <li>Ocean acidification</li>
+          <li>Bleaching from warming waters</li>
+          <li>Physical damage from storms and human activity</li>
+          <li>Poor water quality from coastal development</li>
+        </ul>
+      </p>
+      <p>
+        Conservation efforts include coral nurseries where fragments are grown and later transplanted to restore damaged reefs. Many organizations also work to protect remaining populations through marine protected areas and water quality improvements. Citizen scientists can help by participating in reef monitoring programs.
+      </p>
+    </div>
+
+    <div class="resources">
+      <strong>Additional Resources:</strong><br>
+      <a href="https://www.iucnredlist.org/species/133381/3716457" target="_blank">IUCN Red List</a>
+      <a href="https://www.noaa.gov/education/resource-collections/marine-life/coral-reef-ecosystems" target="_blank">NOAA Coral Resources</a>
+      <a href="https://coral.org/" target="_blank">Coral Restoration Foundation</a>
+    </div>
+  </div>
+
+  <script>
+    // NAVIGATION FUNCTIONALITY
+    function setupNavigation() {
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const hamburgerNav = document.getElementById('hamburgerNav');
+      
+      hamburgerBtn.addEventListener('click', function() {
+        this.classList.toggle('active');
+        hamburgerNav.classList.toggle('active');
+        
+        // Prevent body scrolling when nav is open
+        if (hamburgerNav.classList.contains('active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Close nav when clicking outside on mobile
+      document.addEventListener('click', function(e) {
+        if (hamburgerNav.classList.contains('active') && 
+            !hamburgerNav.contains(e.target) && 
+            !hamburgerBtn.contains(e.target)) {
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+      
+      // Add active class to clicked tab
+      document.querySelectorAll('.hamburger-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Close nav after selection
+          hamburgerBtn.classList.remove('active');
+          hamburgerNav.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      });
+    }
+
+    // Create coral polyps - only on desktop for performance
+    document.addEventListener('DOMContentLoaded', function() {
+      setupNavigation();
+      
+      if (window.innerWidth > 768) { // Only on larger screens
+        const polypCount = 20;
+        const body = document.querySelector('body');
+        const polypShapes = ['●', '○', '◌', '◎', '◉'];
+        
+        for (let i = 0; i < polypCount; i++) {
+          const polyp = document.createElement('div');
+          polyp.className = 'polyp';
+          polyp.innerHTML = polypShapes[Math.floor(Math.random() * polypShapes.length)];
+          
+          // Randomize properties
+          const size = Math.random() * 20 + 10;
+          const left = Math.random() * 100;
+          const opacity = Math.random() * 0.5 + 0.3;
+          const animationDuration = Math.random() * 20 + 10;
+          const animationDelay = Math.random() * 10;
+          const color = `hsl(${Math.random() * 60 + 170}, 80%, 70%)`; // Blue-green colors
+          
+          polyp.style.fontSize = `${size}px`;
+          polyp.style.left = `${left}vw`;
+          polyp.style.opacity = opacity;
+          polyp.style.animationDuration = `${animationDuration}s`;
+          polyp.style.animationDelay = `${animationDelay}s`;
+          polyp.style.color = color;
+          polyp.style.filter = `drop-shadow(0 0 2px ${color})`;
+          
+          body.appendChild(polyp);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

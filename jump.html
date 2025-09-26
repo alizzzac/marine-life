@@ -1,0 +1,2692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sea Obby Adventure</title>
+    <!-- Favicon using your logo.png -->
+    <link rel="icon" type="image/png" href="logo.jpg">
+    <link rel="apple-touch-icon" href="logo.jpg">
+    <meta name="msapplication-TileImage" content="logo.png">
+    <meta name="theme-color" content="#0a2a43">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #001a2e 0%, #003459 50%, #004d73 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #gameCanvas {
+            background: linear-gradient(180deg, 
+                rgba(0, 26, 46, 0.9) 0%, 
+                rgba(0, 52, 89, 0.9) 30%, 
+                rgba(0, 77, 115, 0.9) 60%, 
+                rgba(13, 71, 161, 0.9) 100%);
+            border: 3px solid #00bcd4;
+            border-radius: 15px;
+            box-shadow: 
+                0 0 30px rgba(0, 188, 212, 0.3),
+                inset 0 0 50px rgba(0, 188, 212, 0.1);
+            max-width: 100vw;
+            max-height: 100vh;
+            width: auto;
+            height: auto;
+        }
+
+        #uiOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 26, 46, 0.9);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: all;
+        }
+
+        .screen-content {
+            text-align: center;
+            color: white;
+            background: rgba(0, 52, 89, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #00bcd4;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .shop-content {
+            max-width: 800px;
+            width: 95%;
+            max-height: 90vh;
+            padding: 20px;
+        }
+
+        .game-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #00bcd4;
+            text-shadow: 0 0 20px rgba(0, 188, 212, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .game-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #b3e5fc;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00bcd4, #0097a7);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 188, 212, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.6);
+            background: linear-gradient(45deg, #00e5ff, #00bcd4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #455a64, #37474f);
+            color: white;
+            box-shadow: 0 5px 15px rgba(69, 90, 100, 0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(69, 90, 100, 0.6);
+        }
+
+        .btn-gold {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+            background: linear-gradient(45deg, #FFDF00, #FFB700);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            margin: 5px;
+        }
+
+        .btn-disabled {
+            background: linear-gradient(45deg, #666, #555);
+            color: #aaa;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .controls-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 77, 115, 0.6);
+            border-radius: 10px;
+            border: 1px solid #00bcd4;
+        }
+
+        .controls-info p {
+            color: #b3e5fc;
+            font-size: 0.9rem;
+        }
+
+        #gameHUD {
+            background: transparent;
+            pointer-events: none;
+        }
+
+        .hud-top {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hud-bottom {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .level-info, .score-info, .points-info {
+            background: rgba(0, 52, 89, 0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #00bcd4;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .points-info {
+            border-color: #FFD700;
+        }
+
+        .shop-btn {
+            background: rgba(255, 215, 0, 0.9);
+            padding: 10px 15px;
+            border-radius: 15px;
+            border: 2px solid #FFD700;
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+            pointer-events: all;
+            transition: all 0.3s ease;
+        }
+
+        .shop-btn:hover {
+            background: rgba(255, 215, 0, 1);
+            transform: translateY(-2px);
+        }
+
+        .health-bar {
+            width: 150px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            border-radius: 5px;
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(0, 188, 212, 0.3));
+            border-radius: 50%;
+            animation: floatUp 6s infinite linear;
+        }
+
+        .bubble-1 {
+            left: 20%;
+            animation-delay: 0s;
+            animation-duration: 6s;
+        }
+
+        .bubble-2 {
+            left: 50%;
+            animation-delay: 2s;
+            animation-duration: 8s;
+            width: 15px;
+            height: 15px;
+        }
+
+        .bubble-3 {
+            left: 80%;
+            animation-delay: 4s;
+            animation-duration: 7s;
+            width: 25px;
+            height: 25px;
+        }
+
+        .fish {
+            position: absolute;
+            font-size: 2rem;
+            animation: swimAcross 10s infinite linear;
+        }
+
+        .fish-1 {
+            top: 30%;
+            animation-delay: 0s;
+        }
+
+        .fish-2 {
+            top: 70%;
+            animation-delay: 5s;
+            animation-duration: 12s;
+        }
+
+        .ocean-fact {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 77, 115, 0.6);
+            border-radius: 10px;
+            border-left: 4px solid #00bcd4;
+        }
+
+        .ocean-fact p {
+            color: #b3e5fc;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .final-stats {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 77, 115, 0.6);
+            border-radius: 10px;
+            border: 2px solid #4caf50;
+        }
+
+        .final-stats p {
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .points-stats {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 77, 115, 0.6);
+            border-radius: 10px;
+            border: 2px solid #FFD700;
+        }
+
+        .points-stats p {
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        /* Shop Styles */
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .shop-points {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: 2px solid #FFD700;
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .shop-item {
+            background: rgba(0, 77, 115, 0.8);
+            border: 2px solid #00bcd4;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .shop-item:hover {
+            border-color: #FFD700;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .shop-item.owned {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .shop-item.owned .shop-item-name {
+            color: #4caf50;
+        }
+
+        .shop-item-name {
+            color: #00bcd4;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .shop-item-description {
+            color: #b3e5fc;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .shop-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .shop-item-price {
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .owned-text {
+            color: #4caf50;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        .upgrade-indicator {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid #FFD700;
+            border-radius: 10px;
+            padding: 5px 10px;
+            margin-top: 10px;
+            color: #FFD700;
+            font-size: 0.8rem;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(0, 188, 212, 0.5);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(0, 188, 212, 0.8), 0 0 40px rgba(0, 188, 212, 0.3);
+            }
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        @keyframes swimAcross {
+            0% {
+                transform: translateX(-100px);
+            }
+            100% {
+                transform: translateX(calc(100vw + 100px));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2rem;
+            }
+            
+            .screen-content, .shop-content {
+                padding: 20px;
+                width: 95%;
+            }
+            
+            .btn {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+            
+            .hud-top {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .health-bar {
+                width: 120px;
+            }
+
+            .shop-grid {
+                grid-template-columns: 1fr;
+                max-height: 400px;
+            }
+
+            .shop-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="1200" height="600"></canvas>
+        
+        <div id="uiOverlay">
+            <div id="startScreen" class="screen active">
+                <div class="screen-content">
+                    <h1 class="game-title">🌊 Sea Obby Adventure</h1>
+                    <p class="game-subtitle">Navigate through underwater obstacles!</p>
+                    <button id="startBtn" class="btn btn-primary">Start Adventure</button>
+                    <button id="shopBtnStart" class="btn btn-gold">🛒 Shop</button>
+                    <div class="controls-info">
+                        <p>Controls: WASD or Arrow Keys to move, Space to jump</p>
+                    </div>
+                    <div class="points-info">
+                        <p>Earn points to buy upgrades and redeem for discounts!</p>
+                        <p>Points: <span id="startScreenPoints">0</span></p>
+                    </div>
+                </div>
+                <div class="floating-elements">
+                    <div class="bubble bubble-1"></div>
+                    <div class="bubble bubble-2"></div>
+                    <div class="bubble bubble-3"></div>
+                    <div class="fish fish-1">🐠</div>
+                    <div class="fish fish-2">🐟</div>
+                </div>
+            </div>
+
+            <div id="gameHUD" class="screen">
+                <div class="hud-top">
+                    <div class="level-info">
+                        <span id="currentLevel">Level 1</span>
+                        <div class="health-bar">
+                            <div class="health-fill" id="healthFill"></div>
+                        </div>
+                    </div>
+                    <div class="score-info">
+                        <span id="scoreDisplay">Score: 0</span>
+                    </div>
+                    <div class="points-info">
+                        <span id="pointsDisplay">Points: 0</span>
+                    </div>
+                </div>
+                <div class="hud-bottom">
+                    <div class="shop-btn" id="shopBtnGame">🛒 Shop</div>
+                </div>
+            </div>
+
+            <div id="shopScreen" class="screen">
+                <div class="shop-content screen-content">
+                    <div class="shop-header">
+                        <h2>🛒 Sea Shop</h2>
+                        <div class="shop-points">
+                            Points: <span id="shopPointsDisplay">0</span>
+                        </div>
+                    </div>
+                    <div class="shop-grid" id="shopGrid">
+                        <!-- Shop items will be dynamically added here -->
+                    </div>
+                    <div style="margin-top: 30px; text-align: center;">
+                        <button id="closeShopBtn" class="btn btn-secondary">Close Shop</button>
+                        <button id="redeemPointsBtnShop" class="btn btn-gold">Redeem for Discounts</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="levelCompleteScreen" class="screen">
+                <div class="screen-content">
+                    <h2>🎉 Level Complete!</h2>
+                    <div id="levelStats">
+                        <p>Time: <span id="levelTime">0</span>s</p>
+                        <p>Score: <span id="levelScore">0</span></p>
+                    </div>
+                    <div class="points-stats">
+                        <p>Points earned: <span id="levelPoints">0</span></p>
+                        <p>Total points: <span id="totalPoints">0</span></p>
+                    </div>
+                    <div id="oceanFact" class="ocean-fact">
+                        <p id="factText"></p>
+                    </div>
+                    <button id="nextLevelBtn" class="btn btn-primary">Next Level</button>
+                    <button id="shopBtnLevel" class="btn btn-gold">🛒 Shop</button>
+                    <button id="redeemPointsBtn" class="btn btn-gold">Redeem Points</button>
+                    <button id="restartLevelBtn" class="btn btn-secondary">Restart Level</button>
+                </div>
+            </div>
+
+            <div id="gameOverScreen" class="screen">
+                <div class="screen-content">
+                    <h2>💀 Game Over</h2>
+                    <p>You've been caught by the sea creatures!</p>
+                    <div class="points-stats">
+                        <p>Total points: <span id="gameOverPoints">0</span></p>
+                    </div>
+                    <button id="retryBtn" class="btn btn-primary">Try Again</button>
+                    <button id="shopBtnGameOver" class="btn btn-gold">🛒 Shop</button>
+                    <button id="redeemPointsBtnGameOver" class="btn btn-gold">Redeem Points</button>
+                    <button id="mainMenuBtn" class="btn btn-secondary">Main Menu</button>
+                </div>
+            </div>
+
+            <div id="victoryScreen" class="screen">
+                <div class="screen-content">
+                    <h2>🏆 Congratulations!</h2>
+                    <p>You've completed all 10 levels of the Sea Obby!</p>
+                    <div class="final-stats">
+                        <p>Final Score: <span id="finalScore">0</span></p>
+                        <p>Total Time: <span id="totalTime">0</span>s</p>
+                    </div>
+                    <div class="points-stats">
+                        <p>Total Points Earned: <span id="victoryPoints">0</span></p>
+                        <p>Redeemable Discount: $<span id="discountAmount">0</span></p>
+                    </div>
+                    <button id="playAgainBtn" class="btn btn-primary">Play Again</button>
+                    <button id="shopBtnVictory" class="btn btn-gold">🛒 Shop</button>
+                    <button id="redeemPointsBtnVictory" class="btn btn-gold">Redeem Points</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ocean Facts
+        const OCEAN_FACTS = [
+            "🐙 Octopuses have three hearts and blue blood!",
+            "🐋 Blue whales are the largest animals ever known to have lived on Earth.",
+            "🌊 The ocean contains 99% of the living space on our planet.",
+            "🐠 There are over 30,000 known species of fish in the ocean.",
+            "🦈 Sharks have been around for more than 400 million years.",
+            "🐢 Sea turtles can live for over 100 years.",
+            "🌊 The deepest part of the ocean is the Mariana Trench at 36,200 feet deep.",
+            "🐳 Whales can communicate with each other across hundreds of miles.",
+            "🪸 Coral reefs support 25% of all marine life despite covering less than 1% of the ocean.",
+            "🎉 Congratulations! You've mastered the depths of the sea!"
+        ];
+
+        // Shop Items Configuration
+        const SHOP_ITEMS = [
+            {
+                id: 'speed_boost',
+                name: '⚡ Speed Boost',
+                description: 'Increase your swimming speed by 50%. Navigate through levels faster!',
+                price: 100,
+                type: 'upgrade',
+                effect: { speed: 1.5 }
+            },
+            {
+                id: 'super_jump',
+                name: '🦘 Super Jump',
+                description: 'Jump 30% higher to reach difficult platforms with ease!',
+                price: 150,
+                type: 'upgrade',
+                effect: { jumpPower: 1.3 }
+            },
+            {
+                id: 'extra_life',
+                name: '💖 Extra Life',
+                description: 'Start each level with +1 extra life. More chances to succeed!',
+                price: 200,
+                type: 'upgrade',
+                effect: { extraLife: 1 }
+            },
+            {
+                id: 'pearl_magnet',
+                name: '🧲 Pearl Magnet',
+                description: 'Automatically attract pearls from a greater distance!',
+                price: 250,
+                type: 'powerup',
+                effect: { magnetRange: 60 }
+            },
+            {
+                id: 'invincible_shield',
+                name: '🛡️ Invincible Shield',
+                description: 'Gain temporary invincibility when taking damage (3 seconds).',
+                price: 300,
+                type: 'powerup',
+                effect: { invincibilityTime: 3000 }
+            },
+            {
+                id: 'double_points',
+                name: '💰 Double Points',
+                description: 'Earn 2x points from all pearls and level completions!',
+                price: 400,
+                type: 'multiplier',
+                effect: { pointMultiplier: 2 }
+            },
+            {
+                id: 'golden_fish',
+                name: '🐠 Golden Fish Skin',
+                description: 'Transform into a majestic golden fish! Pure cosmetic upgrade.',
+                price: 300,
+                type: 'cosmetic',
+                effect: { skin: 'golden' }
+            },
+            {
+                id: 'rainbow_fish',
+                name: '🌈 Rainbow Fish Skin',
+                description: 'Become a dazzling rainbow fish with animated colors!',
+                price: 500,
+                type: 'cosmetic',
+                effect: { skin: 'rainbow' }
+            },
+            {
+                id: 'level_skip',
+                name: '⏭️ Level Skip Token',
+                description: 'Skip any level that\'s giving you trouble. Use wisely!',
+                price: 200,
+                type: 'consumable',
+                effect: { levelSkips: 1 }
+            },
+            {
+                id: 'bubble_trail',
+                name: '💫 Bubble Trail',
+                description: 'Leave a beautiful trail of bubbles as you swim!',
+                price: 250,
+                type: 'cosmetic',
+                effect: { bubbleTrail: true }
+            }
+        ];
+
+        // Game Shop System
+        class GameShop {
+            constructor() {
+                this.ownedItems = JSON.parse(localStorage.getItem('seaObby_ownedItems') || '[]');
+                this.activeEffects = {};
+                this.initializeShop();
+                this.applyOwnedEffects();
+            }
+
+            initializeShop() {
+                this.renderShop();
+                this.bindShopEvents();
+            }
+
+            renderShop() {
+                const shopGrid = document.getElementById('shopGrid');
+                shopGrid.innerHTML = '';
+
+                SHOP_ITEMS.forEach(item => {
+                    const isOwned = this.ownedItems.includes(item.id);
+                    const canAfford = window.game ? window.game.points >= item.price : false;
+
+                    const shopItem = document.createElement('div');
+                    shopItem.className = `shop-item ${isOwned ? 'owned' : ''}`;
+                    
+                    shopItem.innerHTML = `
+                        <div class="shop-item-name">${item.name}</div>
+                        <div class="shop-item-description">${item.description}</div>
+                        ${this.getItemTypeIndicator(item.type)}
+                        <div class="shop-item-footer">
+                            <div class="shop-item-price">${isOwned ? 'OWNED' : `${item.price} Points`}</div>
+                            ${isOwned ? 
+                                '<div class="owned-text">✓ Owned</div>' : 
+                                `<button class="btn btn-small ${canAfford ? 'btn-gold' : 'btn-disabled'}" 
+                                    ${canAfford ? `onclick="window.gameShop.purchaseItem('${item.id}')"` : ''} 
+                                    ${!canAfford ? 'disabled' : ''}>
+                                    ${canAfford ? 'Buy' : 'Not enough points'}
+                                </button>`
+                            }
+                        </div>
+                    `;
+
+                    shopGrid.appendChild(shopItem);
+                });
+            }
+
+            getItemTypeIndicator(type) {
+                const indicators = {
+                    upgrade: '<div class="upgrade-indicator">⚡ Permanent Upgrade</div>',
+                    powerup: '<div class="upgrade-indicator">🔥 Power-up</div>',
+                    multiplier: '<div class="upgrade-indicator">💰 Multiplier</div>',
+                    cosmetic: '<div class="upgrade-indicator">✨ Cosmetic</div>',
+                    consumable: '<div class="upgrade-indicator">🎯 Consumable</div>'
+                };
+                return indicators[type] || '';
+            }
+
+            purchaseItem(itemId) {
+                const item = SHOP_ITEMS.find(i => i.id === itemId);
+                if (!item || this.ownedItems.includes(itemId)) return false;
+
+                if (!window.game || window.game.points < item.price) {
+                    alert("Not enough points!");
+                    return false;
+                }
+
+                // Deduct points
+                window.game.points -= item.price;
+                
+                // Add to owned items
+                this.ownedItems.push(itemId);
+                this.saveOwnedItems();
+
+                // Apply effect
+                this.applyItemEffect(item);
+
+                // Show success message
+                alert(`Successfully purchased ${item.name}!`);
+
+                // Refresh shop display
+                this.renderShop();
+                this.updatePointsDisplays();
+
+                return true;
+            }
+
+            applyItemEffect(item) {
+                switch (item.type) {
+                    case 'upgrade':
+                    case 'powerup':
+                    case 'multiplier':
+                    case 'cosmetic':
+                        this.activeEffects[item.id] = item.effect;
+                        break;
+                    case 'consumable':
+                        // Handle consumables differently
+                        if (item.id === 'level_skip') {
+                            const currentSkips = parseInt(localStorage.getItem('seaObby_levelSkips') || '0');
+                            localStorage.setItem('seaObby_levelSkips', (currentSkips + item.effect.levelSkips).toString());
+                        }
+                        break;
+                }
+
+                // Apply to current game if running
+                if (window.game && window.game.player) {
+                    this.applyEffectsToPlayer(window.game.player);
+                }
+            }
+
+            applyOwnedEffects() {
+                this.activeEffects = {};
+                this.ownedItems.forEach(itemId => {
+                    const item = SHOP_ITEMS.find(i => i.id === itemId);
+                    if (item && item.type !== 'consumable') {
+                        this.activeEffects[itemId] = item.effect;
+                    }
+                });
+            }
+
+            applyEffectsToPlayer(player) {
+                // Reset to base values
+                player.speed = 5;
+                player.jumpPower = 12;
+                player.magnetRange = 25;
+                player.pointMultiplier = 1;
+                player.skin = 'default';
+                player.bubbleTrail = false;
+                player.invincibilityTime = 0;
+
+                // Apply all active effects
+                Object.values(this.activeEffects).forEach(effect => {
+                    if (effect.speed) player.speed *= effect.speed;
+                    if (effect.jumpPower) player.jumpPower *= effect.jumpPower;
+                    if (effect.magnetRange) player.magnetRange = effect.magnetRange;
+                    if (effect.pointMultiplier) player.pointMultiplier = effect.pointMultiplier;
+                    if (effect.skin) player.skin = effect.skin;
+                    if (effect.bubbleTrail) player.bubbleTrail = effect.bubbleTrail;
+                    if (effect.invincibilityTime) player.invincibilityTime = effect.invincibilityTime;
+                    if (effect.extraLife && window.game) {
+                        window.game.maxLives = 3 + effect.extraLife;
+                    }
+                });
+            }
+
+            hasLevelSkips() {
+                return parseInt(localStorage.getItem('seaObby_levelSkips') || '0') > 0;
+            }
+
+            useLevelSkip() {
+                const currentSkips = parseInt(localStorage.getItem('seaObby_levelSkips') || '0');
+                if (currentSkips > 0) {
+                    localStorage.setItem('seaObby_levelSkips', (currentSkips - 1).toString());
+                    return true;
+                }
+                return false;
+            }
+
+            updatePointsDisplays() {
+                const points = window.game ? window.game.points : 0;
+                document.getElementById('shopPointsDisplay').textContent = points;
+                document.getElementById('startScreenPoints').textContent = points;
+            }
+
+            saveOwnedItems() {
+                localStorage.setItem('seaObby_ownedItems', JSON.stringify(this.ownedItems));
+            }
+
+            bindShopEvents() {
+                // Shop button events
+                document.getElementById('shopBtnStart').addEventListener('click', () => this.openShop());
+                document.getElementById('shopBtnGame').addEventListener('click', () => this.openShop());
+                document.getElementById('shopBtnLevel').addEventListener('click', () => this.openShop());
+                document.getElementById('shopBtnGameOver').addEventListener('click', () => this.openShop());
+                document.getElementById('shopBtnVictory').addEventListener('click', () => this.openShop());
+                
+                document.getElementById('closeShopBtn').addEventListener('click', () => this.closeShop());
+                document.getElementById('redeemPointsBtnShop').addEventListener('click', () => {
+                    if (window.uiManager) {
+                        window.uiManager.redeemPoints();
+                    }
+                });
+            }
+
+            openShop() {
+                this.previousScreen = document.querySelector('.screen.active').id;
+                this.updatePointsDisplays();
+                this.renderShop();
+                document.querySelector('.screen.active').classList.remove('active');
+                document.getElementById('shopScreen').classList.add('active');
+            }
+
+            closeShop() {
+                document.getElementById('shopScreen').classList.remove('active');
+                if (this.previousScreen) {
+                    document.getElementById(this.previousScreen).classList.add('active');
+                }
+            }
+        }
+
+        // Level Data
+        const LEVELS = [
+            // Level 1: Introduction
+            {
+                playerStart: { x: 50, y: 400 },
+                goal: { x: 800, y: 400 },
+                platforms: [
+                    { x: 0, y: 450, width: 200, height: 20, type: 'coral' },
+                    { x: 250, y: 400, width: 100, height: 20, type: 'coral' },
+                    { x: 400, y: 350, width: 100, height: 20, type: 'coral' },
+                    { x: 550, y: 400, width: 100, height: 20, type: 'coral' },
+                    { x: 700, y: 450, width: 150, height: 20, type: 'coral' }
+                ],
+                obstacles: [],
+                collectibles: [
+                    { x: 300, y: 350, type: 'pearl' },
+                    { x: 600, y: 350, type: 'pearl' }
+                ]
+            },
+            
+            // Level 2: First Jellyfish
+            {
+                playerStart: { x: 50, y: 400 },
+                goal: { x: 900, y: 300 },
+                platforms: [
+                    { x: 0, y: 450, width: 150, height: 20, type: 'coral' },
+                    { x: 200, y: 400, width: 80, height: 20, type: 'rock' },
+                    { x: 350, y: 380, width: 80, height: 20, type: 'rock' },
+                    { x: 500, y: 400, width: 80, height: 20, type: 'coral' },
+                    { x: 650, y: 350, width: 100, height: 20, type: 'coral' },
+                    { x: 800, y: 320, width: 150, height: 20, type: 'coral' }
+                ],
+                obstacles: [
+                    { x: 320, y: 250, type: 'jellyfish', config: { bounceForce: 18 } }
+                ],
+                collectibles: [
+                    { x: 240, y: 350, type: 'pearl' },
+                    { x: 390, y: 330, type: 'pearl' },
+                    { x: 720, y: 270, type: 'pearl' }
+                ]
+            },
+            
+            // Level 3: Moving Platforms
+            {
+                playerStart: { x: 50, y: 400 },
+                goal: { x: 950, y: 200 },
+                platforms: [
+                    { x: 0, y: 450, width: 120, height: 20, type: 'coral' },
+                    { x: 200, y: 400, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: 1, moveRange: 100 },
+                    { x: 400, y: 350, width: 80, height: 20, type: 'rock' },
+                    { x: 550, y: 300, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: -1.5, moveRange: 80 },
+                    { x: 750, y: 250, width: 100, height: 20, type: 'coral' },
+                    { x: 900, y: 220, width: 100, height: 20, type: 'coral' }
+                ],
+                obstacles: [
+                    { x: 300, y: 200, type: 'jellyfish', config: { bounceForce: 16 } },
+                    { x: 600, y: 150, type: 'jellyfish', config: { bounceForce: 20 } }
+                ],
+                collectibles: [
+                    { x: 430, y: 300, type: 'pearl' },
+                    { x: 580, y: 250, type: 'pearl' },
+                    { x: 800, y: 200, type: 'pearl' }
+                ]
+            },
+            
+            // Level 4: First Shark
+            {
+                playerStart: { x: 50, y: 450 },
+                goal: { x: 1000, y: 200 },
+                platforms: [
+                    { x: 0, y: 500, width: 150, height: 20, type: 'coral' },
+                    { x: 200, y: 450, width: 100, height: 20, type: 'rock' },
+                    { x: 350, y: 400, width: 80, height: 20, type: 'coral' },
+                    { x: 500, y: 350, width: 100, height: 20, type: 'rock' },
+                    { x: 650, y: 300, width: 120, height: 20, type: 'coral' },
+                    { x: 820, y: 250, width: 80, height: 20, type: 'coral' },
+                    { x: 950, y: 220, width: 100, height: 20, type: 'coral' }
+                ],
+                obstacles: [
+                    { x: 400, y: 300, type: 'shark', config: { speed: 1.5, patrolDistance: 150 } },
+                    { x: 150, y: 380, type: 'jellyfish', config: { bounceForce: 15 } }
+                ],
+                collectibles: [
+                    { x: 250, y: 400, type: 'pearl' },
+                    { x: 380, y: 350, type: 'pearl' },
+                    { x: 550, y: 300, type: 'pearl' },
+                    { x: 700, y: 250, type: 'pearl' }
+                ]
+            },
+            
+            // Level 5: Seaweed Trap
+            {
+                playerStart: { x: 50, y: 400 },
+                goal: { x: 1100, y: 150 },
+                platforms: [
+                    { x: 0, y: 450, width: 120, height: 20, type: 'coral' },
+                    { x: 180, y: 400, width: 80, height: 20, type: 'rock' },
+                    { x: 320, y: 350, width: 100, height: 20, type: 'coral' },
+                    { x: 480, y: 300, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: 1, moveRange: 120 },
+                    { x: 650, y: 250, width: 100, height: 20, type: 'rock' },
+                    { x: 800, y: 200, width: 80, height: 20, type: 'coral' },
+                    { x: 920, y: 180, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: -1.2, moveRange: 100 },
+                    { x: 1050, y: 170, width: 100, height: 20, type: 'coral' }
+                ],
+                obstacles: [
+                    { x: 280, y: 250, type: 'seaweed_trap', config: { grabRange: 50, grabStrength: 0.15 } },
+                    { x: 600, y: 100, type: 'jellyfish', config: { bounceForce: 22 } },
+                    { x: 750, y: 120, type: 'seaweed_trap', config: { grabRange: 45, grabStrength: 0.12 } }
+                ],
+                collectibles: [
+                    { x: 220, y: 350, type: 'pearl' },
+                    { x: 370, y: 300, type: 'pearl' },
+                    { x: 700, y: 200, type: 'pearl' },
+                    { x: 960, y: 130, type: 'pearl' }
+                ]
+            },
+            
+            // Level 6: Current Challenge
+            {
+                playerStart: { x: 50, y: 500 },
+                goal: { x: 1200, y: 100 },
+                platforms: [
+                    { x: 0, y: 520, width: 100, height: 20, type: 'coral' },
+                    { x: 150, y: 450, width: 80, height: 20, type: 'rock' },
+                    { x: 300, y: 400, width: 100, height: 20, type: 'coral' },
+                    { x: 500, y: 350, width: 80, height: 20, type: 'rock' },
+                    { x: 650, y: 300, width: 100, height: 20, type: 'coral' },
+                    { x: 800, y: 250, width: 80, height: 20, type: 'rock' },
+                    { x: 950, y: 200, width: 100, height: 20, type: 'coral' },
+                    { x: 1100, y: 150, width: 80, height: 20, type: 'rock' },
+                    { x: 1200, y: 120, width: 120, height: 20, type: 'coral' }
+                ],
+                obstacles: [
+                    { x: 250, y: 350, type: 'current', config: { width: 80, height: 150, forceX: -3, forceY: 0 } },
+                    { x: 450, y: 200, type: 'current', config: { width: 100, height: 200, forceX: 4, forceY: -2 } },
+                    { x: 750, y: 150, type: 'current', config: { width: 90, height: 180, forceX: -2, forceY: 1 } },
+                    { x: 380, y: 280, type: 'jellyfish', config: { bounceForce: 18 } },
+                    { x: 720, y: 180, type: 'shark', config: { speed: 2, patrolDistance: 100 } }
+                ],
+                collectibles: [
+                    { x: 190, y: 400, type: 'pearl' },
+                    { x: 350, y: 350, type: 'pearl' },
+                    { x: 540, y: 300, type: 'pearl' },
+                    { x: 850, y: 200, type: 'pearl' },
+                    { x: 1000, y: 150, type: 'pearl' }
+                ]
+            },
+            
+            // Level 7: Spike Trap
+            {
+                playerStart: { x: 50, y: 450 },
+                goal: { x: 1300, y: 200 },
+                platforms: [
+                    { x: 0, y: 480, width: 120, height: 20, type: 'coral' },
+                    { x: 180, y: 420, width: 100, height: 20, type: 'rock' },
+                    { x: 350, y: 370, width: 80, height: 20, type: 'coral' },
+                    { x: 500, y: 320, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: 1.5, moveRange: 100 },
+                    { x: 650, y: 280, width: 120, height: 20, type: 'rock' },
+                    { x: 820, y: 250, width: 100, height: 20, type: 'coral' },
+                    { x: 980, y: 220, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: -1.8, moveRange: 120 },
+                    { x: 1150, y: 200, width: 80, height: 20, type: 'rock' },
+                    { x: 1280, y: 220, width: 100, height: 20, type: 'coral' }
+                ],
+                obstacles: [
+                    { x: 300, y: 370, type: 'spikes', config: { width: 50 } },
+                    { x: 600, y: 280, type: 'spikes', config: { width: 50 } },
+                    { x: 920, y: 250, type: 'spikes', config: { width: 60 } },
+                    { x: 450, y: 200, type: 'jellyfish', config: { bounceForce: 20 } },
+                    { x: 750, y: 150, type: 'shark', config: { speed: 2.2, patrolDistance: 120 } },
+                    { x: 1100, y: 100, type: 'jellyfish', config: { bounceForce: 25 } }
+                ],
+                collectibles: [
+                    { x: 230, y: 370, type: 'pearl' },
+                    { x: 400, y: 320, type: 'pearl' },
+                    { x: 570, y: 270, type: 'pearl' },
+                    { x: 870, y: 200, type: 'pearl' },
+                    { x: 1030, y: 170, type: 'pearl' },
+                    { x: 1200, y: 150, type: 'pearl' }
+                ]
+            },
+            
+            // Level 8: Complex Navigation
+            {
+                playerStart: { x: 50, y: 500 },
+                goal: { x: 1400, y: 100 },
+                platforms: [
+                    { x: 0, y: 520, width: 100, height: 20, type: 'coral' },
+                    { x: 150, y: 470, width: 80, height: 20, type: 'rock' },
+                    { x: 280, y: 420, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: 1, moveRange: 80 },
+                    { x: 400, y: 380, width: 100, height: 20, type: 'coral' },
+                    { x: 550, y: 330, width: 80, height: 20, type: 'rock' },
+                    { x: 680, y: 280, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: -1.5, moveRange: 100 },
+                    { x: 800, y: 250, width: 100, height: 20, type: 'coral' },
+                    { x: 950, y: 200, width: 80, height: 20, type: 'rock' },
+                    { x: 1080, y: 170, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: 1.2, moveRange: 90 },
+                    { x: 1200, y: 140, width: 100, height: 20, type: 'coral' },
+                    { x: 1350, y: 120, width: 100, height: 20, type: 'coral' }
+                ],
+                obstacles: [
+                    { x: 200, y: 350, type: 'seaweed_trap', config: { grabRange: 60, grabStrength: 0.2 } },
+                    { x: 350, y: 250, type: 'current', config: { width: 80, height: 180, forceX: 3, forceY: -1 } },
+                    { x: 500, y: 200, type: 'jellyfish', config: { bounceForce: 22 } },
+                    { x: 650, y: 150, type: 'shark', config: { speed: 2.5, patrolDistance: 150 } },
+                    { x: 850, y: 120, type: 'current', config: { width: 100, height: 200, forceX: -4, forceY: 0 } },
+                    { x: 1000, y: 100, type: 'jellyfish', config: { bounceForce: 28 } },
+                    { x: 1250, y: 50, type: 'seaweed_trap', config: { grabRange: 50, grabStrength: 0.18 } }
+                ],
+                collectibles: [
+                    { x: 190, y: 420, type: 'pearl' },
+                    { x: 320, y: 370, type: 'pearl' },
+                    { x: 450, y: 330, type: 'pearl' },
+                    { x: 590, y: 280, type: 'pearl' },
+                    { x: 720, y: 230, type: 'pearl' },
+                    { x: 990, y: 150, type: 'pearl' },
+                    { x: 1250, y: 90, type: 'pearl' }
+                ]
+            },
+            
+            // Level 9: Speed Challenge
+            {
+                playerStart: { x: 50, y: 450 },
+                goal: { x: 1500, y: 150 },
+                platforms: [
+                    { x: 0, y: 480, width: 100, height: 20, type: 'coral' },
+                    { x: 120, y: 430, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: 2, moveRange: 80 },
+                    { x: 220, y: 400, width: 80, height: 20, type: 'rock' },
+                    { x: 320, y: 370, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: -2.5, moveRange: 100 },
+                    { x: 450, y: 340, width: 100, height: 20, type: 'coral' },
+                    { x: 580, y: 310, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: 1.8, moveRange: 90 },
+                    { x: 700, y: 280, width: 80, height: 20, type: 'rock' },
+                    { x: 820, y: 250, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: -2.2, moveRange: 110 },
+                    { x: 950, y: 220, width: 100, height: 20, type: 'coral' },
+                    { x: 1080, y: 190, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: 2.8, moveRange: 120 },
+                    { x: 1220, y: 170, width: 80, height: 20, type: 'rock' },
+                    { x: 1350, y: 150, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: -3, moveRange: 100 },
+                    { x: 1480, y: 170, width: 100, height: 20, type: 'coral' }
+                ],
+                obstacles: [
+                    { x: 180, y: 300, type: 'shark', config: { speed: 3, patrolDistance: 100 } },
+                    { x: 350, y: 250, type: 'current', config: { width: 80, height: 150, forceX: 5, forceY: -2 } },
+                    { x: 520, y: 200, type: 'jellyfish', config: { bounceForce: 30 } },
+                    { x: 680, y: 150, type: 'shark', config: { speed: 3.5, patrolDistance: 120 } },
+                    { x: 850, y: 120, type: 'current', config: { width: 100, height: 180, forceX: -5, forceY: 1 } },
+                    { x: 1020, y: 100, type: 'jellyfish', config: { bounceForce: 32 } },
+                    { x: 1180, y: 80, type: 'shark', config: { speed: 4, patrolDistance: 140 } },
+                    { x: 1320, y: 50, type: 'current', config: { width: 90, height: 200, forceX: 4, forceY: -3 } }
+                ],
+                collectibles: [
+                    { x: 170, y: 380, type: 'pearl' },
+                    { x: 270, y: 350, type: 'pearl' },
+                    { x: 380, y: 320, type: 'pearl' },
+                    { x: 500, y: 290, type: 'pearl' },
+                    { x: 630, y: 260, type: 'pearl' },
+                    { x: 750, y: 230, type: 'pearl' },
+                    { x: 870, y: 200, type: 'pearl' },
+                    { x: 1000, y: 170, type: 'pearl' },
+                    { x: 1130, y: 140, type: 'pearl' },
+                    { x: 1270, y: 120, type: 'pearl' }
+                ]
+            },
+            
+            // Level 10: Final Boss Level
+            {
+                playerStart: { x: 50, y: 500 },
+                goal: { x: 1600, y: 100 },
+                platforms: [
+                    { x: 0, y: 520, width: 120, height: 20, type: 'coral' },
+                    { x: 150, y: 470, width: 80, height: 20, type: 'rock' },
+                    { x: 280, y: 420, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: 2, moveRange: 100 },
+                    { x: 400, y: 380, width: 100, height: 20, type: 'coral' },
+                    { x: 550, y: 330, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: -2.5, moveRange: 120 },
+                    { x: 700, y: 300, width: 80, height: 20, type: 'rock' },
+                    { x: 830, y: 270, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: 3, moveRange: 110 },
+                    { x: 950, y: 240, width: 100, height: 20, type: 'coral' },
+                    { x: 1100, y: 210, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: -3.5, moveRange: 130 },
+                    { x: 1250, y: 180, width: 80, height: 20, type: 'rock' },
+                    { x: 1380, y: 150, width: 60, height: 15, type: 'crate', moving: true, moveSpeed: 4, moveRange: 100 },
+                    { x: 1520, y: 120, width: 120, height: 20, type: 'coral' }
+                ],
+                obstacles: [
+                    { x: 200, y: 350, type: 'seaweed_trap', config: { grabRange: 70, grabStrength: 0.25 } },
+                    { x: 320, y: 300, type: 'shark', config: { speed: 3.5, patrolDistance: 120 } },
+                    { x: 450, y: 250, type: 'current', config: { width: 100, height: 200, forceX: 6, forceY: -2 } },
+                    { x: 600, y: 200, type: 'jellyfish', config: { bounceForce: 35 } },
+                    { x: 750, y: 150, type: 'spikes', config: { width: 80 } },
+                    { x: 880, y: 120, type: 'shark', config: { speed: 4, patrolDistance: 150 } },
+                    { x: 1000, y: 100, type: 'current', config: { width: 120, height: 220, forceX: -6, forceY: 1 } },
+                    { x: 1150, y: 80, type: 'jellyfish', config: { bounceForce: 38 } },
+                    { x: 1300, y: 60, type: 'seaweed_trap', config: { grabRange: 60, grabStrength: 0.3 } },
+                    { x: 1450, y: 50, type: 'shark', config: { speed: 4.5, patrolDistance: 100 } },
+                    { x: 1580, y: 30, type: 'current', config: { width: 100, height: 180, forceX: 5, forceY: -4 } }
+                ],
+                collectibles: [
+                    { x: 200, y: 420, type: 'pearl' },
+                    { x: 350, y: 380, type: 'pearl' },
+                    { x: 500, y: 330, type: 'pearl' },
+                    { x: 650, y: 280, type: 'pearl' },
+                    { x: 800, y: 250, type: 'pearl' },
+                    { x: 950, y: 220, type: 'pearl' },
+                    { x: 1100, y: 190, type: 'pearl' },
+                    { x: 1250, y: 160, type: 'pearl' },
+                    { x: 1400, y: 130, type: 'pearl' },
+                    { x: 1550, y: 100, type: 'pearl' },
+                    { x: 1600, y: 70, type: 'pearl' }
+                ]
+            }
+        ];
+
+        // Particle System
+        class ParticleSystem {
+            constructor() {
+                this.particles = [];
+            }
+            
+            addParticle(config) {
+                this.particles.push({
+                    x: config.x,
+                    y: config.y,
+                    velocityX: config.velocityX || 0,
+                    velocityY: config.velocityY || 0,
+                    size: config.size || 5,
+                    color: config.color || '#FFFFFF',
+                    life: config.life || 1000,
+                    maxLife: config.life || 1000,
+                    gravity: config.gravity || 0,
+                    fade: config.fade !== false,
+                    ...config
+                });
+            }
+            
+            createBurst(x, y, color, count = 10) {
+                for (let i = 0; i < count; i++) {
+                    const angle = (i / count) * Math.PI * 2;
+                    const speed = 2 + Math.random() * 4;
+                    
+                    this.addParticle({
+                        x: x,
+                        y: y,
+                        velocityX: Math.cos(angle) * speed,
+                        velocityY: Math.sin(angle) * speed,
+                        size: 3 + Math.random() * 4,
+                        color: color,
+                        life: 800 + Math.random() * 400,
+                        gravity: 0.1
+                    });
+                }
+            }
+            
+            update(deltaTime) {
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const particle = this.particles[i];
+                    
+                    particle.x += particle.velocityX;
+                    particle.y += particle.velocityY;
+                    
+                    if (particle.gravity) {
+                        particle.velocityY += particle.gravity;
+                    }
+                    
+                    particle.life -= deltaTime;
+                    
+                    if (particle.life <= 0) {
+                        this.particles.splice(i, 1);
+                    }
+                }
+            }
+            
+            render(ctx) {
+                this.particles.forEach(particle => {
+                    ctx.save();
+                    
+                    let alpha = 1;
+                    if (particle.fade) {
+                        alpha = particle.life / particle.maxLife;
+                    }
+                    
+                    if (particle.color.includes('rgba')) {
+                        ctx.fillStyle = particle.color.replace(/[\d\.]+(?=\))/, alpha);
+                    } else {
+                        ctx.fillStyle = particle.color;
+                        ctx.globalAlpha = alpha;
+                    }
+                    
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.restore();
+                });
+            }
+        }
+
+        // Player Class
+        class Player {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 30;
+                this.height = 30;
+                
+                this.velocityX = 0;
+                this.velocityY = 0;
+                this.speed = 5;
+                this.jumpPower = 12;
+                this.gravity = 0.5;
+                this.friction = 0.8;
+                
+                this.onGround = false;
+                this.canJump = true;
+                
+                this.animationFrame = 0;
+                this.animationSpeed = 0.1;
+                this.direction = 1;
+                
+                this.bubbleTimer = 0;
+                this.swimAnimation = 0;
+                
+                // Shop upgrades
+                this.magnetRange = 25;
+                this.pointMultiplier = 1;
+                this.skin = 'default';
+                this.bubbleTrail = false;
+                this.invincibilityTime = 0;
+                this.invincible = false;
+                this.invincibilityTimer = 0;
+            }
+            
+            update(deltaTime, keys) {
+                let moving = false;
+                
+                if (keys['ArrowLeft'] || keys['KeyA']) {
+                    this.velocityX -= this.speed * 0.1;
+                    this.direction = -1;
+                    moving = true;
+                }
+                
+                if (keys['ArrowRight'] || keys['KeyD']) {
+                    this.velocityX += this.speed * 0.1;
+                    this.direction = 1;
+                    moving = true;
+                }
+                
+                if ((keys['ArrowUp'] || keys['KeyW'] || keys['Space']) && this.canJump && this.onGround) {
+                    this.velocityY = -this.jumpPower;
+                    this.onGround = false;
+                    this.canJump = false;
+                }
+                
+                if (!(keys['ArrowUp'] || keys['KeyW'] || keys['Space'])) {
+                    this.canJump = true;
+                }
+                
+                this.velocityX *= this.friction;
+                this.velocityY += this.gravity;
+                
+                this.velocityX = Math.max(-this.speed, Math.min(this.speed, this.velocityX));
+                this.velocityY = Math.max(-15, Math.min(15, this.velocityY));
+                
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+                
+                if (moving) {
+                    this.animationFrame += this.animationSpeed;
+                }
+                
+                this.swimAnimation += deltaTime * 0.003;
+                
+                // Handle invincibility
+                if (this.invincible) {
+                    this.invincibilityTimer -= deltaTime;
+                    if (this.invincibilityTimer <= 0) {
+                        this.invincible = false;
+                    }
+                }
+                
+                this.bubbleTimer += deltaTime;
+                if (this.bubbleTimer > (this.bubbleTrail ? 100 : 500)) {
+                    this.createBubbles();
+                    this.bubbleTimer = 0;
+                }
+                
+                this.onGround = false;
+            }
+            
+            handlePlatformCollision(platform) {
+                const playerLeft = this.x - this.width / 2;
+                const playerRight = this.x + this.width / 2;
+                const playerTop = this.y - this.height / 2;
+                const playerBottom = this.y + this.height / 2;
+                
+                const platformLeft = platform.x;
+                const platformRight = platform.x + platform.width;
+                const platformTop = platform.y;
+                const platformBottom = platform.y + platform.height;
+                
+                const overlapLeft = playerRight - platformLeft;
+                const overlapRight = platformRight - playerLeft;
+                const overlapTop = playerBottom - platformTop;
+                const overlapBottom = platformBottom - playerTop;
+                
+                const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+                
+                if (minOverlap === overlapTop && this.velocityY > 0) {
+                    this.y = platformTop - this.height / 2;
+                    this.velocityY = 0;
+                    this.onGround = true;
+                    
+                    if (platform.moving) {
+                        this.x += platform.moveSpeed * platform.direction;
+                    }
+                } else if (minOverlap === overlapBottom && this.velocityY < 0) {
+                    this.y = platformBottom + this.height / 2;
+                    this.velocityY = 0;
+                } else if (minOverlap === overlapLeft && this.velocityX > 0) {
+                    this.x = platformLeft - this.width / 2;
+                    this.velocityX = 0;
+                } else if (minOverlap === overlapRight && this.velocityX < 0) {
+                    this.x = platformRight + this.width / 2;
+                    this.velocityX = 0;
+                }
+            }
+            
+            collidesWithRect(x, y, width, height) {
+                return this.x - this.width / 2 < x + width &&
+                       this.x + this.width / 2 > x &&
+                       this.y - this.height / 2 < y + height &&
+                       this.y + this.height / 2 > y;
+            }
+            
+            takeDamage() {
+                if (this.invincible) return false;
+                
+                if (this.invincibilityTime > 0) {
+                    this.invincible = true;
+                    this.invincibilityTimer = this.invincibilityTime;
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            createBubbles() {
+                if (window.game && window.game.particleSystem) {
+                    const bubbleCount = this.bubbleTrail ? 8 : 3;
+                    const bubbleColor = this.skin === 'golden' ? 'rgba(255, 215, 0, 0.7)' : 
+                                       this.skin === 'rainbow' ? `hsl(${Date.now() * 0.1 % 360}, 70%, 70%)` : 
+                                       'rgba(173, 216, 230, 0.7)';
+                    
+                    for (let i = 0; i < bubbleCount; i++) {
+                        const offsetX = (Math.random() - 0.5) * this.width;
+                        const offsetY = (Math.random() - 0.5) * this.height;
+                        
+                        window.game.particleSystem.addParticle({
+                            x: this.x + offsetX,
+                            y: this.y + offsetY,
+                            velocityX: (Math.random() - 0.5) * 2,
+                            velocityY: -Math.random() * 2 - 1,
+                            size: 3 + Math.random() * 3,
+                            color: bubbleColor,
+                            life: 1000 + Math.random() * 1000,
+                            gravity: -0.02
+                        });
+                    }
+                }
+            }
+            
+            render(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                
+                // Handle invincibility flashing
+                if (this.invincible && Math.floor(Date.now() / 100) % 2) {
+                    ctx.globalAlpha = 0.5;
+                }
+                
+                if (this.direction === -1) {
+                    ctx.scale(-1, 1);
+                }
+                
+                const swimOffset = Math.sin(this.swimAnimation) * 2;
+                ctx.translate(0, swimOffset);
+                
+                // Handle different skins
+                this.renderSkin(ctx);
+                
+                ctx.restore();
+            }
+            
+            renderSkin(ctx) {
+                let bodyGradient;
+                
+                switch (this.skin) {
+                    case 'golden':
+                        bodyGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.width / 2);
+                        bodyGradient.addColorStop(0, '#FFD700');
+                        bodyGradient.addColorStop(0.7, '#FFA500');
+                        bodyGradient.addColorStop(1, '#FF8C00');
+                        break;
+                    case 'rainbow':
+                        const hue = (Date.now() * 0.1) % 360;
+                        bodyGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.width / 2);
+                        bodyGradient.addColorStop(0, `hsl(${hue}, 70%, 60%)`);
+                        bodyGradient.addColorStop(0.5, `hsl(${(hue + 60) % 360}, 70%, 60%)`);
+                        bodyGradient.addColorStop(1, `hsl(${(hue + 120) % 360}, 70%, 60%)`);
+                        break;
+                    default:
+                        bodyGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.width / 2);
+                        bodyGradient.addColorStop(0, '#FF6B35');
+                        bodyGradient.addColorStop(0.7, '#FF8E53');
+                        bodyGradient.addColorStop(1, '#FF4500');
+                        break;
+                }
+                
+                ctx.fillStyle = bodyGradient;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                const finMovement = Math.sin(this.animationFrame) * 0.3;
+                
+                ctx.fillStyle = this.skin === 'golden' ? '#FFA500' : 
+                               this.skin === 'rainbow' ? `hsl(${((Date.now() * 0.1) + 180) % 360}, 70%, 60%)` : 
+                               '#FF8E53';
+                ctx.beginPath();
+                ctx.ellipse(-this.width / 3, -5, 8, 15 + finMovement * 5, Math.PI / 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.ellipse(-this.width / 3, 5, 8, 15 + finMovement * 5, -Math.PI / 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = this.skin === 'golden' ? '#FFD700' : 
+                               this.skin === 'rainbow' ? `hsl(${((Date.now() * 0.1) + 240) % 360}, 70%, 60%)` : 
+                               '#FF6B35';
+                ctx.beginPath();
+                ctx.moveTo(-this.width / 2, 0);
+                ctx.lineTo(-this.width / 2 - 15, -10 + finMovement * 3);
+                ctx.lineTo(-this.width / 2 - 15, 10 - finMovement * 3);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(this.width / 4, -5, 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = 'black';
+                ctx.beginPath();
+                ctx.arc(this.width / 4 + 1, -5, 3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(this.width / 4 + 2, -6, 1, 0, Math.PI * 2);
+                ctx.fill();
+                
+                const strokeColor = this.skin === 'golden' ? '#FF8C00' : 
+                                   this.skin === 'rainbow' ? `hsl(${((Date.now() * 0.1) + 300) % 360}, 70%, 60%)` : 
+                                   '#FF4500';
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 3; i++) {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, (this.width / 2) - (i * 5), Math.PI / 3, (2 * Math.PI) / 3);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // Obstacle Class
+        class Obstacle {
+            constructor(x, y, type, config = {}) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.config = { ...config };
+                
+                this.width = this.config.width || 40;
+                this.height = this.config.height || 40;
+                
+                this.animation = 0;
+                this.active = true;
+                
+                this.initializeByType();
+            }
+            
+            initializeByType() {
+                switch (this.type) {
+                    case 'jellyfish':
+                        this.width = 50;
+                        this.height = 60;
+                        this.bounceForce = this.config.bounceForce || 15;
+                        this.floatSpeed = this.config.floatSpeed || 0.02;
+                        this.originalY = this.y;
+                        break;
+                        
+                    case 'shark':
+                        this.width = 80;
+                        this.height = 40;
+                        this.speed = this.config.speed || 2;
+                        this.direction = this.config.direction || 1;
+                        this.patrolDistance = this.config.patrolDistance || 200;
+                        this.originalX = this.x;
+                        break;
+                        
+                    case 'seaweed_trap':
+                        this.width = 30;
+                        this.height = 100;
+                        this.grabRange = this.config.grabRange || 40;
+                        this.grabStrength = this.config.grabStrength || 0.1;
+                        break;
+                        
+                    case 'current':
+                        this.width = this.config.width || 100;
+                        this.height = this.config.height || 200;
+                        this.forceX = this.config.forceX || 5;
+                        this.forceY = this.config.forceY || 0;
+                        break;
+                        
+                    case 'spikes':
+                        this.width = this.config.width || 40;
+                        this.height = 20;
+                        break;
+                }
+            }
+            
+            update(deltaTime) {
+                this.animation += deltaTime * 0.001;
+                
+                switch (this.type) {
+                    case 'jellyfish':
+                        this.y = this.originalY + Math.sin(this.animation * this.floatSpeed) * 30;
+                        break;
+                        
+                    case 'shark':
+                        this.x += this.speed * this.direction;
+                        
+                        if (Math.abs(this.x - this.originalX) > this.patrolDistance) {
+                            this.direction *= -1;
+                        }
+                        break;
+                }
+            }
+            
+            collidesWithPlayer(player) {
+                return player.x - player.width / 2 < this.x + this.width &&
+                       player.x + player.width / 2 > this.x &&
+                       player.y - player.height / 2 < this.y + this.height &&
+                       player.y + player.height / 2 > this.y;
+            }
+            
+            handleCollision(player, game) {
+                switch (this.type) {
+                    case 'jellyfish':
+                        player.velocityY = -this.bounceForce;
+                        player.onGround = false;
+                        
+                        if (game.particleSystem) {
+                            game.particleSystem.createBurst(this.x + this.width / 2, this.y, '#FF69B4', 8);
+                        }
+                        break;
+                        
+                    case 'shark':
+                    case 'spikes':
+                        if (player.takeDamage()) {
+                            game.playerDie();
+                        }
+                        break;
+                        
+                    case 'seaweed_trap':
+                        const dx = player.x - (this.x + this.width / 2);
+                        const dy = player.y - (this.y + this.height / 2);
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < this.grabRange) {
+                            player.velocityX *= (1 - this.grabStrength);
+                            player.velocityY *= (1 - this.grabStrength);
+                            
+                            player.velocityX -= dx * 0.02;
+                            player.velocityY -= dy * 0.02;
+                        }
+                        break;
+                        
+                    case 'current':
+                        player.velocityX += this.forceX * 0.1;
+                        player.velocityY += this.forceY * 0.1;
+                        break;
+                }
+            }
+            
+            render(ctx) {
+                ctx.save();
+                ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+                
+                switch (this.type) {
+                    case 'jellyfish':
+                        this.renderJellyfish(ctx);
+                        break;
+                    case 'shark':
+                        this.renderShark(ctx);
+                        break;
+                    case 'seaweed_trap':
+                        this.renderSeaweedTrap(ctx);
+                        break;
+                    case 'current':
+                        this.renderCurrent(ctx);
+                        break;
+                    case 'spikes':
+                        this.renderSpikes(ctx);
+                        break;
+                }
+                
+                ctx.restore();
+            }
+            
+            renderJellyfish(ctx) {
+                const pulse = Math.sin(this.animation * 3) * 0.1 + 0.9;
+                
+                ctx.scale(pulse, pulse);
+                
+                const gradient = ctx.createRadialGradient(0, -10, 0, 0, -10, 25);
+                gradient.addColorStop(0, 'rgba(255, 105, 180, 0.8)');
+                gradient.addColorStop(0.5, 'rgba(255, 20, 147, 0.6)');
+                gradient.addColorStop(1, 'rgba(199, 21, 133, 0.4)');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, -10, 25, 0, Math.PI, true);
+                ctx.fill();
+                
+                ctx.strokeStyle = 'rgba(255, 105, 180, 0.7)';
+                ctx.lineWidth = 3;
+                
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i / 6) * Math.PI;
+                    const x = Math.cos(angle) * 20;
+                    const tentacleWave = Math.sin(this.animation * 2 + i) * 5;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(x, 15);
+                    ctx.quadraticCurveTo(x + tentacleWave, 25, x + tentacleWave * 2, 35);
+                    ctx.stroke();
+                }
+            }
+            
+            renderShark(ctx) {
+                const swimOffset = Math.sin(this.animation * 4) * 2;
+                
+                ctx.scale(this.direction, 1);
+                ctx.translate(0, swimOffset);
+                
+                ctx.fillStyle = '#696969';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#545454';
+                ctx.beginPath();
+                ctx.moveTo(-10, -15);
+                ctx.lineTo(5, -25);
+                ctx.lineTo(15, -10);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.moveTo(-this.width / 2, 0);
+                ctx.lineTo(-this.width / 2 - 20, -15);
+                ctx.lineTo(-this.width / 2 - 15, 0);
+                ctx.lineTo(-this.width / 2 - 20, 15);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.fillStyle = 'red';
+                ctx.beginPath();
+                ctx.arc(15, -5, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = 'white';
+                for (let i = 0; i < 5; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(20 + i * 4, 0);
+                    ctx.lineTo(22 + i * 4, 8);
+                    ctx.lineTo(24 + i * 4, 0);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+            
+            renderSeaweedTrap(ctx) {
+                const sway = Math.sin(this.animation) * 0.2;
+                
+                ctx.strokeStyle = '#2E7D32';
+                ctx.lineWidth = 4;
+                
+                for (let i = 0; i < 3; i++) {
+                    const offsetX = (i - 1) * 10;
+                    const swayOffset = sway + (i * 0.3);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(offsetX, this.height / 2);
+                    
+                    for (let y = this.height / 2; y >= -this.height / 2; y -= 10) {
+                        const x = offsetX + Math.sin((y * 0.1) + swayOffset) * 8;
+                        ctx.lineTo(x, y);
+                    }
+                    
+                    ctx.stroke();
+                }
+                
+                ctx.fillStyle = '#388E3C';
+                for (let i = 0; i < 6; i++) {
+                    const y = (i / 6) * this.height - this.height / 2;
+                    const x = Math.sin((y * 0.1) + sway) * 8 + (Math.random() - 0.5) * 15;
+                    
+                    ctx.beginPath();
+                    ctx.ellipse(x, y, 4, 8, sway, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            renderCurrent(ctx) {
+                ctx.strokeStyle = 'rgba(64, 196, 255, 0.6)';
+                ctx.lineWidth = 2;
+                
+                for (let i = 0; i < 8; i++) {
+                    const y = (i / 8) * this.height - this.height / 2;
+                    const offset = Math.sin(this.animation * 2 + i * 0.5) * 10;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(-this.width / 2, y);
+                    ctx.lineTo(-this.width / 2 + 20 + offset, y);
+                    ctx.lineTo(-this.width / 2 + 40 + offset, y - 5);
+                    ctx.stroke();
+                }
+                
+                ctx.fillStyle = 'rgba(64, 196, 255, 0.4)';
+                for (let i = 0; i < 10; i++) {
+                    const x = (Math.sin(this.animation * 3 + i) * this.width / 2);
+                    const y = (i / 10) * this.height - this.height / 2;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            renderSpikes(ctx) {
+                ctx.fillStyle = '#424242';
+                
+                ctx.fillRect(-this.width / 2, 0, this.width, 10);
+                
+                ctx.fillStyle = '#616161';
+                const numSpikes = Math.floor(this.width / 10);
+                
+                for (let i = 0; i < numSpikes; i++) {
+                    const x = (i / numSpikes) * this.width - this.width / 2 + 5;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x + 5, -this.height);
+                    ctx.lineTo(x + 10, 0);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+        }
+
+        // Game Class
+        class Game {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.width = canvas.width;
+                this.height = canvas.height;
+                
+                this.state = 'start';
+                this.currentLevel = 1;
+                this.maxLevel = 10;
+                this.score = 0;
+                this.points = 0;
+                this.lives = 3;
+                this.maxLives = 3;
+                this.levelStartTime = 0;
+                this.totalTime = 0;
+                
+                this.camera = {
+                    x: 0,
+                    y: 0,
+                    followSpeed: 0.1
+                };
+                
+                this.player = null;
+                this.obstacles = [];
+                this.platforms = [];
+                this.collectibles = [];
+                this.particles = [];
+                this.backgroundElements = [];
+                
+                this.keys = {};
+                this.setupInput();
+                
+                this.particleSystem = new ParticleSystem();
+                this.initializeBackgroundElements();
+            }
+            
+            setupInput() {
+                document.addEventListener('keydown', (e) => {
+                    this.keys[e.code] = true;
+                    
+                    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+                        e.preventDefault();
+                    }
+                });
+                
+                document.addEventListener('keyup', (e) => {
+                    this.keys[e.code] = false;
+                });
+            }
+            
+            initializeBackgroundElements() {
+                for (let i = 0; i < 10; i++) {
+                    this.backgroundElements.push({
+                        type: 'seaweed',
+                        x: Math.random() * this.width * 3,
+                        y: this.height - 100 - Math.random() * 200,
+                        height: 80 + Math.random() * 40,
+                        sway: Math.random() * 0.02 + 0.01,
+                        time: Math.random() * Math.PI * 2
+                    });
+                }
+                
+                for (let i = 0; i < 5; i++) {
+                    this.backgroundElements.push({
+                        type: 'fish',
+                        x: Math.random() * this.width * 3,
+                        y: 100 + Math.random() * (this.height - 200),
+                        speed: 0.5 + Math.random() * 1,
+                        direction: Math.random() < 0.5 ? 1 : -1,
+                        size: 20 + Math.random() * 15,
+                        color: `hsl(${180 + Math.random() * 60}, 70%, 60%)`
+                    });
+                }
+            }
+            
+            startGame() {
+                this.state = 'playing';
+                this.currentLevel = 1;
+                this.score = 0;
+                this.points = parseInt(localStorage.getItem('seaObby_points') || '0');
+                this.lives = this.maxLives;
+                this.totalTime = 0;
+                this.loadLevel(this.currentLevel);
+            }
+            
+            loadLevel(levelNumber) {
+                this.levelStartTime = Date.now();
+                const levelData = LEVELS[levelNumber - 1];
+                
+                if (!levelData) {
+                    this.state = 'victory';
+                    return;
+                }
+                
+                this.obstacles = [];
+                this.platforms = [];
+                this.collectibles = [];
+                this.particles = [];
+                
+                this.player = new Player(levelData.playerStart.x, levelData.playerStart.y);
+                
+                // Apply shop upgrades to player
+                if (window.gameShop) {
+                    window.gameShop.applyEffectsToPlayer(this.player);
+                }
+                
+                levelData.platforms.forEach(platform => {
+                    this.platforms.push({
+                        x: platform.x,
+                        y: platform.y,
+                        width: platform.width,
+                        height: platform.height,
+                        type: platform.type || 'coral',
+                        moving: platform.moving || false,
+                        moveSpeed: platform.moveSpeed || 0,
+                        moveRange: platform.moveRange || 0,
+                        originalX: platform.x,
+                        direction: 1
+                    });
+                });
+                
+                levelData.obstacles.forEach(obstacle => {
+                    this.obstacles.push(new Obstacle(obstacle.x, obstacle.y, obstacle.type, obstacle.config));
+                });
+                
+                if (levelData.collectibles) {
+                    levelData.collectibles.forEach(collectible => {
+                        this.collectibles.push({
+                            x: collectible.x,
+                            y: collectible.y,
+                            type: collectible.type || 'pearl',
+                            collected: false,
+                            animation: 0
+                        });
+                    });
+                }
+                
+                this.camera.x = 0;
+                this.camera.y = 0;
+            }
+            
+            update(deltaTime) {
+                if (this.state !== 'playing') return;
+                
+                this.player.update(deltaTime, this.keys);
+                
+                const targetCameraX = this.player.x - this.width / 2;
+                const targetCameraY = this.player.y - this.height / 2;
+                
+                this.camera.x += (targetCameraX - this.camera.x) * this.camera.followSpeed;
+                this.camera.y += (targetCameraY - this.camera.y) * this.camera.followSpeed;
+                
+                this.camera.x = Math.max(0, Math.min(this.camera.x, this.width * 2 - this.width));
+                this.camera.y = Math.max(-200, Math.min(this.camera.y, 200));
+                
+                this.platforms.forEach(platform => {
+                    if (platform.moving) {
+                        platform.x += platform.moveSpeed * platform.direction;
+                        
+                        if (Math.abs(platform.x - platform.originalX) > platform.moveRange) {
+                            platform.direction *= -1;
+                        }
+                    }
+                });
+                
+                this.obstacles.forEach(obstacle => {
+                    obstacle.update(deltaTime);
+                });
+                
+                this.collectibles.forEach(collectible => {
+                    if (!collectible.collected) {
+                        collectible.animation += deltaTime * 0.005;
+                    }
+                });
+                
+                this.backgroundElements.forEach(element => {
+                    if (element.type === 'seaweed') {
+                        element.time += element.sway;
+                    } else if (element.type === 'fish') {
+                        element.x += element.speed * element.direction;
+                        
+                        if (element.direction > 0 && element.x > this.width * 3) {
+                            element.x = -50;
+                        } else if (element.direction < 0 && element.x < -50) {
+                            element.x = this.width * 3;
+                        }
+                    }
+                });
+                
+                this.particleSystem.update(deltaTime);
+                
+                this.checkCollisions();
+                
+                const currentLevelData = LEVELS[this.currentLevel - 1];
+                if (currentLevelData && this.player.x >= currentLevelData.goal.x && 
+                    this.player.y >= currentLevelData.goal.y - 50 && 
+                    this.player.y <= currentLevelData.goal.y + 50) {
+                    this.completeLevel();
+                }
+                
+                if (this.player.y > this.height + 100) {
+                    this.playerDie();
+                }
+            }
+            
+            checkCollisions() {
+                this.platforms.forEach(platform => {
+                    if (this.player.collidesWithRect(platform.x, platform.y, platform.width, platform.height)) {
+                        this.player.handlePlatformCollision(platform);
+                    }
+                });
+                
+                this.obstacles.forEach(obstacle => {
+                    if (obstacle.collidesWithPlayer(this.player)) {
+                        obstacle.handleCollision(this.player, this);
+                    }
+                });
+                
+                this.collectibles.forEach(collectible => {
+                    if (!collectible.collected) {
+                        const dx = this.player.x - collectible.x;
+                        const dy = this.player.y - collectible.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        const magnetRange = this.player.magnetRange || 25;
+                        
+                        if (distance < magnetRange) {
+                            collectible.collected = true;
+                            const basePoints = 100;
+                            const multiplier = this.player.pointMultiplier || 1;
+                            const pointsEarned = Math.floor(basePoints * multiplier);
+                            
+                            this.score += pointsEarned;
+                            this.points += Math.floor(pointsEarned / 10);
+                            
+                            // Save points to localStorage
+                            localStorage.setItem('seaObby_points', this.points.toString());
+                            
+                            this.particleSystem.createBurst(collectible.x, collectible.y, '#FFD700', 10);
+                        }
+                    }
+                });
+            }
+            
+            completeLevel() {
+                const levelTime = (Date.now() - this.levelStartTime) / 1000;
+                this.totalTime += levelTime;
+                
+                const timeBonus = Math.max(0, Math.floor((30 - levelTime) * 10));
+                const multiplier = this.player.pointMultiplier || 1;
+                const bonusPoints = Math.floor(timeBonus * multiplier);
+                
+                this.score += bonusPoints;
+                this.points += Math.floor(bonusPoints / 10);
+                
+                // Save points to localStorage
+                localStorage.setItem('seaObby_points', this.points.toString());
+                
+                if (this.currentLevel >= this.maxLevel) {
+                    this.state = 'victory';
+                } else {
+                    this.state = 'levelComplete';
+                }
+            }
+            
+            nextLevel() {
+                this.currentLevel++;
+                this.loadLevel(this.currentLevel);
+                this.state = 'playing';
+            }
+            
+            restartLevel() {
+                this.loadLevel(this.currentLevel);
+                this.state = 'playing';
+            }
+            
+            skipLevel() {
+                if (window.gameShop && window.gameShop.hasLevelSkips()) {
+                    if (window.gameShop.useLevelSkip()) {
+                        alert("Level skipped! Used 1 Level Skip Token.");
+                        this.nextLevel();
+                        return true;
+                    }
+                }
+                alert("No Level Skip Tokens available! Purchase them in the shop.");
+                return false;
+            }
+            
+            playerDie() {
+                this.lives--;
+                
+                this.particleSystem.createBurst(this.player.x, this.player.y, '#FF6B6B', 15);
+                
+                if (this.lives <= 0) {
+                    this.state = 'gameOver';
+                } else {
+                    const levelData = LEVELS[this.currentLevel - 1];
+                    this.player.x = levelData.playerStart.x;
+                    this.player.y = levelData.playerStart.y;
+                    this.player.velocityX = 0;
+                    this.player.velocityY = 0;
+                    this.player.invincible = false;
+                    this.player.invincibilityTimer = 0;
+                }
+            }
+            
+            render() {
+                this.ctx.fillStyle = 'rgba(13, 71, 161, 0.1)';
+                this.ctx.fillRect(0, 0, this.width, this.height);
+                
+                this.ctx.save();
+                this.ctx.translate(-this.camera.x, -this.camera.y);
+                
+                this.renderBackground();
+                
+                this.platforms.forEach(platform => {
+                    this.renderPlatform(platform);
+                });
+                
+                this.collectibles.forEach(collectible => {
+                    if (!collectible.collected) {
+                        this.renderCollectible(collectible);
+                    }
+                });
+                
+                this.obstacles.forEach(obstacle => {
+                    obstacle.render(this.ctx);
+                });
+                
+                if (this.player) {
+                    this.player.render(this.ctx);
+                }
+                
+                const currentLevelData = LEVELS[this.currentLevel - 1];
+                if (currentLevelData) {
+                    this.renderGoal(currentLevelData.goal);
+                }
+                
+                this.particleSystem.render(this.ctx);
+                
+                this.ctx.restore();
+                
+                this.renderWaveEffect();
+            }
+            
+            renderBackground() {
+                this.backgroundElements.forEach(element => {
+                    if (element.type === 'seaweed') {
+                        const swayOffset = Math.sin(element.time) * 10;
+                        
+                        this.ctx.strokeStyle = '#2E7D32';
+                        this.ctx.lineWidth = 3;
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(element.x, element.y);
+                        this.ctx.quadraticCurveTo(
+                            element.x + swayOffset,
+                            element.y - element.height / 2,
+                            element.x + swayOffset * 2,
+                            element.y - element.height
+                        );
+                        this.ctx.stroke();
+                    } else if (element.type === 'fish') {
+                        this.ctx.fillStyle = element.color;
+                        this.ctx.beginPath();
+                        this.ctx.ellipse(element.x, element.y, element.size, element.size * 0.6, 0, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(element.x - element.size, element.y);
+                        this.ctx.lineTo(element.x - element.size * 1.5, element.y - element.size * 0.3);
+                        this.ctx.lineTo(element.x - element.size * 1.5, element.y + element.size * 0.3);
+                        this.ctx.closePath();
+                        this.ctx.fill();
+                    }
+                });
+            }
+            
+            renderPlatform(platform) {
+                this.ctx.fillStyle = this.getPlatformColor(platform.type);
+                this.ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+                
+                this.ctx.fillStyle = this.getPlatformAccentColor(platform.type);
+                this.ctx.fillRect(platform.x, platform.y, platform.width, 5);
+                
+                for (let i = 0; i < platform.width; i += 20) {
+                    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                    this.ctx.fillRect(platform.x + i, platform.y + 5, 2, platform.height - 10);
+                }
+            }
+            
+            getPlatformColor(type) {
+                switch (type) {
+                    case 'coral': return '#FF6B9D';
+                    case 'rock': return '#546E7A';
+                    case 'crate': return '#8D6E63';
+                    default: return '#FF6B9D';
+                }
+            }
+            
+            getPlatformAccentColor(type) {
+                switch (type) {
+                    case 'coral': return '#FF8A80';
+                    case 'rock': return '#607D8B';
+                    case 'crate': return '#A1887F';
+                    default: return '#FF8A80';
+                }
+            }
+            
+            renderCollectible(collectible) {
+                const bounce = Math.sin(collectible.animation) * 5;
+                const glow = Math.sin(collectible.animation * 2) * 0.3 + 0.7;
+                
+                this.ctx.save();
+                this.ctx.translate(collectible.x, collectible.y + bounce);
+                this.ctx.scale(glow, glow);
+                
+                const gradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, 15);
+                gradient.addColorStop(0, '#FFD700');
+                gradient.addColorStop(0.5, '#FFA000');
+                gradient.addColorStop(1, '#FF8F00');
+                
+                this.ctx.fillStyle = gradient;
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, 12, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                this.ctx.beginPath();
+                this.ctx.arc(-4, -4, 4, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.restore();
+            }
+            
+            renderGoal(goal) {
+                const time = Date.now() * 0.001;
+                const pulse = Math.sin(time * 2) * 0.2 + 0.8;
+                
+                this.ctx.save();
+                this.ctx.translate(goal.x, goal.y);
+                this.ctx.scale(pulse, pulse);
+                
+                const gradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, 40);
+                gradient.addColorStop(0, 'rgba(0, 255, 255, 0.8)');
+                gradient.addColorStop(0.5, 'rgba(0, 188, 212, 0.6)');
+                gradient.addColorStop(1, 'rgba(0, 188, 212, 0.1)');
+                
+                this.ctx.fillStyle = gradient;
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, 35, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.fillStyle = '#00FFFF';
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, 15, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.restore();
+            }
+            
+            renderWaveEffect() {
+                const time = Date.now() * 0.001;
+                
+                this.ctx.save();
+                this.ctx.globalAlpha = 0.1;
+                
+                for (let i = 0; i < 3; i++) {
+                    this.ctx.strokeStyle = '#00BCD4';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    
+                    for (let x = 0; x <= this.width; x += 5) {
+                        const y = Math.sin((x * 0.01) + (time * 2) + (i * 0.5)) * 20 + (this.height * 0.1) + (i * 10);
+                        
+                        if (x === 0) {
+                            this.ctx.moveTo(x, y);
+                        } else {
+                            this.ctx.lineTo(x, y);
+                        }
+                    }
+                    
+                    this.ctx.stroke();
+                }
+                
+                this.ctx.restore();
+            }
+        }
+
+        // UI Manager
+        class UIManager {
+            constructor(game) {
+                this.game = game;
+                this.initializeElements();
+                this.bindEvents();
+            }
+            
+            initializeElements() {
+                this.startScreen = document.getElementById('startScreen');
+                this.gameHUD = document.getElementById('gameHUD');
+                this.levelCompleteScreen = document.getElementById('levelCompleteScreen');
+                this.gameOverScreen = document.getElementById('gameOverScreen');
+                this.victoryScreen = document.getElementById('victoryScreen');
+                
+                this.currentLevelElement = document.getElementById('currentLevel');
+                this.scoreDisplayElement = document.getElementById('scoreDisplay');
+                this.pointsDisplayElement = document.getElementById('pointsDisplay');
+                this.healthFillElement = document.getElementById('healthFill');
+                
+                this.levelTimeElement = document.getElementById('levelTime');
+                this.levelScoreElement = document.getElementById('levelScore');
+                this.levelPointsElement = document.getElementById('levelPoints');
+                this.totalPointsElement = document.getElementById('totalPoints');
+                this.factTextElement = document.getElementById('factText');
+                
+                this.gameOverPointsElement = document.getElementById('gameOverPoints');
+                
+                this.finalScoreElement = document.getElementById('finalScore');
+                this.totalTimeElement = document.getElementById('totalTime');
+                this.victoryPointsElement = document.getElementById('victoryPoints');
+                this.discountAmountElement = document.getElementById('discountAmount');
+                
+                this.startBtn = document.getElementById('startBtn');
+                this.nextLevelBtn = document.getElementById('nextLevelBtn');
+                this.redeemPointsBtn = document.getElementById('redeemPointsBtn');
+                this.restartLevelBtn = document.getElementById('restartLevelBtn');
+                this.retryBtn = document.getElementById('retryBtn');
+                this.redeemPointsBtnGameOver = document.getElementById('redeemPointsBtnGameOver');
+                this.mainMenuBtn = document.getElementById('mainMenuBtn');
+                this.playAgainBtn = document.getElementById('playAgainBtn');
+                this.redeemPointsBtnVictory = document.getElementById('redeemPointsBtnVictory');
+            }
+            
+            bindEvents() {
+                this.startBtn.addEventListener('click', () => {
+                    this.game.startGame();
+                    this.showScreen('gameHUD');
+                });
+                
+                this.nextLevelBtn.addEventListener('click', () => {
+                    this.game.nextLevel();
+                    this.showScreen('gameHUD');
+                });
+                
+                this.redeemPointsBtn.addEventListener('click', () => {
+                    this.redeemPoints();
+                });
+                
+                this.restartLevelBtn.addEventListener('click', () => {
+                    this.game.restartLevel();
+                    this.showScreen('gameHUD');
+                });
+                
+                this.retryBtn.addEventListener('click', () => {
+                    this.game.restartLevel();
+                    this.showScreen('gameHUD');
+                });
+                
+                this.redeemPointsBtnGameOver.addEventListener('click', () => {
+                    this.redeemPoints();
+                });
+                
+                this.mainMenuBtn.addEventListener('click', () => {
+                    this.game.state = 'start';
+                    this.showScreen('startScreen');
+                });
+                
+                this.playAgainBtn.addEventListener('click', () => {
+                    this.game.startGame();
+                    this.showScreen('gameHUD');
+                });
+                
+                this.redeemPointsBtnVictory.addEventListener('click', () => {
+                    this.redeemPoints();
+                });
+
+                // Add Level Skip functionality
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'KeyS' && e.shiftKey && this.game.state === 'playing') {
+                        this.game.skipLevel();
+                    }
+                });
+            }
+            
+            showScreen(screenName) {
+                document.querySelectorAll('.screen').forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                
+                if (screenName === 'gameHUD') {
+                    this.gameHUD.classList.add('active');
+                } else {
+                    document.getElementById(screenName).classList.add('active');
+                }
+            }
+            
+            updateHUD() {
+                if (this.game.state === 'playing') {
+                    this.currentLevelElement.textContent = `Level ${this.game.currentLevel}`;
+                    
+                    this.scoreDisplayElement.textContent = `Score: ${this.game.score}`;
+                    this.pointsDisplayElement.textContent = `Points: ${this.game.points}`;
+                    
+                    const healthPercentage = (this.game.lives / this.game.maxLives) * 100;
+                    this.healthFillElement.style.width = `${healthPercentage}%`;
+                    
+                    if (healthPercentage > 66) {
+                        this.healthFillElement.style.background = 'linear-gradient(90deg, #4caf50, #8bc34a)';
+                    } else if (healthPercentage > 33) {
+                        this.healthFillElement.style.background = 'linear-gradient(90deg, #ff9800, #ffc107)';
+                    } else {
+                        this.healthFillElement.style.background = 'linear-gradient(90deg, #f44336, #e57373)';
+                    }
+                }
+            }
+            
+            showLevelComplete() {
+                const levelTime = ((Date.now() - this.game.levelStartTime) / 1000).toFixed(1);
+                const levelPoints = Math.floor(this.game.score / 10);
+                
+                this.levelTimeElement.textContent = levelTime;
+                this.levelScoreElement.textContent = this.game.score;
+                this.levelPointsElement.textContent = levelPoints;
+                this.totalPointsElement.textContent = this.game.points;
+                
+                const factIndex = Math.min(this.game.currentLevel - 1, OCEAN_FACTS.length - 1);
+                this.factTextElement.textContent = OCEAN_FACTS[factIndex];
+                
+                if (this.game.currentLevel >= this.game.maxLevel) {
+                    this.nextLevelBtn.style.display = 'none';
+                } else {
+                    this.nextLevelBtn.style.display = 'inline-block';
+                }
+                
+                this.showScreen('levelCompleteScreen');
+            }
+            
+            showGameOver() {
+                this.gameOverPointsElement.textContent = this.game.points;
+                this.showScreen('gameOverScreen');
+            }
+            
+            showVictory() {
+                this.finalScoreElement.textContent = this.game.score;
+                this.totalTimeElement.textContent = (this.game.totalTime).toFixed(1);
+                this.victoryPointsElement.textContent = this.game.points;
+                this.discountAmountElement.textContent = Math.floor(this.game.points / 10);
+                
+                this.showScreen('victoryScreen');
+            }
+            
+            redeemPoints() {
+                if (this.game.points >= 10) {
+                    const discountAmount = Math.floor(this.game.points / 10);
+                    const remainingPoints = this.game.points % 10;
+                    
+                    // Store in localStorage
+                    let redeemedDiscounts = localStorage.getItem('seaObbyDiscounts') || 0;
+                    redeemedDiscounts = parseInt(redeemedDiscounts) + discountAmount;
+                    localStorage.setItem('seaObbyDiscounts', redeemedDiscounts);
+                    
+                    // Update game points
+                    this.game.points = remainingPoints;
+                    localStorage.setItem('seaObby_points', this.game.points.toString());
+                    
+                    // Update UI
+                    if (this.game.state === 'levelComplete') {
+                        this.totalPointsElement.textContent = this.game.points;
+                    } else if (this.game.state === 'gameOver') {
+                        this.gameOverPointsElement.textContent = this.game.points;
+                    } else if (this.game.state === 'victory') {
+                        this.victoryPointsElement.textContent = this.game.points;
+                        this.discountAmountElement.textContent = Math.floor(this.game.points / 10);
+                    }
+                    
+                    if (window.gameShop) {
+                        window.gameShop.updatePointsDisplays();
+                    }
+                    
+                    alert(`You've redeemed ${discountAmount} discount points ($${discountAmount} off)! Total discounts: $${redeemedDiscounts}`);
+                } else {
+                    alert("You need at least 10 points to redeem a discount!");
+                }
+            }
+            
+            update() {
+                switch (this.game.state) {
+                    case 'playing':
+                        this.updateHUD();
+                        break;
+                    case 'levelComplete':
+                        this.showLevelComplete();
+                        this.game.state = 'waiting';
+                        break;
+                    case 'gameOver':
+                        this.showGameOver();
+                        this.game.state = 'waiting';
+                        break;
+                    case 'victory':
+                        this.showVictory();
+                        this.game.state = 'waiting';
+                        break;
+                }
+            }
+        }
+
+        // Main Game Loop
+        let game;
+        let gameShop;
+        let uiManager;
+        let lastTime = 0;
+
+        function init() {
+            const canvas = document.getElementById('gameCanvas');
+            
+            resizeCanvas(canvas);
+            window.addEventListener('resize', () => resizeCanvas(canvas));
+            
+            game = new Game(canvas);
+            window.game = game;
+            
+            gameShop = new GameShop();
+            window.gameShop = gameShop;
+            
+            uiManager = new UIManager(game);
+            window.uiManager = uiManager;
+            
+            // Update points display on start screen
+            document.getElementById('startScreenPoints').textContent = localStorage.getItem('seaObby_points') || '0';
+            
+            gameLoop(0);
+        }
+
+        function resizeCanvas(canvas) {
+            const container = document.getElementById('gameContainer');
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+            
+            const targetWidth = 1200;
+            const targetHeight = 600;
+            const scaleX = containerWidth / targetWidth;
+            const scaleY = containerHeight / targetHeight;
+            const scale = Math.min(scaleX, scaleY, 1);
+            
+            canvas.style.width = (targetWidth * scale) + 'px';
+            canvas.style.height = (targetHeight * scale) + 'px';
+        }
+
+        function gameLoop(currentTime) {
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+            
+            game.update(deltaTime);
+            uiManager.update();
+            game.render();
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+        
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && game.state === 'playing') {
+                game.state = 'paused';
+            }
+        });
+    </script>
+</body>
+</html>

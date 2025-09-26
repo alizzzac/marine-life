@@ -1,0 +1,3158 @@
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Ocean Times - Interactive Edition</title>
+    <link rel="shortcut icon" href="logo.jpg" type="image/jpeg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* CSS Custom Properties for Responsive Design */
+        :root {
+            --deep-blue: #051937;
+            --electric-aqua: #00f9ff;
+            --neon-seafoam: #6fffe9;
+            --coral-pink: #ff6b6b;
+            --sunlight-yellow: #fffac2;
+            --purple-depth: #9d4edd;
+            --ocean-teal: #00c9b7;
+            
+            /* Responsive spacing system */
+            --spacing-xs: clamp(0.25rem, 0.5vw, 0.5rem);
+            --spacing-sm: clamp(0.5rem, 1vw, 1rem);
+            --spacing-md: clamp(1rem, 2vw, 1.5rem);
+            --spacing-lg: clamp(1.5rem, 3vw, 2.5rem);
+            --spacing-xl: clamp(2rem, 4vw, 4rem);
+            --spacing-2xl: clamp(3rem, 6vw, 6rem);
+            
+            /* Responsive font sizes - improved for better readability */
+            --font-xs: clamp(0.7rem, 2vw, 0.8rem);
+            --font-sm: clamp(0.8rem, 2.5vw, 0.95rem);
+            --font-base: clamp(0.95rem, 3vw, 1.1rem);
+            --font-lg: clamp(1.1rem, 3.5vw, 1.3rem);
+            --font-xl: clamp(1.3rem, 4vw, 1.6rem);
+            --font-2xl: clamp(1.5rem, 5vw, 2rem);
+            --font-3xl: clamp(1.8rem, 6vw, 2.5rem);
+            --font-4xl: clamp(2.2rem, 8vw, 3.5rem);
+            
+            /* Container widths */
+            --container-sm: 640px;
+            --container-md: 768px;
+            --container-lg: 1024px;
+            --container-xl: 1280px;
+            --container-2xl: 1536px;
+            
+            /* Touch targets */
+            --touch-target: 44px;
+            
+            /* Animation control for reduced motion preference */
+            --anim-duration: 0.4s;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            :root {
+                --anim-duration: 0.01ms;
+            }
+        }
+
+        /* Enhanced Navigation Styles - FIXED */
+        .hamburger-menu {
+            position: fixed;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .hamburger-btn {
+            width: var(--touch-target);
+            height: var(--touch-target);
+            border-radius: 50%;
+            background: var(--electric-aqua);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            transition: all var(--anim-duration) ease;
+            z-index: 10001;
+            border: none;
+            outline: none;
+        }
+
+        .hamburger-btn:hover, .hamburger-btn:focus {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 249, 255, 0.6);
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: clamp(18px, 4vw, 24px);
+            height: 3px;
+            margin: 2px 0;
+            background: white;
+            border-radius: 3px;
+            transition: all var(--anim-duration) ease;
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .hamburger-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: min(85vw, 300px);
+            height: 100vh;
+            background: rgba(5, 20, 35, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            transition: right var(--anim-duration) ease;
+            padding: calc(var(--touch-target) + var(--spacing-lg)) var(--spacing-md) var(--spacing-md);
+            overflow-y: auto;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.4);
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+
+        .hamburger-nav.active {
+            right: 0;
+        }
+
+        .hamburger-tabs {
+            list-style: none;
+            width: 100%;
+        }
+
+        .hamburger-tab {
+            width: 100%;
+            margin-bottom: var(--spacing-xs);
+            overflow: hidden;
+            transition: all var(--anim-duration) ease;
+            border-radius: 10px;
+        }
+
+        .hamburger-tab a {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md);
+            text-decoration: none;
+            color: white;
+            position: relative;
+            z-index: 2;
+            transition: all var(--anim-duration) ease;
+            min-height: var(--touch-target);
+        }
+
+        .hamburger-tab a i {
+            font-size: var(--font-xl);
+            width: 40px;
+            text-align: center;
+            transition: all var(--anim-duration) ease;
+        }
+
+        .hamburger-tab a span {
+            margin-left: var(--spacing-md);
+            font-size: var(--font-base);
+            font-weight: 600;
+        }
+
+        .hamburger-tab:hover {
+            transform: translateX(-5px);
+        }
+
+        /* Tab colors */
+        .tab1 { background: var(--electric-aqua); }
+        .tab2 { background: var(--neon-seafoam); }
+        .tab3 { background: var(--coral-pink); }
+        .tab4 { background: #ffcc33; }
+        .tab5 { background: var(--purple-depth); }
+        .tab6 { background: #4776e6; }
+        .tab7 { background: var(--ocean-teal); }
+        .tab8 { background: #ff5e62; }
+        .tab9 { background: #dd1f1f; }
+        .tab10 { background: #ff4757; }
+
+        .hamburger-tab.active {
+            box-shadow: inset 5px 0 0 rgba(255, 255, 255, 0.5);
+        }
+
+        /* Video Loader Styles */
+        #video-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #001f3f;
+            z-index: 9998;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease-out, visibility 1s ease-out;
+        }
+
+        #video-loader video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+        }
+
+        .loader-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: white;
+            padding: var(--spacing-md);
+        }
+
+        .loading-spinner {
+            width: clamp(60px, 15vw, 80px);
+            height: clamp(60px, 15vw, 80px);
+            border: 8px solid rgba(127, 219, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #7FDBFF;
+            animation: spin 1.5s linear infinite;
+            margin: 0 auto var(--spacing-md);
+        }
+
+        .loader-text {
+            font-size: var(--font-lg);
+            color: #7FDBFF;
+            text-shadow: 0 0 10px rgba(127, 219, 255, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            background: linear-gradient(135deg, #001f3f 0%, #003459 25%, #004876 50%, #0074D9 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-top: calc(var(--touch-target) + var(--spacing-lg));
+            font-size: var(--font-base);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1516370873344-fb7c61054fa9?q=80&w=1471&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: min(95vw, var(--container-2xl));
+            margin: 0 auto;
+            padding: var(--spacing-md);
+            background: linear-gradient(135deg, rgba(0, 31, 63, 0.95), rgba(0, 52, 89, 0.85));
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            border-radius: clamp(10px, 3vw, 20px);
+            position: relative;
+            z-index: 1;
+            margin-top: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            border: 2px solid rgba(127, 219, 255, 0.3);
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+            align-items: center;
+            text-align: center;
+            padding: var(--spacing-xl) 0;
+            border-bottom: 3px solid #0074D9;
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #7FDBFF, #0074D9, #39CCCC, #7FDBFF);
+            animation: shimmer 4s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.6; transform: translateX(-100%); }
+            50% { opacity: 1; transform: translateX(100%); }
+        }
+
+        .logo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-md);
+            text-align: center;
+        }
+
+        .logo-icon {
+            font-size: var(--font-4xl);
+            color: #7FDBFF;
+            text-shadow: 0 0 30px rgba(127, 219, 255, 0.8);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-8px) rotate(2deg); }
+            50% { transform: translateY(-15px) rotate(0deg); }
+            75% { transform: translateY(-8px) rotate(-2deg); }
+        }
+
+        .logo {
+            font-size: var(--font-3xl);
+            font-weight: bold;
+            color: #7FDBFF;
+            text-shadow: 0 0 20px rgba(127, 219, 255, 0.6);
+            background: linear-gradient(45deg, #7FDBFF, #39CCCC, #0074D9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes textGlow {
+            from { filter: drop-shadow(0 0 10px rgba(127, 219, 255, 0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(127, 219, 255, 0.8)); }
+        }
+
+        .subtitle {
+            font-size: var(--font-base);
+            color: #39CCCC;
+            opacity: 0.9;
+            margin-top: var(--spacing-sm);
+            font-style: italic;
+        }
+
+        .date-time {
+            text-align: center;
+            font-size: var(--font-sm);
+            color: #7FDBFF;
+            background: rgba(0, 116, 217, 0.3);
+            padding: var(--spacing-md);
+            border-radius: 15px;
+            border: 2px solid rgba(127, 219, 255, 0.4);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 116, 217, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .live-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #FF4136;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            margin-right: var(--spacing-sm);
+            box-shadow: 0 0 10px rgba(255, 65, 54, 0.6);
+        }
+
+        .breaking-news {
+            background: linear-gradient(135deg, #FF4136, #DC143C, #B22222);
+            padding: var(--spacing-lg);
+            border-radius: 15px;
+            margin-bottom: var(--spacing-xl);
+            animation: newsFlash 4s infinite;
+            display: none;
+            box-shadow: 0 10px 30px rgba(255, 65, 54, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .breaking-news::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: newsSlide 3s infinite;
+        }
+
+        @keyframes newsSlide {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes newsFlash {
+            0%, 100% { opacity: 0.9; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); box-shadow: 0 15px 40px rgba(255, 65, 54, 0.7); }
+        }
+
+        .breaking-news h3 {
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--spacing-md);
+            font-size: var(--font-lg);
+            font-weight: bold;
+        }
+
+        .breaking-news .news-ticker {
+            font-size: var(--font-sm);
+            margin-top: var(--spacing-sm);
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+
+        .ocean-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+            gap: var(--spacing-md);
+            background: rgba(0, 116, 217, 0.2);
+            padding: var(--spacing-lg);
+            border-radius: 20px;
+            margin-bottom: var(--spacing-xl);
+            border: 2px solid rgba(127, 219, 255, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 116, 217, 0.2);
+        }
+
+        .stat {
+            text-align: center;
+            padding: var(--spacing-lg);
+            background: rgba(0, 52, 89, 0.6);
+            border-radius: 15px;
+            transition: all var(--anim-duration) ease;
+            border: 2px solid rgba(127, 219, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(127, 219, 255, 0.2), transparent);
+            transition: left var(--anim-duration);
+        }
+
+        .stat:hover::before, .stat:focus::before {
+            left: 100%;
+        }
+
+        .stat:hover, .stat:focus {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 116, 217, 0.4);
+            border-color: rgba(127, 219, 255, 0.6);
+        }
+
+        .stat-value {
+            font-size: var(--font-xl);
+            font-weight: bold;
+            color: #7FDBFF;
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            text-shadow: 0 0 10px rgba(127, 219, 255, 0.5);
+        }
+
+        .stat-label {
+            font-size: var(--font-sm);
+            opacity: 0.9;
+            color: #39CCCC;
+            font-weight: 500;
+        }
+
+        .trend-indicator {
+            font-size: var(--font-xs);
+            padding: 4px 8px;
+            border-radius: 15px;
+            margin-left: var(--spacing-xs);
+            font-weight: bold;
+            animation: trendPulse 2s infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes trendPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .trend-up { background: #2ECC40; color: white; }
+        .trend-down { background: #FF4136; color: white; }
+        .trend-stable { background: #FFDC00; color: #001f3f; }
+
+        .navigation-tabs {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+            flex-wrap: wrap;
+            justify-content: center;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-tab {
+            background: rgba(0, 52, 89, 0.7);
+            color: #7FDBFF;
+            border: 2px solid rgba(127, 219, 255, 0.3);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all var(--anim-duration) ease;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-sm);
+            font-weight: 500;
+            backdrop-filter: blur(5px);
+            min-height: var(--touch-target);
+            flex: 1;
+            min-width: max-content;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover, .nav-tab:focus {
+            background: rgba(0, 116, 217, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 116, 217, 0.3);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #0074D9, #39CCCC);
+            color: white;
+            box-shadow: 0 10px 25px rgba(0, 116, 217, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-xl);
+        }
+
+        .articles {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xl);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn var(--anim-duration) ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .article {
+            background: rgba(0, 52, 89, 0.8);
+            padding: var(--spacing-xl);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            transition: all var(--anim-duration) ease;
+            border: 2px solid rgba(127, 219, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .article::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #7FDBFF, #39CCCC, #0074D9, #7FDBFF);
+            background-size: 200% 100%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .article:hover, .article:focus-within {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 60px rgba(0, 116, 217, 0.4);
+            border-color: rgba(127, 219, 255, 0.6);
+        }
+
+        .article-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            align-items: center;
+        }
+
+        .article-category {
+            background: linear-gradient(135deg, #39CCCC, #0074D9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: var(--font-xs);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .article-info {
+            color: #7FDBFF;
+            font-size: var(--font-sm);
+            opacity: 0.9;
+        }
+
+        .article h2 {
+            color: #7FDBFF;
+            margin: 0 0 var(--spacing-lg) 0;
+            font-size: var(--font-2xl);
+            line-height: 1.3;
+            text-shadow: 0 0 10px rgba(127, 219, 255, 0.3);
+        }
+
+        .featured-image {
+            margin: var(--spacing-lg) 0;
+            overflow: hidden;
+            border-radius: 15px;
+            height: clamp(200px, 40vw, 280px);
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .featured-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .article:hover .featured-image img {
+            transform: scale(1.1);
+        }
+
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            padding: var(--spacing-lg);
+            color: white;
+            font-size: var(--font-sm);
+        }
+
+        .article-content {
+            color: #E6E6E6;
+            line-height: 1.8;
+            margin-bottom: var(--spacing-lg);
+            font-size: var(--font-base);
+        }
+
+        .article-content ul {
+            margin: var(--spacing-md) 0;
+            padding-left: var(--spacing-lg);
+        }
+
+        .article-content li {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .article-content h4 {
+            color: #7FDBFF;
+            margin: var(--spacing-lg) 0 var(--spacing-md) 0;
+            font-size: var(--font-lg);
+        }
+
+        .article-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--spacing-lg) 0;
+            background: rgba(0, 116, 217, 0.15);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            font-size: var(--font-sm);
+        }
+
+        .article-content th,
+        .article-content td {
+            padding: var(--spacing-md);
+            text-align: left;
+            border-bottom: 1px solid rgba(127, 219, 255, 0.2);
+        }
+
+        .article-content th {
+            background: rgba(0, 116, 217, 0.4);
+            color: #7FDBFF;
+            font-weight: bold;
+        }
+
+        .fact-box {
+            background: linear-gradient(135deg, rgba(0, 116, 217, 0.4), rgba(57, 204, 204, 0.3));
+            padding: var(--spacing-lg);
+            border-left: 5px solid #7FDBFF;
+            border-radius: 10px;
+            margin: var(--spacing-lg) 0;
+            font-style: italic;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 116, 217, 0.2);
+        }
+
+        .fact-box::before {
+            content: '💡';
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            font-size: var(--font-xl);
+            animation: factGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes factGlow {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .article-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-lg);
+        }
+
+        .tag {
+            background: rgba(0, 116, 217, 0.4);
+            color: #7FDBFF;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: var(--font-xs);
+            border: 1px solid rgba(127, 219, 255, 0.3);
+            transition: all var(--anim-duration) ease;
+        }
+
+        .tag:hover {
+            background: rgba(0, 116, 217, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xl);
+        }
+
+        .widget {
+            background: rgba(0, 52, 89, 0.8);
+            padding: var(--spacing-lg);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            transition: all var(--anim-duration) ease;
+            border: 2px solid rgba(127, 219, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .widget:hover, .widget:focus-within {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 116, 217, 0.3);
+            border-color: rgba(127, 219, 255, 0.5);
+        }
+
+        .widget h3 {
+            color: #7FDBFF;
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-lg);
+            text-shadow: 0 0 10px rgba(127, 219, 255, 0.3);
+        }
+
+        .weather-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-lg);
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .weather-icon {
+            font-size: var(--font-3xl);
+            color: #FFDC00;
+            text-shadow: 0 0 15px rgba(255, 220, 0, 0.6);
+            animation: weatherFloat 3s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes weatherFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .weather-temp {
+            font-size: var(--font-3xl);
+            font-weight: bold;
+            color: #7FDBFF;
+            margin-bottom: var(--spacing-sm);
+            text-shadow: 0 0 15px rgba(127, 219, 255, 0.5);
+        }
+
+        .weather-desc {
+            color: #39CCCC;
+            font-size: var(--font-lg);
+            margin-bottom: var(--spacing-lg);
+            font-weight: 500;
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
+            gap: var(--spacing-md);
+            font-size: var(--font-sm);
+        }
+
+        .weather-detail {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            background: rgba(0, 116, 217, 0.3);
+            border-radius: 8px;
+            transition: all var(--anim-duration) ease;
+        }
+
+        .weather-detail:hover, .weather-detail:focus {
+            background: rgba(0, 116, 217, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .weather-detail i {
+            color: #7FDBFF;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) calc(var(--spacing-md) * 3);
+            background: rgba(0, 116, 217, 0.3);
+            border: 2px solid rgba(127, 219, 255, 0.4);
+            border-radius: 30px;
+            color: white;
+            font-size: var(--font-base);
+            transition: all var(--anim-duration) ease;
+            min-height: var(--touch-target);
+        }
+
+        .search-input::placeholder {
+            color: rgba(127, 219, 255, 0.7);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #7FDBFF;
+            box-shadow: 0 0 20px rgba(127, 219, 255, 0.4);
+            background: rgba(0, 116, 217, 0.4);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7FDBFF;
+            font-size: var(--font-lg);
+        }
+
+        .marine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
+            gap: var(--spacing-md);
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .marine-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .marine-grid::-webkit-scrollbar-track {
+            background: rgba(0, 116, 217, 0.2);
+            border-radius: 4px;
+        }
+
+        .marine-grid::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #7FDBFF, #39CCCC);
+            border-radius: 4px;
+        }
+
+        .marine-grid::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #39CCCC, #0074D9);
+        }
+
+        .marine-item {
+            background: rgba(0, 116, 217, 0.3);
+            padding: var(--spacing-md);
+            border-radius: 15px;
+            text-align: center;
+            transition: all var(--anim-duration) ease;
+            cursor: pointer;
+            border: 2px solid rgba(127, 219, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            min-height: var(--touch-target);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .marine-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(127, 219, 255, 0.2), transparent);
+            transition: left var(--anim-duration);
+        }
+
+        .marine-item:hover::before, .marine-item:focus::before {
+            left: 100%;
+        }
+
+        .marine-item:hover, .marine-item:focus {
+            background: rgba(0, 116, 217, 0.5);
+            transform: scale(1.08);
+            box-shadow: 0 15px 30px rgba(0, 116, 217, 0.4);
+            border-color: rgba(127, 219, 255, 0.6);
+        }
+
+        .marine-emoji {
+            font-size: var(--font-3xl);
+            margin-bottom: var(--spacing-sm);
+            display: block;
+            animation: marineFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes marineFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-3px) rotate(2deg); }
+        }
+
+        .marine-name {
+            font-weight: bold;
+            color: white;
+            margin-bottom: var(--spacing-xs);
+            font-size: var(--font-sm);
+        }
+
+        .marine-fact {
+            font-size: var(--font-xs);
+            color: #7FDBFF;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .depth-meter-container {
+            text-align: center;
+        }
+
+        .depth-meter {
+            height: clamp(200px, 50vw, 350px);
+            width: clamp(60px, 12vw, 90px);
+            background: linear-gradient(to bottom, 
+                #7FDBFF 0%, 
+                #39CCCC 20%, 
+                #0074D9 40%, 
+                #003459 60%, 
+                #001f3f 80%, 
+                #000 100%);
+            border-radius: 45px;
+            position: relative;
+            overflow: hidden;
+            margin: var(--spacing-lg) auto;
+            box-shadow: 
+                inset 0 0 30px rgba(0, 0, 0, 0.6), 
+                0 0 30px rgba(127, 219, 255, 0.4);
+            border: 3px solid rgba(127, 219, 255, 0.5);
+        }
+
+        .depth-indicator {
+            position: absolute;
+            width: 85%;
+            height: 15px;
+            background: linear-gradient(90deg, #FF4136, #FF851B, #FFDC00);
+            border-radius: 8px;
+            transition: top 3s ease-in-out;
+            left: 7.5%;
+            box-shadow: 0 0 15px rgba(255, 65, 54, 0.8);
+            animation: indicatorPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes indicatorPulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 65, 54, 0.8); }
+            50% { box-shadow: 0 0 25px rgba(255, 65, 54, 1); }
+        }
+
+        .depth-labels {
+            display: flex;
+            justify-content: space-between;
+            width: clamp(60px, 12vw, 90px);
+            margin: var(--spacing-md) auto 0;
+            font-size: var(--font-xs);
+            color: #7FDBFF;
+        }
+
+        .depth-info {
+            margin-top: var(--spacing-md);
+            text-align: center;
+        }
+
+        .current-depth {
+            font-size: var(--font-2xl);
+            font-weight: bold;
+            color: #7FDBFF;
+            text-shadow: 0 0 10px rgba(127, 219, 255, 0.5);
+        }
+
+        .depth-zone {
+            font-size: var(--font-base);
+            color: #39CCCC;
+            margin-top: var(--spacing-sm);
+            font-weight: 500;
+        }
+
+        .research-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .research-section h4 {
+            color: #7FDBFF;
+            margin-bottom: var(--spacing-md);
+            font-size: var(--font-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            text-shadow: 0 0 10px rgba(127, 219, 255, 0.3);
+        }
+
+        .data-grid {
+            display: grid;
+            gap: var(--spacing-sm);
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md);
+            background: rgba(0, 116, 217, 0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(127, 219, 255, 0.2);
+            transition: all var(--anim-duration) ease;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .data-item:hover, .data-item:focus {
+            background: rgba(0, 116, 217, 0.4);
+            transform: translateX(5px);
+            border-color: rgba(127, 219, 255, 0.4);
+        }
+
+        .data-label {
+            color: #E6E6E6;
+            font-weight: 500;
+            font-size: var(--font-sm);
+        }
+
+        .data-value {
+            color: #7FDBFF;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-sm);
+            flex-wrap: wrap;
+        }
+
+        .status-indicator {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: var(--font-xs);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .status-operational { 
+            background: linear-gradient(135deg, #2ECC40, #01FF70); 
+            color: white; 
+            box-shadow: 0 0 10px rgba(46, 204, 64, 0.5);
+        }
+        .status-maintenance { 
+            background: linear-gradient(135deg, #FFDC00, #FF851B); 
+            color: #001f3f; 
+            box-shadow: 0 0 10px rgba(255, 220, 0, 0.5);
+        }
+        .status-offline { 
+            background: linear-gradient(135deg, #FF4136, #85144b); 
+            color: white; 
+            box-shadow: 0 0 10px rgba(255, 65, 54, 0.5);
+        }
+
+        .live-feed {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .live-feed::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .live-feed::-webkit-scrollbar-track {
+            background: rgba(0, 116, 217, 0.2);
+            border-radius: 3px;
+        }
+
+        .live-feed::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #7FDBFF, #39CCCC);
+            border-radius: 3px;
+        }
+
+        .feed-item {
+            padding: var(--spacing-md);
+            background: rgba(0, 116, 217, 0.3);
+            border-radius: 12px;
+            border-left: 5px solid #7FDBFF;
+            margin-bottom: var(--spacing-md);
+            transition: all var(--anim-duration) ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .feed-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #7FDBFF, #39CCCC, #0074D9);
+            animation: feedPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes feedPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .feed-item:hover, .feed-item:focus {
+            background: rgba(0, 116, 217, 0.4);
+            transform: translateX(8px);
+            box-shadow: 0 5px 20px rgba(0, 116, 217, 0.3);
+        }
+
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .feed-title {
+            color: #7FDBFF;
+            font-weight: bold;
+            font-size: var(--font-base);
+        }
+
+        .feed-status {
+            font-size: var(--font-xs);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .feed-time {
+            color: #39CCCC;
+            font-size: var(--font-xs);
+            opacity: 0.8;
+        }
+
+        .feed-content {
+            color: #E6E6E6;
+            line-height: 1.6;
+            font-size: var(--font-sm);
+        }
+
+        .feed-details {
+            font-size: var(--font-sm);
+            font-style: italic;
+            line-height: 1.4;
+            color: #a0d8ff;
+            margin-top: var(--spacing-sm);
+            border-left: 3px solid #39cccc;
+            padding-left: var(--spacing-sm);
+        }
+
+        .feed-item:focus {
+            outline: 3px solid #4db8ff;
+            background-color: rgba(77, 184, 255, 0.1);
+        }
+
+        .feed-item.expanded {
+            background-color: rgba(77, 184, 255, 0.15);
+        }
+
+        .status-active { 
+            background: linear-gradient(135deg, #2ECC40, #01FF70); 
+            color: white; 
+        }
+        .status-recording { 
+            background: linear-gradient(135deg, #0074D9, #7FDBFF); 
+            color: white; 
+        }
+        .status-processing { 
+            background: linear-gradient(135deg, #FFDC00, #FF851B); 
+            color: #001f3f; 
+        }
+        .status-analyzing { 
+            background: linear-gradient(135deg, #B10DC9, #F012BE); 
+            color: white; 
+        }
+        .status-monitoring { 
+            background: linear-gradient(135deg, #39CCCC, #01FF70); 
+            color: white; 
+        }
+
+        .priority-high { border-left-color: #FF4136; }
+        .priority-medium { border-left-color: #FFDC00; }
+        .priority-low { border-left-color: #2ECC40; }
+
+        /* Whale Tracker Styles - Improved for mobile */
+        .whale-tracker {
+            margin-top: var(--spacing-md);
+            background: rgba(0, 52, 89, 0.6);
+            border-radius: 15px;
+            padding: var(--spacing-md);
+            border: 2px solid rgba(127, 219, 255, 0.3);
+            overflow: hidden;
+        }
+
+        .whale-tracker h4 {
+            color: #7FDBFF;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-lg);
+        }
+
+        .whale-info {
+            display: grid;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .whale-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm);
+            background: rgba(0, 116, 217, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(127, 219, 255, 0.2);
+        }
+
+        .whale-name {
+            font-weight: bold;
+            color: #7FDBFF;
+            font-size: var(--font-sm);
+        }
+
+        .whale-data {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .whale-stat {
+            font-size: var(--font-xs);
+            color: #E6E6E6;
+        }
+
+        .whale-stat span {
+            color: #39CCCC;
+            font-weight: bold;
+        }
+
+        .whale-map {
+            width: 100%;
+            height: clamp(150px, 35vw, 300px);
+            background: #001F3F;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(127, 219, 255, 0.3);
+        }
+
+        .whale-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #7FDBFF;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(127, 219, 255, 0.8);
+            border: 2px solid white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            animation: modalFadeIn var(--anim-duration) ease;
+            padding: var(--spacing-md);
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(0, 52, 89, 0.95), rgba(0, 31, 63, 0.95));
+            margin: var(--spacing-md) auto;
+            padding: var(--spacing-xl);
+            border-radius: 20px;
+            width: 100%;
+            max-width: min(90vw, 700px);
+            border: 2px solid rgba(127, 219, 255, 0.4);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            animation: modalSlideIn var(--anim-duration) ease;
+            max-height: calc(100vh - var(--spacing-xl));
+            overflow-y: auto;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close {
+            color: #7FDBFF;
+            float: right;
+            font-size: clamp(24px, 6vw, 32px);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--anim-duration);
+            line-height: 1;
+            min-height: var(--touch-target);
+            min-width: var(--touch-target);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close:hover, .close:focus {
+            color: white;
+            transform: scale(1.2);
+        }
+
+        .modal h3 {
+            color: #7FDBFF;
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--spacing-md);
+            font-size: var(--font-2xl);
+            text-shadow: 0 0 15px rgba(127, 219, 255, 0.5);
+        }
+
+        .modal-emoji {
+            font-size: var(--font-3xl);
+            animation: modalEmojiFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes modalEmojiFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .modal-info {
+            display: grid;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            color: white;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background: rgba(0, 116, 217, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(127, 219, 255, 0.2);
+        }
+
+        .info-label {
+            color: #7FDBFF;
+            font-weight: bold;
+            font-size: var(--font-sm);
+        }
+
+        .info-value {
+            color: #E6E6E6;
+            line-height: 1.5;
+            font-size: var(--font-sm);
+        }
+
+        footer {
+            text-align: center;
+            padding: var(--spacing-xl);
+            margin-top: var(--spacing-2xl);
+            border-top: 3px solid rgba(0, 116, 217, 0.5);
+            font-size: var(--font-sm);
+            opacity: 0.9;
+            background: rgba(0, 31, 63, 0.4);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .footer-link {
+            color: #7FDBFF;
+            text-decoration: none;
+            transition: all var(--anim-duration);
+            font-weight: 500;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: 8px;
+            min-height: var(--touch-target);
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-link:hover, .footer-link:focus {
+            color: white;
+            text-shadow: 0 0 10px rgba(127, 219, 255, 0.5);
+            background: rgba(127, 219, 255, 0.1);
+        }
+
+        /* Live Video Styles */
+        .live-video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            margin-bottom: var(--spacing-md);
+            border-radius: 10px;
+            background: #000;
+        }
+
+        .live-video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-info {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            font-size: var(--font-xs);
+            color: #7FDBFF;
+            padding: var(--spacing-sm);
+            background: rgba(0, 52, 89, 0.7);
+            border-radius: 0 0 10px 10px;
+        }
+
+        /* Live Deals Styles */
+        .live-deals {
+            margin-top: var(--spacing-xl);
+        }
+
+        .deals-container {
+            display: grid;
+            gap: var(--spacing-md);
+        }
+
+        .deal-item {
+            background: rgba(0, 116, 217, 0.3);
+            padding: var(--spacing-md);
+            border-radius: 10px;
+            border-left: 4px solid #39CCCC;
+            transition: all var(--anim-duration) ease;
+        }
+
+        .deal-item:hover, .deal-item:focus {
+            background: rgba(0, 116, 217, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .deal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-sm);
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .deal-title {
+            font-weight: bold;
+            color: #7FDBFF;
+            font-size: var(--font-base);
+        }
+
+        .deal-expiry {
+            font-size: var(--font-xs);
+            color: #39CCCC;
+            background: rgba(57, 204, 204, 0.2);
+            padding: 3px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+
+        .deal-content {
+            color: #E6E6E6;
+            font-size: var(--font-sm);
+            line-height: 1.5;
+        }
+
+        .deal-tags {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .deal-tag {
+            background: rgba(127, 219, 255, 0.2);
+            color: #7FDBFF;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: var(--font-xs);
+        }
+
+        /* Utility Classes */
+        .fade-in {
+            animation: fadeIn var(--anim-duration) ease-in forwards;
+        }
+
+        .slide-in {
+            animation: slideIn var(--anim-duration) ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border: 3px solid rgba(127, 219, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #7FDBFF;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        /* Responsive Design Breakpoints */
+
+        /* Small phones (320px and up) */
+        @media (min-width: 320px) {
+            .container {
+                padding: var(--spacing-md);
+            }
+            
+            .hamburger-nav {
+                width: 85vw;
+            }
+            
+            .article-content table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .ocean-stats {
+                grid-template-columns: repeat(auto-fit, minmax(min(120px, 100%), 1fr));
+            }
+        }
+
+        /* Large phones (375px and up) */
+        @media (min-width: 375px) {
+            .navigation-tabs {
+                flex-direction: row;
+            }
+            
+            .nav-tab {
+                flex: 1;
+                min-width: auto;
+            }
+        }
+
+        /* Extra large phones (414px and up) */
+        @media (min-width: 414px) {
+            .ocean-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .weather-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Small tablets (600px and up) */
+        @media (min-width: 600px) {
+            .ocean-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Small tablets (768px and up) */
+        @media (min-width: 768px) {
+            body {
+                padding-top: calc(var(--touch-target) + var(--spacing-xl));
+            }
+            
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+            }
+            
+            .logo-section {
+                flex-direction: row;
+                text-align: left;
+            }
+            
+            .date-time {
+                text-align: right;
+                width: auto;
+            }
+            
+            .main-content {
+                grid-template-columns: 2fr 1fr;
+            }
+            
+            .ocean-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .marine-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .weather-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .info-item {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .info-label {
+                min-width: 140px;
+                flex-shrink: 0;
+            }
+        }
+
+        /* Large tablets (900px and up) */
+        @media (min-width: 900px) {
+            .ocean-stats {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        /* Large tablets (1024px and up) */
+        @media (min-width: 1024px) {
+            .navigation-tabs {
+                justify-content: flex-start;
+            }
+            
+            .nav-tab {
+                flex: none;
+            }
+            
+            .weather-details {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Desktops (1280px and up) */
+        @media (min-width: 1280px) {
+            .marine-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Large desktops (1440px and up) */
+        @media (min-width: 1440px) {
+            .container {
+                max-width: var(--container-2xl);
+            }
+        }
+
+        /* Ultra-wide screens (1920px and up) */
+        @media (min-width: 1920px) {
+            .main-content {
+                grid-template-columns: 3fr 1fr;
+            }
+        }
+
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .container {
+                border: 3px solid rgba(127, 219, 255, 0.8);
+            }
+            
+            .article, .widget {
+                border: 2px solid rgba(127, 219, 255, 0.8);
+            }
+        }
+
+        /* Focus indicators */
+        *:focus {
+            outline: 2px solid #7FDBFF;
+            outline-offset: 2px;
+        }
+
+        button:focus, .nav-tab:focus, .hamburger-tab a:focus {
+            outline: 3px solid #7FDBFF;
+            outline-offset: 2px;
+        }
+
+        /* Touch device optimizations */
+        @media (pointer: coarse) {
+            .marine-item {
+                min-height: var(--touch-target);
+                padding: var(--spacing-md);
+            }
+            
+            .feed-item {
+                padding: var(--spacing-md);
+                min-height: var(--touch-target);
+            }
+            
+            .data-item {
+                min-height: var(--touch-target);
+                padding: var(--spacing-md);
+            }
+            
+            /* Increase tap target size for small screens */
+            .hamburger-tab a {
+                min-height: 50px;
+            }
+            
+            .nav-tab {
+                min-height: 50px;
+            }
+        }
+
+        /* Very small screens (under 300px) */
+        @media (max-width: 300px) {
+            :root {
+                --spacing-md: clamp(0.5rem, 2vw, 1rem);
+                --spacing-lg: clamp(1rem, 3vw, 1.5rem);
+            }
+            
+            .article-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .logo {
+                font-size: var(--font-2xl);
+            }
+            
+            .logo-icon {
+                font-size: var(--font-3xl);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="hamburger-menu">
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+    <nav class="hamburger-nav" id="hamburgerNav" role="navigation">
+        <ul class="hamburger-tabs">
+            <li class="hamburger-tab tab1">
+                <a href="gemes.html">
+                    <i class="fas fa-gamepad" aria-hidden="true"></i>
+                    <span>Games</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab2">
+                <a href="chat.html">
+                    <i class="fas fa-comments" aria-hidden="true"></i>
+                    <span>Convo</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab3">
+                <a href="DONATE.HTML">
+                    <i class="fas fa-donate" aria-hidden="true"></i>
+                    <span>Donate</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab4">
+                <a href="animals.html">
+                    <i class="fas fa-paw" aria-hidden="true"></i>
+                    <span>Animals</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab5">
+                <a href="about.html">
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
+                    <span>About</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab6">
+                <a href="contact.html">
+                    <i class="fas fa-envelope" aria-hidden="true"></i>
+                    <span>Contact</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab7">
+                <a href="news.html">
+                    <i class="fas fa-newspaper" aria-hidden="true"></i>
+                    <span>News</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab8">
+                <a href="visit.html">
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                    <span>Visit</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab9">
+                <a href="index.html">
+                    <i class="fas fa-home" aria-hidden="true"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class="hamburger-tab tab10 active">
+                <a href="pollution.html">
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span>Ocean Pollution</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Video Loader -->
+    <div id="video-loader">
+        <video autoplay muted loop preload="auto">
+            <source src="127713-739309133_small.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="loader-content">
+            <div class="loading-spinner"></div>
+            <div class="loader-text">Diving into the Deep Ocean Times...</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo-section">
+                <div class="logo-icon" aria-hidden="true">⚓</div>
+                <div>
+                    <h1 class="logo">Deep Ocean Times</h1>
+                    <div class="subtitle">Interactive Marine Research Edition</div>
+                </div>
+            </div>
+            <div class="date-time">
+                <div><span class="live-indicator" aria-hidden="true"></span><strong id="current-time">Loading...</strong></div>
+                <div id="current-date">Loading date...</div>
+                <div id="location">📍 Depth: 0m | Research Vessel Poseidon</div>
+            </div>
+        </header>
+
+        <div class="breaking-news" id="breakingNews" role="alert">
+            <h3><i class="fas fa-bullhorn" aria-hidden="true"></i> <span id="breaking-title">BREAKING NEWS</span></h3>
+            <div class="news-ticker" id="breaking-content">Loading breaking news...</div>
+        </div>
+
+        <div class="ocean-stats" id="oceanStats">
+            <!-- Stats will be populated by JavaScript -->
+        </div>
+
+        <div class="navigation-tabs" role="tablist">
+            <button class="nav-tab active" onclick="switchTab('articles')" role="tab" aria-selected="true">
+                <i class="fas fa-newspaper" aria-hidden="true"></i> Latest Articles
+            </button>
+            <button class="nav-tab" onclick="switchTab('research')" role="tab" aria-selected="false">
+                <i class="fas fa-flask" aria-hidden="true"></i> Research Data
+            </button>
+            <button class="nav-tab" onclick="switchTab('live')" role="tab" aria-selected="false">
+                <i class="fas fa-broadcast-tower" aria-hidden="true"></i> Live Feed
+            </button>
+        </div>
+
+        <div class="main-content">
+            <main class="articles">
+                <!-- Articles Tab -->
+                <div id="articles-content" class="tab-content active" role="tabpanel">
+                    <article class="article fade-in" id="article1">
+                        <!-- Article content will be populated by JavaScript -->
+                    </article>
+                    <article class="article slide-in" id="article2">
+                        <!-- Article content will be populated by JavaScript -->
+                    </article>
+                </div>
+
+                <!-- Research Data Tab -->
+                <div id="research-content" class="tab-content" role="tabpanel">
+                    <div class="widget">
+                        <h3><i class="fas fa-chart-line" aria-hidden="true"></i> Real-Time Research Data</h3>
+                        
+                        <section class="research-section">
+                            <h4><i class="fas fa-leaf" aria-hidden="true"></i> Environmental Monitoring</h4>
+                            <div class="data-grid" id="environmental-data">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </section>
+
+                        <section class="research-section">
+                            <h4><i class="fas fa-cogs" aria-hidden="true"></i> Equipment Status</h4>
+                            <div class="data-grid" id="equipment-status">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </section>
+
+                        <section class="research-section">
+                            <h4><i class="fas fa-fish" aria-hidden="true"></i> Marine Ecosystem Data</h4>
+                            <div class="data-grid" id="ecosystem-data">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </section>
+
+                        <section class="research-section">
+                            <h4><i class="fas fa-thermometer-half" aria-hidden="true"></i> Climate Indicators</h4>
+                            <div class="data-grid" id="climate-data">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Live Feed Tab -->
+                <div id="live-content" class="tab-content" role="tabpanel">
+                    <div class="widget">
+                        <h3><i class="fas fa-satellite-dish" aria-hidden="true"></i> Live Ocean Monitoring Feed</h3>
+                        <div class="live-feed" id="live-feed" role="log" aria-live="polite">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Whale Tracker Widget -->
+                    <div class="widget whale-tracker">
+                        <h3><i class="fas fa-water" aria-hidden="true"></i> Live Whale Tracker</h3>
+                        <div class="whale-info" id="whale-tracker-info">
+                            <!-- Whale info will be populated by JavaScript -->
+                        </div>
+                        <div class="whale-map" id="whale-tracker-map" role="img" aria-label="Whale tracking map showing current positions">
+                            <!-- Whale map will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Current Research Deals -->
+                    <div class="widget live-deals">
+                        <h3><i class="fas fa-tags" aria-hidden="true"></i> Current Research Deals</h3>
+                        <div class="deals-container" id="liveDeals">
+                            <!-- Deals will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <aside class="sidebar">
+                <!-- Weather Widget -->
+                <div class="widget">
+                    <div class="weather-header">
+                        <div>
+                            <h3><i class="fas fa-cloud-sun" aria-hidden="true"></i> Ocean Surface Weather</h3>
+                            <div id="weather-location">Research Position Alpha</div>
+                        </div>
+                        <div class="weather-icon" id="weather-icon" aria-hidden="true">
+                            <i class="fas fa-sun"></i>
+                        </div>
+                    </div>
+                    <div class="weather-temp" id="weather-temp">24°C</div>
+                    <div class="weather-desc" id="weather-desc">Clear Skies</div>
+                    <div class="weather-details" id="weather-details">
+                        <!-- Details populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Live Ocean Camera -->
+                <div class="widget">
+                    <h3><i class="fas fa-video" aria-hidden="true"></i> Live Ocean Camera</h3>
+                    <div class="live-video-container">
+                        <iframe src="https://www.youtube.com/embed/jzx_n25g3kA?autoplay=1&mute=1&rel=0&showinfo=0" 
+                                title="Live Ocean Camera - Monterey Bay Aquarium" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen 
+                                loading="lazy">
+                        </iframe>
+                    </div>
+                    <div class="video-info">
+                        <span class="video-location">Monterey Bay Aquarium, California</span>
+                        <span class="video-depth">Depth: 12m</span>
+                    </div>
+                </div>
+
+                <!-- Marine Life Search -->
+                <div class="widget">
+                    <h3><i class="fas fa-fish" aria-hidden="true"></i> Marine Life Database</h3>
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                        <input type="text" 
+                               class="search-input" 
+                               id="marine-search" 
+                               placeholder="Search species..." 
+                               oninput="filterMarineLife()"
+                               aria-label="Search marine species">
+                    </div>
+                    <div class="marine-grid" id="marineGrid" role="grid">
+                        <!-- Marine life items populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Depth Meter -->
+                <div class="widget">
+                    <div class="depth-meter-container">
+                        <h3><i class="fas fa-anchor" aria-hidden="true"></i> Current Research Depth</h3>
+                        <div class="depth-meter" role="meter" aria-label="Current research depth">
+                            <div class="depth-indicator" id="depthIndicator"></div>
+                        </div>
+                        <div class="depth-labels">
+                            <span>0m</span>
+                            <span>1.5km</span>
+                            <span>3km</span>
+                            <span>4.5km</span>
+                            <span>6km</span>
+                        </div>
+                        <div class="depth-info">
+                            <div class="current-depth" id="current-depth">0m</div>
+                            <div class="depth-zone" id="depth-zone">Surface Zone</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sponsored Content -->
+                <div class="widget">
+                    <div style="font-size: 0.7em; color: #7FDBFF; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; text-align: center;">
+                        Sponsored Research
+                    </div>
+                    <img id="ad-image" 
+                         src="https://images.pexels.com/photos/1544551/pexels-photo-1544551.jpeg?auto=compress&cs=tinysrgb&w=400" 
+                         alt="Advanced oceanographic equipment for deep-sea exploration" 
+                         style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;"
+                         loading="lazy">
+                    <div style="text-align: center; color: #E6E6E6; font-size: 0.9em;" id="ad-text">
+                        Advanced Oceanographic Equipment for Deep-Sea Exploration
+                    </div>
+                    <button style="width: 100%; margin-top: 15px; background: linear-gradient(135deg, #39CCCC, #0074D9); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; transition: all 0.3s; font-weight: bold; min-height: 44px;" 
+                            onmouseover="this.style.background='linear-gradient(135deg, #7FDBFF, #39CCCC)'" 
+                            onmouseout="this.style.background='linear-gradient(135deg, #39CCCC, #0074D9)'"
+                            onclick="alert('Redirecting to sponsor website...')">
+                        Learn More
+                    </button>
+                </div>
+            </aside>
+        </div>
+
+        <footer>
+            <nav class="footer-links">
+                <a href="gemes.html" class="footer-link">Games</a>
+                <a href="about.html" class="footer-link">About</a>
+                <a href="daliy.html" class="footer-link">Home</a>
+                <a href="contact.html" class="footer-link">Contact</a>
+                <a href="animals.html" class="footer-link">Animals</a>
+                <a href="DONATE.HTML" class="footer-link">Donate</a>
+            </nav>
+            <p>&copy; 2024 Deep Ocean Times Interactive Edition | All research data simulated for demonstration</p>
+            <p style="margin-top: 15px; font-size: 0.85em; opacity: 0.8;">
+                Powered by Advanced Marine Research Institute | Real-time ocean monitoring
+            </p>
+        </footer>
+    </div>
+
+    <!-- Species Detail Modal -->
+    <div id="species-modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+        <div class="modal-content">
+            <button class="close" onclick="closeModal()" aria-label="Close modal">&times;</button>
+            <h3 id="modal-title">
+                <span class="modal-emoji" id="modal-emoji" aria-hidden="true">🐋</span>
+                <span id="modal-name">Species Name</span>
+            </h3>
+            <div class="modal-info" id="modal-info">
+                <!-- Species details populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // NAVIGATION FUNCTIONALITY - FIXED
+        function setupNavigation() {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const hamburgerNav = document.getElementById('hamburgerNav');
+            
+            hamburgerBtn.addEventListener('click', function() {
+                const isActive = this.classList.contains('active');
+                this.classList.toggle('active');
+                hamburgerNav.classList.toggle('active');
+                
+                // Update ARIA attributes
+                this.setAttribute('aria-expanded', !isActive);
+                hamburgerNav.setAttribute('aria-hidden', isActive);
+                
+                // Prevent body scrolling when nav is open
+                if (hamburgerNav.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Close nav when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (hamburgerNav.classList.contains('active') && 
+                    !hamburgerNav.contains(e.target) && 
+                    !hamburgerBtn.contains(e.target)) {
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                    hamburgerNav.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Handle keyboard navigation
+            hamburgerBtn.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+            
+            // Add active class to clicked tab
+            document.querySelectorAll('.hamburger-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.hamburger-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Close nav after selection
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                    hamburgerNav.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = '';
+                });
+            });
+        }
+
+        // Handle escape key for navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const hamburgerNav = document.getElementById('hamburgerNav');
+                const hamburgerBtn = document.getElementById('hamburgerBtn');
+                
+                if (hamburgerNav && hamburgerNav.classList.contains('active')) {
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                    hamburgerNav.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+
+        // Comprehensive marine life database
+        const marineLife = [
+            { emoji: "🐋", name: "Blue Whale", fact: "Largest animal ever (up to 30m, 200 tons)", details: "Can consume 4 tons of krill daily. Heart weighs 400kg. Live 80-90 years.", scientificName: "Balaenoptera musculus", habitat: "Open ocean worldwide", conservation: "Endangered", depth: "Surface to 500m" },
+            { emoji: "🦑", name: "Colossal Squid", fact: "Largest invertebrate (14m, 750kg)", details: "Eyes are basketball-sized. Found in Antarctic waters. Rarely observed alive.", scientificName: "Mesonychoteuthis hamiltoni", habitat: "Southern Ocean depths", conservation: "Data Deficient", depth: "300-2000m" },
+            { emoji: "🦈", name: "Great White Shark", fact: "Top predator (up to 6m, 2,200kg)", details: "Can detect 1 drop of blood in 100L water. Body temp 10°C warmer than water.", scientificName: "Carcharodon carcharias", habitat: "Coastal waters worldwide", conservation: "Vulnerable", depth: "Surface to 1200m" },
+            { emoji: "🐬", name: "Bottlenose Dolphin", fact: "Highly intelligent marine mammal", details: "Use tools, recognize selves in mirrors. Sleep with one hemisphere at a time.", scientificName: "Tursiops truncatus", habitat: "Warm coastal waters", conservation: "Least Concern", depth: "Surface to 500m" },
+            { emoji: "🐙", name: "Giant Pacific Octopus", fact: "Most intelligent invertebrate", details: "9 brains, 3 hearts. Can solve puzzles, open jars. Live 3-5 years.", scientificName: "Enteroctopus dofleini", habitat: "North Pacific Ocean", conservation: "Near Threatened", depth: "Surface to 2000m" },
+            { emoji: "🦀", name: "Japanese Spider Crab", fact: "Largest arthropod (3.7m leg span)", details: "Lives at 150-300m depth. Can live 100 years. Molts to grow.", scientificName: "Macrocheira kaempferi", habitat: "Japanese waters", conservation: "Vulnerable", depth: "150-300m" },
+            { emoji: "🐠", name: "Mandarin Fish", fact: "Most colorful fish in the ocean", details: "Changes sex based on social hierarchy. Lives in coral reefs.", scientificName: "Synchiropus splendidus", habitat: "Western Pacific reefs", conservation: "Stable", depth: "1-18m" },
+            { emoji: "🦐", name: "Mantis Shrimp", fact: "Most complex eyes in nature", details: "See 16 color channels (humans see 3). Punch at 80km/h.", scientificName: "Stomatopoda", habitat: "Tropical shallow waters", conservation: "Varied by species", depth: "Surface to 40m" },
+            { emoji: "🐡", name: "Pufferfish", fact: "Highly toxic defense mechanism", details: "Tetrodotoxin is 1200x deadlier than cyanide. Some predators immune.", scientificName: "Tetraodontidae", habitat: "Tropical/subtropical waters", conservation: "Varied by species", depth: "Surface to 300m" },
+            { emoji: "🦭", name: "Elephant Seal", fact: "Deepest diving mammal", details: "Can dive to 2,388m for 2 hours. Males weigh up to 4,000kg.", scientificName: "Mirounga", habitat: "Sub-Antarctic waters", conservation: "Least Concern", depth: "Surface to 2388m" }
+        ];
+
+        // Breaking news items - ENHANCED with more variety
+        const breakingNewsItems = [
+            { title: "BREAKING: Underwater volcano erupts near Tonga, creating new marine habitats", content: "Scientists report formation of new thermal vent ecosystems following volcanic activity in the Pacific Ring of Fire" },
+            { title: "ALERT: Record-breaking whale migration spotted via satellite tracking", content: "Humpback whales travel unprecedented 25,000km route, suggesting rapid climate adaptation strategies" },
+            { title: "URGENT: Deep-sea thermal vent discovered harboring unknown life forms", content: "ROV expedition finds 47 new species in Mariana Trench hydrothermal field, revolutionizing understanding of extremophile evolution" },
+            { title: "NEWS: Ocean current disruption threatens global weather patterns", content: "Atlantic Meridional Overturning Circulation shows signs of significant weakening, potentially triggering climate tipping point" },
+            { title: "UPDATE: Coral bleaching recovery exceeds scientific predictions", content: "Great Barrier Reef shows 23% recovery rate, highest in decade of monitoring, offering hope for marine ecosystem resilience" },
+            { title: "DISCOVERY: Ancient shipwreck reveals new historical timeline", content: "1,200-year-old vessel found at 2,400m depth contains unprecedented artifacts, rewriting maritime archaeology" },
+            { title: "PHENOMENON: Rare deep-sea bioluminescent display captured on camera", content: "Massive jellyfish bloom creates spectacular light show in Pacific depths, visible from space via satellite imagery" },
+            { title: "RESEARCH: Microplastic pollution reaches deepest ocean trenches", content: "New study reveals plastic particles found in 90% of deep-sea organisms, raising concerns about ecosystem health" },
+            { title: "CONSERVATION: New marine protected area established in Antarctic waters", content: "International agreement protects 2.5 million km² of pristine ocean habitat from commercial fishing" },
+            { title: "TECHNOLOGY: AI-powered underwater drones map coral reefs with unprecedented detail", content: "Autonomous vehicles capture 3D models of reef systems, aiding conservation efforts worldwide" }
+        ];
+
+        // Weather conditions
+        const weatherConditions = [
+            { icon: "fa-sun", temp: 24, desc: "Clear Skies", color: "#FFDC00" },
+            { icon: "fa-cloud-sun", temp: 19, desc: "Partly Cloudy", color: "#7FDBFF" },
+            { icon: "fa-cloud", temp: 16, desc: "Overcast", color: "#AAAAAA" },
+            { icon: "fa-cloud-rain", temp: 14, desc: "Rainy", color: "#39CCCC" },
+            { icon: "fa-bolt", temp: 18, desc: "Stormy", color: "#FFDC00" },
+            { icon: "fa-smog", temp: 21, desc: "Foggy", color: "#CCCCCC" }
+        ];
+
+        // Whale tracking data
+        const whaleTracks = [
+            { id: 1, name: "Blue Whale #1", lat: 34.12, lng: -120.45, depth: 200, speed: 5.2, heading: 95 },
+            { id: 2, name: "Blue Whale #2", lat: 34.50, lng: -119.80, depth: 150, speed: 4.8, heading: 110 },
+            { id: 3, name: "Blue Whale #3", lat: 33.90, lng: -120.75, depth: 300, speed: 6.1, heading: 80 }
+        ];
+
+        // Current research deals data
+        const researchDeals = [
+            { title: "Deep-Sea Exploration Package", content: "Special 30% discount on ROV time for new research institutions. Includes full sensor suite and 4K video recording.", expiry: "Expires in 2 days", tags: ["ROV", "Discount", "New Clients"] },
+            { title: "Hydrothermal Vent Sampling", content: "Join our expedition to the Mariana Trench vents. Limited space available for 2 additional researchers.", expiry: "3 spots left", tags: ["Expedition", "Mariana Trench", "Sampling"] },
+            { title: "Whale Tagging Collaboration", content: "Seeking partners for North Pacific humpback whale tagging program. Shared data access and equipment provided.", expiry: "Ongoing", tags: ["Whales", "Collaboration", "Tracking"] },
+            { title: "Coral Reef Monitoring", content: "Subsidized equipment rental for reef conservation projects in Southeast Asia. 50% funding available.", expiry: "Until funds last", tags: ["Coral", "Conservation", "Funding"] }
+        ];
+
+        // Live feed data - ENHANCED with more variety
+        const liveFeedData = [
+            { title: 'Hydrophone Array Network', status: 'active', content: 'Detecting whale song at 2.3 km distance - Blue whale vocalizations confirmed', priority: 'high', time: '2 min ago', details: 'Hydrophone arrays picking up consistent calls in the eastern Pacific, signal strength improving.' },
+            { title: 'Deep-Sea ROV Submersible', status: 'recording', content: 'Exploring hydrothermal vent field at 2,400m depth - New species discovery potential', priority: 'high', time: '5 min ago', details: 'ROV cameras transmitting live video with high resolution showing bio-luminescent organisms.' },
+            { title: 'Automated Water Sampling', status: 'processing', content: 'Analyzing microplastic density variations across different depth layers', priority: 'medium', time: '8 min ago', details: 'Sampling at 200m intervals showing increasing microplastic concentration at thermocline.' },
+            { title: 'Seismic Monitoring Station', status: 'monitoring', content: 'Tracking underwater earthquake activity - 3.2 magnitude detected 400km SW', priority: 'medium', time: '12 min ago', details: 'Seismic activity correlates with increased hydrothermal vent activity in the region.' },
+            { title: 'Satellite Ocean Color Analysis', status: 'analyzing', content: 'Processing chlorophyll concentration data - Massive phytoplankton bloom identified', priority: 'high', time: '15 min ago', details: 'Bloom covers approximately 1200 km² with chlorophyll levels 40% above seasonal average.' },
+            { title: 'Marine Mammal Tracking', status: 'active', content: 'Following tagged sperm whale pod - Diving patterns suggest feeding behavior', priority: 'medium', time: '18 min ago', details: 'Pod of 6 whales displaying coordinated diving to 800m depth for 45 minute intervals.' },
+            { title: 'Ocean Current Profiler', status: 'monitoring', content: 'Measuring Gulf Stream velocity changes - 15% speed increase from last month', priority: 'high', time: '22 min ago', details: 'Current speed now averaging 5.8 knots at surface, with significant subsurface turbulence.' },
+            { title: 'Coral Reef Health Monitor', status: 'processing', content: 'Evaluating bleaching recovery rates - 34% improvement in shallow reef zones', priority: 'medium', time: '25 min ago', details: 'New coral growth observed in previously bleached areas, suggesting temperature adaptation.' }
+        ];
+
+        // Live feed updates - ENHANCED with more variety
+        const liveFeedUpdates = [
+            'Unusual bioluminescent activity detected in sector 12',
+            'Deep-sea current anomaly recorded at 1,800m depth',
+            'Marine mammal echolocation patterns suggest feeding ground',
+            'Thermal vent temperature spike indicates geological activity',
+            'Microplastic concentration analysis reveals concerning trends',
+            'New species behavior patterns logged by ROV cameras',
+            'Seismic activity correlates with marine life migration',
+            'Ocean pH levels showing gradual stabilization',
+            'Satellite imagery confirms massive algae bloom formation',
+            'Underwater landslide detected via acoustic monitoring',
+            'Rare deep-sea fish species photographed at 3,200m depth',
+            'Methane seepage detected in previously stable seafloor region',
+            'Autonomous glider reports unusual water column stratification',
+            'Marine snow density increases by 40% in observation zone',
+            'Hydrothermal vent chimney growth accelerating beyond normal rates'
+        ];
+
+        // NEW: Article data for randomization on reload
+        const articleData = {
+            article1: [
+                {
+                    category: "Marine Biology",
+                    readTime: "8 min read",
+                    author: "By Dr. Sarah Chen",
+                    timeAgo: "2 hours ago",
+                    title: "Revolutionary Deep-Sea Mining Discovery Sparks Environmental Debate",
+                    image: {
+                        src: "https://images.pexels.com/photos/1001682/pexels-photo-1001682.jpeg?auto=compress&cs=tinysrgb&w=800",
+                        alt: "Deep sea mining equipment on ocean floor",
+                        overlay: "Scientists explore polymetallic nodule fields in the Clarion-Clipperton Zone"
+                    },
+                    content: `
+                        <p>Scientists aboard the research vessel <em>Atlantis</em> have discovered vast polymetallic nodule fields in the Clarion-Clipperton Zone, containing critical minerals for renewable energy technologies. However, environmental groups warn of catastrophic impacts on unique deep-sea ecosystems.</p>
+                        
+                        <h4>Key Findings:</h4>
+                        <ul>
+                            <li><strong>Manganese Nodules:</strong> Fields covering 9 million km² contain cobalt, nickel, and rare earth elements</li>
+                            <li><strong>Endemic Species:</strong> 90% of species found are new to science</li>
+                            <li><strong>Economic Value:</strong> Estimated $30 trillion in mineral resources</li>
+                            <li><strong>Recovery Time:</strong> Ecosystems may take centuries to recover from mining</li>
+                        </ul>
+
+                        <p>The International Seabed Authority faces pressure to establish comprehensive regulations before commercial extraction begins. Marine biologist Dr. Sarah Chen warns: "We're essentially considering mining an alien world we barely understand."</p>
+                    `,
+                    fact: "Ocean Fact: Deep-sea nodules grow only 5mm per million years, making them among Earth's slowest-forming geological features.",
+                    tags: ["#DeepSeaMining", "#Conservation", "#RenewableEnergy", "#Biodiversity"]
+                },
+                {
+                    category: "Climate Science",
+                    readTime: "6 min read",
+                    author: "By Dr. Michael Rodriguez",
+                    timeAgo: "3 hours ago",
+                    title: "Arctic Sea Ice Decline Accelerates Beyond Predictions",
+                    image: {
+                        src: "https://images.pexels.com/photos/847393/pexels-photo-847393.jpeg?auto=compress&cs=tinysrgb&w=800",
+                        alt: "Melting Arctic sea ice",
+                        overlay: "Satellite imagery shows unprecedented ice loss in the Arctic region"
+                    },
+                    content: `
+                        <p>New satellite data reveals that Arctic sea ice is disappearing at a rate 40% faster than previously estimated, with profound implications for global climate patterns and marine ecosystems.</p>
+                        
+                        <h4>Critical Observations:</h4>
+                        <ul>
+                            <li><strong>Ice Thickness:</strong> Average thickness reduced by 1.5 meters since 2000</li>
+                            <li><strong>Summer Minimum:</strong> Record low ice coverage for 5 consecutive years</li>
+                            <li><strong>Albedo Effect:</strong> Reduced reflectivity accelerating warming</li>
+                            <li><strong>Ecosystem Impact:</strong> Polar bear habitats shrinking by 15% annually</li>
+                        </ul>
+
+                        <p>Climate scientists warn that we may see ice-free Arctic summers by 2035, decades earlier than previous models suggested. "The feedback loops are stronger than we anticipated," notes Dr. Rodriguez.</p>
+                    `,
+                    fact: "Ocean Fact: Sea ice reflects up to 90% of sunlight, while open ocean absorbs 90%, creating a powerful climate feedback loop.",
+                    tags: ["#ClimateChange", "#Arctic", "#SeaIce", "#GlobalWarming"]
+                }
+            ],
+            article2: [
+                {
+                    category: "Behavioral Science",
+                    readTime: "6 min read",
+                    author: "By Dr. James Patterson",
+                    timeAgo: "4 hours ago",
+                    title: "Ocean Memory: How Whales Pass Down Cultural Knowledge Across Generations",
+                    image: {
+                        src: "https://images.pexels.com/photos/892548/pexels-photo-892548.jpeg?auto=compress&cs=tinysrgb&w=800",
+                        alt: "Humpback whale breaching in ocean waters",
+                        overlay: "Humpback whale displaying complex social behavior patterns"
+                    },
+                    content: `
+                        <p>Groundbreaking research using hydrophone networks and genetic analysis reveals that whale populations maintain cultural traditions spanning centuries, with implications for conservation and understanding animal intelligence.</p>
+                        
+                        <h4>Cultural Transmission Discoveries:</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Behavior Type</th>
+                                    <th>Learning Method</th>
+                                    <th>Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Song Evolution</td>
+                                    <td>Vocal Learning</td>
+                                    <td>Decades</td>
+                                </tr>
+                                <tr>
+                                    <td>Migration Routes</td>
+                                    <td>Elder Guidance</td>
+                                    <td>Centuries</td>
+                                </tr>
+                                <tr>
+                                    <td>Feeding Techniques</td>
+                                    <td>Social Teaching</td>
+                                    <td>Generations</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p>Dr. James Patterson's 15-year study of Pacific gray whales shows that pods remember ice-free Arctic routes from decades past, suggesting whales may be adapting to climate change using ancestral knowledge.</p>
+                    `,
+                    fact: "Ocean Fact: Sperm whales have distinct family 'codas' - vocal signatures that identify their clan, passed down through 100+ generations.",
+                    tags: ["#WhaleBehavior", "#CulturalEvolution", "#ClimateAdaptation", "#Bioacoustics"]
+                },
+                {
+                    category: "Technology",
+                    readTime: "7 min read",
+                    author: "By Dr. Elena Vasquez",
+                    timeAgo: "5 hours ago",
+                    title: "AI-Powered Drones Revolutionize Coral Reef Monitoring",
+                    image: {
+                        src: "https://images.pexels.com/photos/2888150/pexels-photo-2888150.jpeg?auto=compress&cs=tinysrgb&w=800",
+                        alt: "Underwater drone monitoring coral reef",
+                        overlay: "Autonomous drone captures high-resolution imagery of coral health"
+                    },
+                    content: `
+                        <p>Advanced machine learning algorithms combined with autonomous underwater vehicles are transforming how scientists monitor and protect fragile coral reef ecosystems worldwide.</p>
+                        
+                        <h4>Technological Breakthroughs:</h4>
+                        <ul>
+                            <li><strong>Real-time Analysis:</strong> AI identifies bleaching events within hours</li>
+                            <li><strong>3D Mapping:</strong> High-resolution models track reef growth over time</li>
+                            <li><strong>Species Recognition:</strong> Automated identification of 500+ coral species</li>
+                            <li><strong>Predictive Modeling:</strong> Forecasts bleaching risk with 94% accuracy</li>
+                        </ul>
+
+                        <p>"This technology allows us to monitor reefs at a scale and precision never before possible," explains Dr. Vasquez. "We can now respond to threats in near real-time rather than months later."</p>
+                    `,
+                    fact: "Ocean Fact: Coral reefs cover less than 1% of the ocean floor but support 25% of all marine species.",
+                    tags: ["#AI", "#CoralReefs", "#Technology", "#Conservation"]
+                }
+            ]
+        };
+
+        // Global variables
+        let currentDepth = 0;
+        let filteredMarineLife = [...marineLife];
+        let currentLiveFeed = [...liveFeedData];
+
+        // Initialize page
+        function initializePage() {
+            // Setup navigation first
+            setupNavigation();
+            
+            // Show loading state
+            document.getElementById('current-time').innerHTML = '<span class="loading"></span> Loading...';
+            document.getElementById('current-date').innerHTML = '<span class="loading"></span> Loading date...';
+            
+            // Simulate loading time
+            setTimeout(() => {
+                updateDateTime();
+                generateOceanStats();
+                populateMarineLife();
+                updateWeather();
+                animateDepthMeter();
+                showBreakingNews();
+                populateResearchData();
+                populateLiveFeed();
+                renderWhaleTracker();
+                populateLiveDeals();
+                populateArticles(); // NEW: Populate articles with random content
+                
+                // Hide loader when everything is ready
+                const loader = document.getElementById('video-loader');
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+                
+                // Set up intervals
+                setInterval(updateDateTime, 1000);
+                setInterval(generateOceanStats, 15000);
+                setInterval(updateWeather, 20000);
+                setInterval(animateDepthMeter, 4000);
+                setInterval(showBreakingNews, 35000);
+                setInterval(updateLiveFeed, 10000);
+                setInterval(updateWhaleTracker, 15000);
+                setInterval(updateLiveDeals, 30000);
+            }, 2000);
+        }
+
+        // NEW: Populate articles with random content on each reload
+        function populateArticles() {
+            // Select random articles for each slot
+            const article1Index = Math.floor(Math.random() * articleData.article1.length);
+            const article2Index = Math.floor(Math.random() * articleData.article2.length);
+            
+            const article1 = articleData.article1[article1Index];
+            const article2 = articleData.article2[article2Index];
+            
+            // Populate article 1
+            document.getElementById('article1').innerHTML = `
+                <div class="article-meta">
+                    <span class="article-category">${article1.category}</span>
+                    <span class="article-info">${article1.readTime}</span>
+                    <span class="article-info">${article1.author}</span>
+                    <span class="article-info">${article1.timeAgo}</span>
+                </div>
+                <h2>${article1.title}</h2>
+                <div class="featured-image">
+                    <img src="${article1.image.src}" alt="${article1.image.alt}" loading="lazy">
+                    <div class="image-overlay">${article1.image.overlay}</div>
+                </div>
+                <div class="article-content">
+                    ${article1.content}
+                </div>
+                <div class="fact-box">
+                    <strong>${article1.fact}</strong>
+                </div>
+                <div class="article-tags">
+                    ${article1.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+            `;
+            
+            // Populate article 2
+            document.getElementById('article2').innerHTML = `
+                <div class="article-meta">
+                    <span class="article-category">${article2.category}</span>
+                    <span class="article-info">${article2.readTime}</span>
+                    <span class="article-info">${article2.author}</span>
+                    <span class="article-info">${article2.timeAgo}</span>
+                </div>
+                <h2>${article2.title}</h2>
+                <div class="featured-image">
+                    <img src="${article2.image.src}" alt="${article2.image.alt}" loading="lazy">
+                    <div class="image-overlay">${article2.image.overlay}</div>
+                </div>
+                <div class="article-content">
+                    ${article2.content}
+                </div>
+                <div class="fact-box">
+                    <strong>${article2.fact}</strong>
+                </div>
+                <div class="article-tags">
+                    ${article2.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+            `;
+        }
+
+        // Tab switching with accessibility
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+                content.setAttribute('aria-hidden', 'true');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.setAttribute('aria-selected', 'false');
+            });
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById(tabName + '-content');
+            selectedContent.classList.add('active');
+            selectedContent.setAttribute('aria-hidden', 'false');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            event.target.setAttribute('aria-selected', 'true');
+        }
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            
+            // Update location with simulated coordinates
+            const lat = (Math.random() * 60 - 30).toFixed(2);
+            const lng = (Math.random() * 180 - 90).toFixed(2);
+            document.getElementById('location').textContent = `📍 Depth: ${currentDepth.toFixed(0)}m | ${lat}°N ${lng}°W | Research Vessel Poseidon`;
+        }
+
+        // Generate ocean statistics
+        function generateOceanStats() {
+            const stats = [
+                { label: "Water Temperature", value: `${(Math.random() * 25 + 5).toFixed(1)}°C`, icon: "fa-thermometer-half", trend: Math.random() > 0.5 ? 'up' : 'down', change: `${(Math.random() * 2).toFixed(1)}°` },
+                { label: "Salinity Level", value: `${(Math.random() * 5 + 33).toFixed(1)} ppt`, icon: "fa-flask", trend: 'stable', change: '0.1 ppt' },
+                { label: "Current Speed", value: `${(Math.random() * 3 + 0.5).toFixed(1)} knots`, icon: "fa-wind", trend: Math.random() > 0.3 ? 'up' : 'down', change: `${(Math.random()).toFixed(1)} kt` },
+                { label: "Wave Height", value: `${(Math.random() * 8 + 1).toFixed(1)} m`, icon: "fa-water", trend: Math.random() > 0.4 ? 'up' : 'stable', change: `${(Math.random() * 2).toFixed(1)} m` },
+                { label: "Pressure", value: `${(Math.random() * 50 + 1000).toFixed(0)} hPa`, icon: "fa-tachometer-alt", trend: Math.random() > 0.6 ? 'down' : 'stable', change: `${(Math.random() * 10).toFixed(0)} hPa` },
+                { label: "Visibility", value: `${(Math.random() * 30 + 10).toFixed(1)} m`, icon: "fa-eye", trend: Math.random() > 0.5 ? 'up' : 'down', change: `${(Math.random() * 5).toFixed(1)} m` }
+            ];
+            
+            const statsContainer = document.getElementById('oceanStats');
+            statsContainer.innerHTML = '';
+            
+            stats.forEach(stat => {
+                const statElement = document.createElement('div');
+                statElement.className = 'stat';
+                statElement.setAttribute('tabindex', '0');
+                statElement.innerHTML = `
+                    <div class="stat-value">
+                        <i class="fas ${stat.icon}" aria-hidden="true"></i>
+                        ${stat.value}
+                        <span class="trend-indicator trend-${stat.trend}">
+                            ${stat.trend === 'up' ? '↗' : stat.trend === 'down' ? '↘' : '→'} ${stat.change}
+                        </span>
+                    </div>
+                    <div class="stat-label">${stat.label}</div>
+                `;
+                statsContainer.appendChild(statElement);
+            });
+        }
+
+        // Populate marine life grid
+        function populateMarineLife() {
+            const grid = document.getElementById('marineGrid');
+            grid.innerHTML = '';
+            
+            // Shuffle the marine life array for variety
+            const shuffledMarineLife = [...filteredMarineLife].sort(() => Math.random() - 0.5);
+            
+            shuffledMarineLife.forEach(creature => {
+                const item = document.createElement('div');
+                item.className = 'marine-item';
+                item.setAttribute('tabindex', '0');
+                item.setAttribute('role', 'button');
+                item.setAttribute('aria-label', `Learn more about ${creature.name}`);
+                item.innerHTML = `
+                    <span class="marine-emoji" aria-hidden="true">${creature.emoji}</span>
+                    <div class="marine-name">${creature.name}</div>
+                    <div class="marine-fact">${creature.fact}</div>
+                `;
+                item.addEventListener('click', () => showSpeciesModal(creature));
+                item.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        showSpeciesModal(creature);
+                    }
+                });
+                grid.appendChild(item);
+            });
+        }
+
+        // Filter marine life based on search
+        function filterMarineLife() {
+            const searchTerm = document.getElementById('marine-search').value.toLowerCase();
+            filteredMarineLife = marineLife.filter(creature => 
+                creature.name.toLowerCase().includes(searchTerm) || 
+                creature.scientificName.toLowerCase().includes(searchTerm) || 
+                creature.habitat.toLowerCase().includes(searchTerm)
+            );
+            populateMarineLife();
+        }
+
+        // Show species modal
+        function showSpeciesModal(creature) {
+            const modal = document.getElementById('species-modal');
+            document.getElementById('modal-emoji').textContent = creature.emoji;
+            document.getElementById('modal-name').textContent = creature.name;
+            document.getElementById('modal-info').innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">Scientific Name:</span>
+                    <span class="info-value">${creature.scientificName}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Habitat:</span>
+                    <span class="info-value">${creature.habitat}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Conservation:</span>
+                    <span class="info-value">${creature.conservation}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Depth Range:</span>
+                    <span class="info-value">${creature.depth}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Details:</span>
+                    <span class="info-value">${creature.details}</span>
+                </div>
+            `;
+            modal.style.display = 'block';
+            modal.setAttribute('aria-hidden', 'false');
+            document.querySelector('.close').focus();
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('species-modal');
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        // Update weather
+        function updateWeather() {
+            const condition = weatherConditions[Math.floor(Math.random() * weatherConditions.length)];
+            const temp = (Math.random() * 15 + 10).toFixed(1);
+            
+            document.getElementById('weather-icon').innerHTML = `<i class="fas ${condition.icon}" style="color: ${condition.color}"></i>`;
+            document.getElementById('weather-temp').textContent = `${temp}°C`;
+            document.getElementById('weather-desc').textContent = condition.desc;
+            
+            const details = [
+                { icon: "fa-wind", label: "Wind", value: `${(Math.random() * 40 + 5).toFixed(0)} km/h` },
+                { icon: "fa-tint", label: "Humidity", value: `${(Math.random() * 40 + 50).toFixed(0)}%` },
+                { icon: "fa-eye", label: "Visibility", value: `${(Math.random() * 20 + 5).toFixed(1)} km` },
+                { icon: "fa-water", label: "Waves", value: `${(Math.random() * 4 + 0.5).toFixed(1)} m` },
+                { icon: "fa-thermometer-half", label: "Pressure", value: `${(Math.random() * 40 + 990).toFixed(0)} hPa` },
+                { icon: "fa-sun", label: "UV Index", value: `${(Math.random() * 10).toFixed(0)}` }
+            ];
+            
+            const detailsContainer = document.getElementById('weather-details');
+            detailsContainer.innerHTML = '';
+            
+            details.forEach(detail => {
+                const detailElement = document.createElement('div');
+                detailElement.className = 'weather-detail';
+                detailElement.setAttribute('tabindex', '0');
+                detailElement.innerHTML = `
+                    <i class="fas ${detail.icon}" aria-hidden="true"></i>
+                    <div>
+                        <div style="color: #39CCCC; font-size: 0.8em;">${detail.label}</div>
+                        <div style="color: white; font-weight: bold;">${detail.value}</div>
+                    </div>
+                `;
+                detailsContainer.appendChild(detailElement);
+            });
+        }
+
+        // Animate depth meter
+        function animateDepthMeter() {
+            currentDepth = Math.random() * 6000;
+            const indicator = document.getElementById('depthIndicator');
+            indicator.style.top = `${(currentDepth / 6000) * 100}%`;
+            
+            document.getElementById('current-depth').textContent = `${currentDepth.toFixed(0)}m`;
+            
+            let zone = 'Surface Zone';
+            if (currentDepth > 200) zone = 'Epipelagic Zone';
+            if (currentDepth > 1000) zone = 'Mesopelagic Zone';
+            if (currentDepth > 4000) zone = 'Bathypelagic Zone';
+            if (currentDepth > 6000) zone = 'Abyssopelagic Zone';
+            
+            document.getElementById('depth-zone').textContent = zone;
+        }
+
+        // Show breaking news
+        function showBreakingNews() {
+            if (Math.random() < 0.5) {
+                const news = breakingNewsItems[Math.floor(Math.random() * breakingNewsItems.length)];
+                document.getElementById('breaking-title').textContent = news.title.split(':')[0] + ':';
+                document.getElementById('breaking-content').textContent = news.content;
+                document.getElementById('breakingNews').style.display = 'block';
+                
+                setTimeout(() => {
+                    document.getElementById('breakingNews').style.display = 'none';
+                }, 10000);
+            }
+        }
+
+        // Populate research data
+        function populateResearchData() {
+            // Environmental data
+            const envData = [
+                { label: 'pH Level', value: (Math.random() * 0.5 + 7.8).toFixed(2) },
+                { label: 'Dissolved Oxygen', value: `${(Math.random() * 3 + 6).toFixed(1)} mg/L` },
+                { label: 'Turbidity', value: `${(Math.random() * 10).toFixed(1)} NTU` },
+                { label: 'Nitrate Levels', value: `${(Math.random() * 20 + 5).toFixed(1)} μg/L` },
+                { label: 'Phosphate Content', value: `${(Math.random() * 15 + 2).toFixed(1)} μg/L` },
+                { label: 'Heavy Metal Traces', value: `${(Math.random() * 5).toFixed(2)} ppb` }
+            ];
+            
+            const environmentalContainer = document.getElementById('environmental-data');
+            environmentalContainer.innerHTML = envData.map(item => `
+                <div class="data-item" tabindex="0">
+                    <span class="data-label">${item.label}</span>
+                    <span class="data-value">${item.value}</span>
+                </div>
+            `).join('');
+            
+            // Equipment status
+            const equipment = [
+                { name: 'Sonar Array Network', status: 'operational' },
+                { name: 'ROV Submersible Fleet', status: 'operational' },
+                { name: 'Sample Analyzer Unit', status: 'maintenance' },
+                { name: 'Hydrophone Grid', status: 'operational' },
+                { name: 'Satellite Uplink', status: 'operational' },
+                { name: 'Depth Profiler', status: 'maintenance' },
+                { name: 'CTD Sensors', status: 'operational' },
+                { name: 'Emergency Systems', status: 'operational' }
+            ];
+            
+            const equipmentContainer = document.getElementById('equipment-status');
+            equipmentContainer.innerHTML = equipment.map(item => `
+                <div class="data-item" tabindex="0">
+                    <span class="data-label">${item.name}</span>
+                    <span class="data-value">
+                        <span class="status-indicator status-${item.status}">
+                            ${item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                        </span>
+                    </span>
+                </div>
+            `).join('');
+            
+            // Marine ecosystem data
+            const ecosystemData = [
+                { label: 'Plankton Density', value: `${(Math.random() * 500 + 100).toFixed(0)} cells/mL` },
+                { label: 'Fish Population Index', value: `${(Math.random() * 40 + 60).toFixed(1)}%` },
+                { label: 'Coral Coverage', value: `${(Math.random() * 30 + 45).toFixed(1)}%` },
+                { label: 'Biodiversity Score', value: `${(Math.random() * 2 + 7).toFixed(1)}/10` },
+                { label: 'Marine Debris Count', value: `${(Math.random() * 50 + 10).toFixed(0)} items/km²` },
+                { label: 'Whale Song Frequency', value: `${(Math.random() * 5 + 15).toFixed(0)} Hz` }
+            ];
+            
+            const ecosystemContainer = document.getElementById('ecosystem-data');
+            ecosystemContainer.innerHTML = ecosystemData.map(item => `
+                <div class="data-item" tabindex="0">
+                    <span class="data-label">${item.label}</span>
+                    <span class="data-value">${item.value}</span>
+                </div>
+            `).join('');
+            
+            // Climate indicators
+            const climateData = [
+                { label: 'Sea Surface Temperature', value: `${(Math.random() * 5 + 22).toFixed(1)}°C` },
+                { label: 'Ocean Acidification', value: `${(Math.random() * 0.3 + 7.9).toFixed(2)} pH` },
+                { label: 'Sea Level Change', value: `${(Math.random() * 4 - 2).toFixed(1)} mm/year` },
+                { label: 'Ice Coverage', value: `${(Math.random() * 20 + 70).toFixed(1)}%` },
+                { label: 'Carbon Sequestration', value: `${(Math.random() * 100 + 200).toFixed(0)} Gt/year` },
+                { label: 'Thermal Expansion', value: `${(Math.random() * 2 + 1).toFixed(2)} mm/year` }
+            ];
+            
+            const climateContainer = document.getElementById('climate-data');
+            climateContainer.innerHTML = climateData.map(item => `
+                <div class="data-item" tabindex="0">
+                    <span class="data-label">${item.label}</span>
+                    <span class="data-value">${item.value}</span>
+                </div>
+            `).join('');
+        }
+
+        // Populate live feed
+        function populateLiveFeed() {
+            const liveFeed = document.getElementById('live-feed');
+            liveFeed.innerHTML = '';
+            
+            currentLiveFeed.forEach((feed, index) => {
+                const feedElement = document.createElement('div');
+                feedElement.className = `feed-item priority-${feed.priority} fade-in`;
+                feedElement.setAttribute('tabindex', '0');
+                feedElement.setAttribute('aria-label', `Feed item: ${feed.title}`);
+                feedElement.innerHTML = `
+                    <div class="feed-header">
+                        <span class="feed-title">${feed.title}</span>
+                        <div>
+                            <span class="feed-status status-${feed.status}">
+                                ${feed.status.charAt(0).toUpperCase() + feed.status.slice(1)}
+                            </span>
+                            <span class="feed-time">${feed.time}</span>
+                        </div>
+                    </div>
+                    <div class="feed-content">${feed.content}</div>
+                `;
+                
+                if (feed.details) {
+                    const detailsDiv = document.createElement('div');
+                    detailsDiv.className = 'feed-details';
+                    detailsDiv.textContent = feed.details;
+                    detailsDiv.style.display = 'none';
+                    feedElement.appendChild(detailsDiv);
+                }
+                
+                feedElement.addEventListener('click', () => toggleFeedDetails(feedElement));
+                feedElement.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleFeedDetails(feedElement);
+                    }
+                });
+                
+                liveFeed.appendChild(feedElement);
+            });
+        }
+
+        // Toggle feed details
+        function toggleFeedDetails(feedElement) {
+            const detailsDiv = feedElement.querySelector('.feed-details');
+            if (detailsDiv) {
+                if (feedElement.classList.contains('expanded')) {
+                    detailsDiv.style.display = 'none';
+                    feedElement.classList.remove('expanded');
+                    feedElement.setAttribute('aria-expanded', 'false');
+                } else {
+                    detailsDiv.style.display = 'block';
+                    feedElement.classList.add('expanded');
+                    feedElement.setAttribute('aria-expanded', 'true');
+                }
+            }
+        }
+
+        // Update live feed
+        function updateLiveFeed() {
+            if (Math.random() < 0.6) {
+                // Create new feed item
+                const newFeed = {
+                    title: 'Live System Update',
+                    status: ['active', 'recording', 'processing', 'analyzing', 'monitoring'][Math.floor(Math.random() * 5)],
+                    content: liveFeedUpdates[Math.floor(Math.random() * liveFeedUpdates.length)],
+                    priority: ['high', 'medium', 'low'][Math.floor(Math.random() * 3)],
+                    time: 'Just now',
+                    details: 'Additional monitoring data being processed. Analysis expected within the hour.'
+                };
+                
+                // Add to beginning of array (but keep max 10 items)
+                currentLiveFeed.unshift(newFeed);
+                if (currentLiveFeed.length > 10) {
+                    currentLiveFeed.pop();
+                }
+                
+                // Repopulate the feed
+                populateLiveFeed();
+            }
+        }
+
+        // Populate live deals
+        function populateLiveDeals() {
+            const dealsContainer = document.getElementById('liveDeals');
+            dealsContainer.innerHTML = '';
+            
+            researchDeals.forEach(deal => {
+                const dealElement = document.createElement('div');
+                dealElement.className = 'deal-item';
+                dealElement.setAttribute('tabindex', '0');
+                dealElement.innerHTML = `
+                    <div class="deal-header">
+                        <div class="deal-title">${deal.title}</div>
+                        <div class="deal-expiry">${deal.expiry}</div>
+                    </div>
+                    <div class="deal-content">${deal.content}</div>
+                    <div class="deal-tags">
+                        ${deal.tags.map(tag => `<span class="deal-tag">#${tag}</span>`).join('')}
+                    </div>
+                `;
+                dealsContainer.appendChild(dealElement);
+            });
+        }
+
+        // Update live deals
+        function updateLiveDeals() {
+            if (Math.random() < 0.4) {
+                // Randomly modify one deal
+                const randomIndex = Math.floor(Math.random() * researchDeals.length);
+                const modifications = [
+                    { field: "expiry", values: ["Last chance", "Almost gone", "Hurry!", "Limited time"] },
+                    { field: "content", values: ["Extended funding available!", "New equipment added to package.", "Additional spots opened up!"] }
+                ];
+                
+                const modification = modifications[Math.floor(Math.random() * modifications.length)];
+                researchDeals[randomIndex][modification.field] = modification.values[Math.floor(Math.random() * modification.values.length)];
+                
+                populateLiveDeals();
+            }
+        }
+
+        // Render whale tracker information
+        function renderWhaleTracker() {
+            const infoContainer = document.getElementById('whale-tracker-info');
+            const mapContainer = document.getElementById('whale-tracker-map');
+            
+            // Clear previous content
+            infoContainer.innerHTML = '';
+            mapContainer.innerHTML = '';
+            
+            // Create whale info items
+            whaleTracks.forEach(whale => {
+                const whaleItem = document.createElement('div');
+                whaleItem.className = 'whale-item';
+                whaleItem.innerHTML = `
+                    <div class="whale-name">${whale.name}</div>
+                    <div class="whale-data">
+                        <div class="whale-stat">Depth: <span>${whale.depth}m</span></div>
+                        <div class="whale-stat">Speed: <span>${whale.speed.toFixed(1)} km/h</span></div>
+                        <div class="whale-stat">Heading: <span>${whale.heading}°</span></div>
+                    </div>
+                `;
+                infoContainer.appendChild(whaleItem);
+            });
+            
+            // Create whale map
+            setTimeout(() => {
+                const mapWidth = mapContainer.clientWidth || 300;
+                const mapHeight = mapContainer.clientHeight || 200;
+                
+                whaleTracks.forEach(whale => {
+                    // Convert lat/lng to map coordinates (simplified for demo)
+                    const x = ((whale.lng + 180) / 360) * mapWidth;
+                    const y = ((90 - whale.lat) / 180) * mapHeight;
+                    
+                    const whaleDot = document.createElement('div');
+                    whaleDot.className = 'whale-dot';
+                    whaleDot.style.left = `${Math.max(10, Math.min(mapWidth - 10, x))}px`;
+                    whaleDot.style.top = `${Math.max(10, Math.min(mapHeight - 10, y))}px`;
+                    whaleDot.title = `${whale.name}\nDepth: ${whale.depth}m\nSpeed: ${whale.speed.toFixed(1)} km/h`;
+                    whaleDot.setAttribute('aria-label', whaleDot.title);
+                    mapContainer.appendChild(whaleDot);
+                });
+            }, 100);
+        }
+
+        // Update whale tracker data
+        function updateWhaleTracker() {
+            // Simulate whale movement
+            whaleTracks.forEach(whale => {
+                // Random movement
+                const latChange = (Math.random() - 0.5) * 0.02;
+                const lngChange = (Math.random() - 0.5) * 0.02;
+                
+                whale.lat = Math.max(Math.min(whale.lat + latChange, 90), -90);
+                whale.lng = Math.max(Math.min(whale.lng + lngChange, 180), -180);
+                
+                // Random depth change
+                const depthChange = (Math.random() - 0.5) * 50;
+                whale.depth = Math.max(whale.depth + depthChange, 0);
+                
+                // Random speed change
+                const speedChange = (Math.random() - 0.5) * 0.5;
+                whale.speed = Math.max(whale.speed + speedChange, 0);
+                
+                // Random heading change
+                const headingChange = (Math.random() - 0.5) * 10;
+                whale.heading = (whale.heading + headingChange + 360) % 360;
+            });
+            
+            // Update the display
+            renderWhaleTracker();
+        }
+
+        // Handle escape key for modal
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('species-modal');
+                if (modal.style.display === 'block') {
+                    closeModal();
+                }
+                
+                // Also close navigation if open
+                const hamburgerNav = document.getElementById('hamburgerNav');
+                const hamburgerBtn = document.getElementById('hamburgerBtn');
+                
+                if (hamburgerNav && hamburgerNav.classList.contains('active')) {
+                    hamburgerBtn.classList.remove('active');
+                    hamburgerNav.classList.remove('active');
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                    hamburgerNav.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('species-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Handle window resize for whale map
+        window.addEventListener('resize', function() {
+            renderWhaleTracker();
+        });
+
+        // Initialize when page loads
+        window.addEventListener('load', initializePage);
+
+        // Handle visibility changes (tab switching)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Pause animations when tab is not visible
+                document.body.style.animationPlayState = 'paused';
+            } else {
+                // Resume animations when tab becomes visible
+                document.body.style.animationPlayState = 'running';
+            }
+        });
+    </script>
+</body>
+</html>
